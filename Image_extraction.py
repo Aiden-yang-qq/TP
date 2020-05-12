@@ -39,7 +39,7 @@ def extraction(pic_):
 if __name__ == '__main__':
     pic_4 = mp_img.imread('pic4.jpg')
     plt.imshow(pic_4)
-    # plt.axis('off')
+    plt.grid()
     plt.show()
 
     xList, yList = extraction(pic_4)
@@ -52,12 +52,13 @@ if __name__ == '__main__':
 
     net = Net(1, 500, 1)
     optimizer = torch.optim.SGD(net.parameters(), lr=0.05, momentum=0.7)
+    # optimizer = torch.optim.RMSprop(net.parameters(), lr=0.05, alpha=0.9)
     loss_func = torch.nn.MSELoss()
 
     plt.figure()
     plt.ion()
 
-    for t in range(10001):
+    for t in range(1001):
         prediction = net(x)
         loss = loss_func(prediction, y)
         optimizer.zero_grad()
@@ -65,12 +66,12 @@ if __name__ == '__main__':
         optimizer.step()
 
         if t % 100 == 0:
-            print(t, float('%.6f' % loss.data.numpy()))
+            # print(t, float('%.6f' % loss.data.numpy()))
             plt.cla()
             plt.grid()
             plt.scatter(x.data.numpy(), y.data.numpy())
             plt.plot(x.data.numpy(), prediction.data.numpy(), 'k-.', lw=3)
-            plt.text(0, -0.4, 'Loss=%.6f' % loss.data.numpy(), fontdict={'size': 20, 'color': 'black'})
+            # plt.text(0, -0.4, 'Loss=%.6f' % loss.data.numpy(), fontdict={'size': 20, 'color': 'black'})
             plt.pause(0.1)
     plt.ioff()
     plt.show()
