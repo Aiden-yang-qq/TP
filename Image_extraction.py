@@ -25,9 +25,9 @@ def extraction(pic_):
     pic = np.swapaxes(pic_, 1, 0)
     shape_i = pic.shape[0]
     shape_j = pic.shape[1]
-    for i in range(shape_i):
+    for i in range(0, shape_i, 5):
         for j in range(shape_j):
-            if pic[i][j][0] != 255 or pic[i][j][1] != 255 or pic[i][j][2] != 255:
+            if pic[i][j][0] <= 10 and pic[i][j][1] <= 10 and pic[i][j][2] >= 245:
                 count += 1
                 x_list.append(i)
                 y_list.append(-1 * j)
@@ -43,22 +43,24 @@ if __name__ == '__main__':
     plt.show()
 
     xList, yList = extraction(pic_4)
-    # plt.figure()
-    # plt.plot(xList, yList, '.')
-    # plt.grid()
+    plt.figure()
+    plt.plot(xList, yList, '.')
+    plt.grid()
+
     xTensor = torch.Tensor(xList)
     x = torch.unsqueeze(torch.Tensor(xList), 1)
     y = torch.unsqueeze(torch.Tensor(yList), 1)
 
     net = Net(1, 500, 1)
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.05, momentum=0.7)
-    # optimizer = torch.optim.RMSprop(net.parameters(), lr=0.05, alpha=0.9)
+    # optimizer = torch.optim.SGD(net.parameters(), lr=0.05, momentum=0.7)
+    # optimizer = torch.optim.RMSprop(net.parameters(), lr=0.1, alpha=0.9)
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.1, betas=(0.9, 0.99))
     loss_func = torch.nn.MSELoss()
 
     plt.figure()
     plt.ion()
 
-    for t in range(1001):
+    for t in range(10001):
         prediction = net(x)
         loss = loss_func(prediction, y)
         optimizer.zero_grad()
@@ -66,12 +68,12 @@ if __name__ == '__main__':
         optimizer.step()
 
         if t % 100 == 0:
-            # print(t, float('%.6f' % loss.data.numpy()))
+            print(t, float('%.6f' % loss.data.numpy()))
             plt.cla()
             plt.grid()
             plt.scatter(x.data.numpy(), y.data.numpy())
             plt.plot(x.data.numpy(), prediction.data.numpy(), 'k-.', lw=3)
-            # plt.text(0, -0.4, 'Loss=%.6f' % loss.data.numpy(), fontdict={'size': 20, 'color': 'black'})
+            plt.text(0, -0.4, 'Loss=%.6f' % loss.data.numpy(), fontdict={'size': 20, 'color': 'black'})
             plt.pause(0.1)
     plt.ioff()
     plt.show()
