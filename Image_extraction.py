@@ -13,7 +13,8 @@ def extraction(pic_):
             if pic[i][j][0] <= 10 and pic[i][j][1] <= 10 and pic[i][j][2] >= 245:
                 count += 1
                 x_list.append(i)
-                y_list.append(-1 * j)
+                # y_list.append(-1 * j)
+                y_list.append(j)
                 # print(i, j)
                 break
     return x_list, y_list
