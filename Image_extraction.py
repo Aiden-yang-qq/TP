@@ -1,11 +1,9 @@
 # 曲线提取 curve extraction
 import numpy as np
-import cv2
 
 
 def extraction(pic_):
     count = 0
-    # pic_b = 255
     x_list = []
     y_list = []
     pic = np.swapaxes(pic_, 1, 0)
@@ -17,8 +15,5 @@ def extraction(pic_):
                 count += 1
                 x_list.append(i)
                 y_list.append(j)
-                # print(i, j)
-                # pic_b = 255
                 break
-            # pic_b = pic[i][j][0]
     return x_list, y_list

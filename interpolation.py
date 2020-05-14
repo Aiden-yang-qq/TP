@@ -13,6 +13,7 @@ def interpolation(x_old, y_old):
         f = spi.interp1d(x_old, y_old, kind=kind)
         y_new = f(x_new)
         plt.plot(x_new, y_new, label=str(kind))
+        plt.legend(loc='lower right')
     return x_new, y_new
 
 
