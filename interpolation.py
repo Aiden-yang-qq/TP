@@ -17,13 +17,17 @@ def interpolation(x_old, y_old):
 
 
 if __name__ == '__main__':
-    pic_4 = mp_img.imread('pic4.jpg')
-    xList, yList = Ie.extraction(pic_4)
+    # pic = mp_img.imread('pic4.jpg')
+    pic = mp_img.imread('Figure_1.jpg')
+    plt.imshow(pic)
+    plt.show()
+
+    xList, yList = Ie.extraction(pic)
     x_arr = np.array(xList)
     y_arr = np.array(yList)
 
     plt.plot(x_arr, y_arr, 'ro')
-    x, y = interpolation(x_arr, y_arr)
-
-    plt.legend(loc='lower right')
-    plt.show()
+    # x, y = interpolation(x_arr, y_arr)
+    #
+    # plt.legend(loc='lower right')
+    # plt.show()

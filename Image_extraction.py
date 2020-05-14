@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 
 def extraction(pic_):
@@ -10,7 +11,8 @@ def extraction(pic_):
     shape_j = pic.shape[1]
     for i in range(0, shape_i, 5):
         for j in range(shape_j):
-            if pic[i][j][0] <= 10 and pic[i][j][1] <= 10 and pic[i][j][2] >= 245:
+            # if pic[i][j][0] <= 10 and pic[i][j][1] <= 10 and pic[i][j][2] >= 245:  # 选择想要的颜色区间
+            if 50 < pic[i][j][0] < 60 and 110 < pic[i][j][1] < 120 and 150 < pic[i][j][2] < 160:  # 选择想要的颜色区间
                 count += 1
                 x_list.append(i)
                 # y_list.append(-1 * j)
