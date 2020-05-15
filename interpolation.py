@@ -10,7 +10,8 @@ import Image_extraction as Ie
 
 def interpolate(x_old, y_old):
     try:
-        x_new = np.linspace(0, x_old[-1] - 1, x_old[-1])
+        # x_new = np.linspace(0, x_old[-1] - 1, x_old[-1])
+        x_new = np.arange(0, x_old[-1] + 1)
         for kind in ['slinear', 'quadratic', 'cubic']:
             f = spi.interp1d(x_old, y_old, kind=kind)
             y_new = f(x_new)
