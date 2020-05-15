@@ -7,8 +7,12 @@ import cv2
 from PIL import Image
 
 if __name__ == '__main__':
-    pic_4 = mp_img.imread('pic4.jpg')
-    xList, yList = Ie.extraction(pic_4)
+    # pic_ = mp_img.imread('pic4.jpg')
+    pic_ = mp_img.imread('Figure_1.jpg')
+    # plt.imshow(pic_)
+    # plt.show()
+
+    xList, yList = Ie.extraction(pic_)
     yListNew = add_noise(yList)
 
     xnew, ynew = interpolation(xList, yListNew)
@@ -22,6 +26,6 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(xList, yList, 'r')
     plt.plot(xList, yListNew, 'g.')
-    plt.imshow(pic_4)
+    plt.imshow(pic_)
     plt.grid()
     plt.show()

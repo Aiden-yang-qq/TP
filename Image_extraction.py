@@ -1,4 +1,6 @@
 # 曲线提取 curve extraction
+import matplotlib.image as mp_img
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -6,14 +8,25 @@ def extraction(pic_):
     count = 0
     x_list = []
     y_list = []
-    pic = np.swapaxes(pic_, 1, 0)
-    shape_i = pic.shape[0]
-    shape_j = pic.shape[1]
+    pic_new = np.swapaxes(pic_, 1, 0)
+    shape_i = pic_new.shape[0]
+    shape_j = pic_new.shape[1]
     for i in range(0, shape_i):
-        for j in range(1, shape_j):
-            if int(pic[i][j - 1][0]) - int(pic[i][j][0]) > 200:
+        for j in range(5, shape_j):
+            if int(pic_new[i][j - 5][0]) - int(pic_new[i][j][0]) > 200:
                 count += 1
                 x_list.append(i)
                 y_list.append(j)
                 break
     return x_list, y_list
+
+
+if __name__ == '__main__':
+    # pic = mp_img.imread('pic4.jpg')
+    pic = mp_img.imread('Figure_1.jpg')
+    # plt.imshow(pic)
+    # plt.show()
+
+    xList, yList = extraction(pic)
+    x_arr = np.array(xList)
+    y_arr = np.array(yList)

@@ -8,13 +8,17 @@ import Image_extraction as Ie
 
 
 def interpolation(x_old, y_old):
-    x_new = np.linspace(0, x_old[-1], x_old[-1] + 1)
-    for kind in ['slinear', 'quadratic', 'cubic']:
-        f = spi.interp1d(x_old, y_old, kind=kind)
-        y_new = f(x_new)
-        plt.plot(x_new, y_new, label=str(kind))
+    try:
+        x_new = np.linspace(0, x_old[-1], x_old[-1] + 1)
+        for kind in ['slinear', 'quadratic', 'cubic']:
+            f = spi.interp1d(x_old, y_old, kind=kind)
+            y_new = f(x_new)
+            plt.plot(x_new, y_new, label=str(kind))
         plt.legend(loc='lower right')
-    return x_new, y_new
+        plt.show()
+        return x_new, y_new
+    except IOError as err:
+        print('Error!:', err)
 
 
 if __name__ == '__main__':
@@ -28,7 +32,7 @@ if __name__ == '__main__':
     y_arr = np.array(yList)
 
     plt.plot(x_arr, y_arr, 'ro')
-    # x, y = interpolation(x_arr, y_arr)
-    #
+    x, y = interpolation(x_arr, y_arr)
+
     # plt.legend(loc='lower right')
     # plt.show()
