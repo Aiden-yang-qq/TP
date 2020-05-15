@@ -1,14 +1,12 @@
-# add_noise
+# add noise
 import random
 
 
-def add_noise(y_list):
+def noise(y_list, n):
     for i in range(1, len(y_list)):
-        rad = random.randint(20, 50)
-        if random.random() <= 0.5:
-            rad *= -1
-        if i % 129 == 0:
+        if i % int(len(y_list) / n) == 0:
+            rad = random.randint(20, 50)
+            if random.random() <= 0.5:
+                rad *= -1
             y_list[i] += rad
-
     return y_list
-

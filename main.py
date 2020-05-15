@@ -1,8 +1,8 @@
 import matplotlib.image as mp_img
 import matplotlib.pyplot as plt
 import Image_extraction as Ie
-from add_noise import add_noise
-from interpolation import interpolation
+from add_noise import noise
+from interpolation import interpolate
 import cv2
 from PIL import Image
 
@@ -13,9 +13,9 @@ if __name__ == '__main__':
     # plt.show()
 
     xList, yList = Ie.extraction(pic_)
-    yListNew = add_noise(yList)
+    yListNew = noise(yList, 5)
 
-    xnew, ynew = interpolation(xList, yListNew)
+    xnew, ynew = interpolate(xList, yListNew)
 
     # I = Image.open('Figure_1.jpg')
     # # I = Image.open('pic4.jpg')

@@ -12,7 +12,7 @@ def extraction(pic_):
     shape_i = pic_new.shape[0]
     shape_j = pic_new.shape[1]
     for i in range(0, shape_i):
-        for j in range(5, shape_j):
+        for j in range(5, shape_j, 5):
             if int(pic_new[i][j - 5][0]) - int(pic_new[i][j][0]) > 200:
                 count += 1
                 x_list.append(i)
