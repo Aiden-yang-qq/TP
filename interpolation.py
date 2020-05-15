@@ -1,11 +1,9 @@
 # interpolate
 
-import matplotlib.image as mp_img
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.interpolate as spi
 from add_noise import noise
-import Image_extraction as Ie
 
 
 def interpolate(x_old, y_old):
@@ -24,24 +22,30 @@ def interpolate(x_old, y_old):
 
 
 if __name__ == '__main__':
-    # pic = mp_img.imread('pic4.jpg')
-    pic = mp_img.imread('Figure_1.jpg')
-    # plt.imshow(pic)
+    import matplotlib.image as mp_img
+    import Image_extraction as Ie
+
+    # x = [28, 48, 55, 70, 88, 95, 100]
+    # x = np.arange(0, 100, 5)
+    # y = np.sin(x) + 0.5 * x
+    pic_ = mp_img.imread('Figure_1.jpg')
+    # plt.imshow(pic_)
     # plt.show()
 
-    xList, yList = Ie.extraction(pic)
-    yListNew = noise(yList, 10)
+    x, y = Ie.extraction(pic_)
+    xarr = np.array(x)
+    yarr = np.array(y)
 
-    # x_arr = np.array(xList)
-    # y_arr = np.array(yList)
+    y_n = noise(yarr, 5)
 
-    # plt.plot(x_arr, y_arr, 'ro')
-    # x, y = interpolate(xList, yList)
-    # x, y = interpolate(x_arr, y_arr)
-
-    # plt.legend(loc='lower right')
-    # plt.show()
     plt.figure()
-    plt.plot(xList, yList, 'ro')
-    plt.plot(xList, yListNew, 'g-.')
+    plt.plot(x, y, 'ro')
     plt.grid()
+    # xnew, ynew = interpolate(x, y)
+    #
+    # # plt.plot(xnew, ynew, 'g-.')
+    #
+    # plt.figure()
+    # plt.plot(x, y, 'ro')
+    # plt.grid()
+    # xnew_1, ynew_1 = interpolate(x, y_n)
