@@ -29,17 +29,22 @@ if __name__ == '__main__':
     # x = np.arange(0, 100, 5)
     # y = np.sin(x) + 0.5 * x
     pic_ = mp_img.imread('Figure_1.jpg')
-    # plt.imshow(pic_)
-    # plt.show()
+    plt.imshow(pic_)
+    plt.show()
 
     x, y = Ie.extraction(pic_)
+    x_1, y_1 = Ie.extraction(pic_)
     xarr = np.array(x)
     yarr = np.array(y)
 
+    xarr_1 = np.array(x_1)
+    yarr_1 = np.array(y_1)
+
     y_n = noise(yarr, 5)
 
-    plt.figure()
+    # plt.figure()
     plt.plot(x, y, 'ro')
+    plt.plot(x, y_n)
     plt.grid()
     # xnew, ynew = interpolate(x, y)
     #

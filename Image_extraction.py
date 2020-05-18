@@ -13,11 +13,13 @@ def extraction(pic_):
     shape_j = pic_new.shape[1]
     for i in range(0, shape_i):
         for j in range(5, shape_j, 5):
-            if int(pic_new[i][j - 5][0]) - int(pic_new[i][j][0]) > 200:
-                count += 1
-                x_list.append(i)
-                y_list.append(j)
-                break
+            if int(pic_new[i][j - 5][0]) - int(pic_new[i][j][0]) > 195:
+                if int(pic_new[i][j - 5][1]) - int(pic_new[i][j][1]) > 135:
+                    if int(pic_new[i][j - 5][2]) - int(pic_new[i][j][2]) > 100:
+                        count += 1
+                        x_list.append(i)
+                        y_list.append(j)
+                        break
     return x_list, y_list
 
 
