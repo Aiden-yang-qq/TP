@@ -30,7 +30,7 @@ if __name__ == '__main__':
     plt.grid()
     plt.show()
 
-    x, y = Ie.extraction(pic_, 20)
+    x, y = Ie.extraction(pic_, 60)
     xarr = np.array(x)
     yarr = np.array(y)
 

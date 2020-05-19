@@ -4,10 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def extraction(pic_, n_dot = 20):
+def extraction(pic_, n_dot=20):
     """
     将图片矩阵中的曲线提取出来
-    :param pic_: 图片矩阵
+    :param pic_:图片矩阵
+    :param n_dot: 想要提取的点数数量（默认从曲线上提取20个点）
+                  一般提取出的点数量会小于n_dot，因为在程序中会筛选掉一部分不合要求的点
     :return: 曲线的横纵坐标
     """
     count = 0
@@ -21,7 +23,6 @@ def extraction(pic_, n_dot = 20):
     print(shape_i, n_dot, gap)
     for i in range(0, shape_i, gap):  # 扫x轴
         for j in range(shape_j):  # 扫y轴
-            # if int(pic_new[i][j][0]) == int(pic_new[i][j][1]) == int(pic_new[i][j][2]) == 0:  # RGB=[0,0,0]
             if int(pic_new[i][j][0]) == 0:
                 count += 1
                 x_list.append(i)
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     pic_n = gray_scale(pic)
     plt.imshow(pic_n)
 
-    xList, yList = extraction(pic, 50)
+    xList, yList = extraction(pic, 10)
     x_arr = np.array(xList)
     y_arr = np.array(yList)
 
