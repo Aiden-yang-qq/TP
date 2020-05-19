@@ -9,23 +9,16 @@ from PIL import Image
 if __name__ == '__main__':
     # pic_ = mp_img.imread('pic4.jpg')
     pic_ = mp_img.imread('Figure_1.jpg')
-    # plt.imshow(pic_)
-    # plt.show()
 
     xList, yList = Ie.extraction(pic_)
-    yListNew = noise(yList, 5)
+    y_noise = noise(yList, 5)
 
-    xnew, ynew = interpolate(xList, yListNew)
-
-    # I = Image.open('Figure_1.jpg')
-    # # I = Image.open('pic4.jpg')
-    # I.show()
-    # L = I.convert('L')
-    # L.show()
+    xnew, ynew = interpolate(xList, y_noise)
 
     plt.figure()
-    plt.plot(xList, yList, 'r')
-    plt.plot(xList, yListNew, 'g.')
     plt.imshow(pic_)
+    plt.plot(xList, yList, 'r')
+    plt.plot(xList, y_noise, 'g.')
+
     plt.grid()
     plt.show()
