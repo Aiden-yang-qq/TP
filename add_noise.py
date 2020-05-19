@@ -1,27 +1,28 @@
 # add noise
 # 目前加噪的点只能小于10个
-import random
 import sys
+import random
+import numpy as np
 
 
-def noise(y_data, n):
-    y_data_len = len(y_data)
-    count = int(y_data_len / (n + 1))
+def noise(y_, n):
+    y__ = np.array(y_)
+    y_len = len(y__)
+    count = int(y_len / (n + 1))
     try:
-        for i in range(count, y_data_len-2, count):
-            if i < y_data_len:
+        for i in range(count, y_len - 2, count):
+            if i < y_len:
                 rad = random.randint(20, 50)
                 if random.random() <= 0.5:
                     rad *= -1
-                y_data[i] = y_data[i] + rad
-        return y_data
+                y__[i] = y__[i] + rad
+        return y__
     except:
         print('Unexpected error:', sys.exc_info()[0])
         raise
 
 
 if __name__ == '__main__':
-    import numpy as np
     import matplotlib.pyplot as plt
     import matplotlib.image as mp_img
     from Image_extraction import gray_scale, extraction
