@@ -33,7 +33,7 @@ if __name__ == '__main__':
     # pic_n = gray_scale(pic)
     plt.imshow(pic)
 
-    xList, yList = extraction(pic)
+    xList, yList = extraction(pic, 20)
     x_arr = np.array(xList)
     y_arr = np.array(yList)
 

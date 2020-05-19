@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def extraction(pic_):
+def extraction(pic_, n_dot = 20):
     """
     将图片矩阵中的曲线提取出来
     :param pic_: 图片矩阵
@@ -17,8 +17,10 @@ def extraction(pic_):
     pic_new = np.swapaxes(pic__, 1, 0)
     shape_i = pic_new.shape[0]
     shape_j = pic_new.shape[1]
-    for i in range(shape_i):
-        for j in range(shape_j):
+    gap = shape_i // n_dot
+    print(shape_i, n_dot, gap)
+    for i in range(0, shape_i, gap):  # 扫x轴
+        for j in range(shape_j):  # 扫y轴
             # if int(pic_new[i][j][0]) == int(pic_new[i][j][1]) == int(pic_new[i][j][2]) == 0:  # RGB=[0,0,0]
             if int(pic_new[i][j][0]) == 0:
                 count += 1
@@ -51,12 +53,12 @@ if __name__ == '__main__':
     # pic = mp_img.imread('pic4.jpg')
     pic = mp_img.imread('Figure_1.jpg')
     pic_n = gray_scale(pic)
-    # plt.imshow(pic_n)
+    plt.imshow(pic_n)
 
-    xList, yList = extraction(pic)
+    xList, yList = extraction(pic, 50)
     x_arr = np.array(xList)
     y_arr = np.array(yList)
 
-    plt.imshow(pic)
+    # plt.imshow(pic)
     plt.plot(x_arr, y_arr, 'ro')
     plt.show()

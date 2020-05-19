@@ -6,7 +6,7 @@ import Neural_Networks as Neural
 
 if __name__ == '__main__':
     pic_4 = mp_img.imread('pic4.jpg')
-    xlist, yList = Ie.extraction(pic_4)
+    xlist, yList = Ie.extraction(pic_4, 20)
 
     # plt.imshow(pic_4)
     # plt.grid()
