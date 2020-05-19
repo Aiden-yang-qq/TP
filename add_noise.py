@@ -5,21 +5,16 @@ import sys
 
 
 def noise(y_data, n):
-    # y_data_n = [y_data[0]]
-    y_data_n = []
     y_data_len = len(y_data)
     count = int(y_data_len / (n + 1))
     try:
-        for i in range(y_data_len):
-            if i % count == 0:
+        for i in range(count, y_data_len-2, count):
+            if i < y_data_len:
                 rad = random.randint(20, 50)
                 if random.random() <= 0.5:
                     rad *= -1
-                y_data_n.append(y_data[i] + rad)
-            else:
-                y_data_n.append(y_data[i])
-        # y_data_n.append(y_data[-1])
-        return y_data_n
+                y_data[i] = y_data[i] + rad
+        return y_data
     except:
         print('Unexpected error:', sys.exc_info()[0])
         raise
@@ -41,7 +36,9 @@ if __name__ == '__main__':
     x_arr = np.array(xList)
     y_arr = np.array(yList)
 
-    y_n = noise(y_arr, 5)
+    y_new_arr = np.array(y_arr)
+    y_new_arr.flags.writeable = True
+    y_n = noise(y_new_arr, 5)
 
     # plt.figure()
     plt.plot(x_arr, y_arr, 'ro')
