@@ -43,7 +43,9 @@ def gray_scale(pic_):
     shape_j = pic__.shape[1]
     for i in range(shape_i):
         for j in range(shape_j):
-            if pic__[i][j][0] <= 60 and pic__[i][j][1] <= 120 and pic__[i][j][2] <= 160:
+            # if pic__[i][j][0] <= 60 and pic__[i][j][1] <= 120 and pic__[i][j][2] <= 160:
+            # if pic__[i][j][0] <= 60 and pic__[i][j][1] <= 120 and pic__[i][j][2] <= 160 or pic__[i][j][0] + pic__[i][j][1] + pic__[i][j][2] <= 340:
+            if int(pic__[i][j][0]) + int(pic__[i][j][1]) + int(pic__[i][j][2]) <= 340:
                 pic__[i][j] = np.array([0, 0, 0], dtype='uint8')
             else:
                 pic__[i][j] = np.array([255, 255, 255], dtype='uint8')
