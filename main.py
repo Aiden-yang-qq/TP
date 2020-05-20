@@ -15,13 +15,9 @@ if __name__ == '__main__':
     y_noise_all = noise_all(yList)
     y_nn = np.array(yList) + y_noise_all
 
-    # plt.figure()
     plt.imshow(pic_)
-    # xnew, ynew = interpolate(xList, y_noise)
     xnew, ynew = interpolate(xList, y_nn)
 
-    # plt.plot(xList, yList, 'r')
-    # plt.plot(xList, y_noise, 'g.')
     plt.plot(xList, y_nn, '.')
 
     plt.grid()

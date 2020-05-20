@@ -20,7 +20,7 @@ def extraction(pic_, n_dot=20):
     shape_i = pic_new.shape[0]
     shape_j = pic_new.shape[1]
     gap = shape_i // n_dot
-    print(shape_i, n_dot, gap)
+    # print(shape_i, n_dot, gap)
     for i in range(shape_i):  # 扫x轴
     # for i in range(0, shape_i, gap):  # 扫x轴
         for j in range(shape_j):  # 扫y轴
