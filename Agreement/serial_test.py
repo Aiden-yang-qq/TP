@@ -25,20 +25,40 @@ import serial.tools.list_ports
 #         print(port_list[i])
 
 # == 十六进制处理 ==
+# try:
+#     portx = 'COM1'
+#     bps = 115200
+#     timex = None
+#     ser = serial.Serial(portx, bps, timeout=timex)
+#     print('串口详情参数：', ser)
+#     result = ser.write(chr(0x06).encode('utf-8'))  # 十六进制的发送
+#     print('写总字节数：', result)
+#     print(ser.read().hex())  # 读一个字节
+#     print('-------------------')
+#     ser.close()
+# except Exception as e:
+#     print('---异常---：', e)
+
+# == 其他细节补充 ==
 try:
     portx = 'COM1'
     bps = 115200
-    timex = None
+    timex = 5
     ser = serial.Serial(portx, bps, timeout=timex)
     print('串口详情参数：', ser)
-
-    result = ser.write(chr(0x06).encode('utf-8'))  # 十六进制的发送
+    print(ser.port)  # 获取到当前打开的串口名
+    print(ser.baudrate)  # 获取波特率
+    result = ser.write('我是艾登'.encode('gbk'))
     print('写总字节数：', result)
-
-    print(ser.read().hex())  # 读一个字节
-
+    # 循环接收数据，此为死循环，可用线程实现
+    while True:
+        if ser.in_waiting:
+            str = ser.read(ser.in_waiting).decode('gbk')
+            if str == 'exit':
+                break
+            else:
+                print('收到数据', str)
     print('-------------------')
     ser.close()
-
 except Exception as e:
-    print('---异常---：', e)
+    print('---异常---:', e)
