@@ -5,40 +5,53 @@ import time
 
 
 class SerialRS485:
-    def __init__(self, port, bps=115200, timeout=5):
+    def __init__(self, port, bps=115200, timeout=2):
         # 配置参数
         self.port = port  # 端口号
         self.bps = bps  # 波特率
         self.timeout = timeout  # 超时时间
         self.ser = serial.Serial(port, bps, timeout=timeout)  # 开启串口
+        self.set_buffer = serial.Serial.set_buffer_size(self.ser, rx_size=10240)
+        # self.reset_buffer = serial.Serial.reset_input_buffer(self.ser)
 
     def port_open(self):
-        if not self.ser.isOpen():
-            self.ser.open()
+        if not self.ser.is_open:
+            # self.ser.open()
+            # self.set_buffer()
+            self.__init__(self.port, self.bps, self.timeout)
+            # self.ser.reset_input_buffer()
 
     def port_close(self):
         self.ser.close()
 
     def port_read(self):
-        received_all = ''
-        if self.ser.isOpen():
-            print('read串口已经打开')
+        count_all = 0
+        received_all = b''
+        if self.ser.is_open:
+            print('串口已经打开，等待接收数据')
             while True:
                 # print('循环等待数据接收')
-                count = self.ser.inWaiting()
+                count = self.ser.in_waiting
                 # print('count的类型', type(count))  # count的类型 <class 'int'>
                 if count > 0:
-                    print('接收到%d字节的数据' % count)
                     received_data = self.ser.read(count)
-                    # print(type(received_data))
-                    print('received_data:', received_data, type(received_data))
                     if received_data == b'exit':
-                        print('--------------- 数据接收完毕 --------------- ')
+                        print('--------------- 共接收到%d字节的数据，数据已接收完毕，串口关闭 --------------- ' % count_all)
                         self.port_close()
                         break
                     else:
-                        received_all += str(received_data)
+                        print('接收到%d字节的数据' % count)
+                        # print('received_data:', received_data, type(received_data))
+                        received_all += received_data
+                        count_all += count
         return received_all
+
+    def reopen_read(self):
+
+        self.port_open()
+        print('该串口再次开启')
+        # self.ser.reset_input_buffer()
+        self.port_read()
 
 
 def check_ports():
@@ -80,6 +93,8 @@ if __name__ == '__main__':
     sp = select_port(ap)  # 选择串口进行数据接收
     if len(sp) >= 1:
         my_ser = SerialRS485(sp[0])
+        print('当前使用的串口为：%s' % my_ser.port)
         rec_all = my_ser.port_read()
+
     else:
         print('无可用于接收数据的串口')
