@@ -1,10 +1,11 @@
 # 扫描文件夹，有新的txt文档则读取并调用算法程序
 import os
+from Agreement import config
 
 
-def scan_path(dir):
+def scan_path(dir_path):
     # os.path.isdir(dir)
-    os.listdir(dir)
+    os.listdir(dir_path)
 
 
 def file_name(file_dir):
@@ -20,6 +21,8 @@ def main(path):
 
 
 if __name__ == '__main__':
-    file_path = 'D:/jaysk/OneDrive/Working/Python/TC'
-    # main(file_path)
-    r, d, f = file_name(file_path)
+    conf = config.ConfigInfo()
+    conf.first_scan()
+    # file_path = 'D:/jaysk/OneDrive/Working/Python/TC'
+    # # main(file_path)
+    # r, d, f = file_name(file_path)
