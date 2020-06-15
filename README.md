@@ -21,9 +21,10 @@ TP项目包含以下模块：
 4.Database数据库模块：
     |- Data_pool文件夹，用来存放接收的原始数据
     |- scanning_interface.py 扫描接口模块（供通信模块调用，通信模块给出执行命令，开始扫描数据库）
+    |- data_collection.py 数据获取模块（将新增数据加载到缓存，待算法程序调用）
 
 
 TP项目包含以下文件：
 
-|- main.py 主程序文件
+|- car_no_list.py 主程序文件
 |- README.md 说明文件
