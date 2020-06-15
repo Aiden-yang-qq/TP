@@ -5,13 +5,17 @@ from configparser import ConfigParser
 
 class ConfigInfo:
     def __init__(self):
-        self.path = __path__[0]
+        # self.path = __path__[0]
+        # self.path = os.getcwd()
+        self.path = os.path.split(__file__)[0]  # 取出当前文件所处路径
         self.file_path = self.path + '\\Config.ini'
         # print(self.file_path)
         self.cp = ConfigParser()
-        self.cp.read(self.file_path)
+        # self.cp.read(self.file_path)
 
     def first_scan(self):
+        # print(self.file_path)
+        self.cp.read(self.file_path)
         first_scan = self.cp.get('SCAN', 'first_scan')  # SCAN中的FIRST_SCAN值
         fs = str_to_bool(first_scan)
         if fs:
@@ -29,3 +33,5 @@ def str_to_bool(string):
 if __name__ == '__main__':
     conf = ConfigInfo()
     conf.first_scan()
+    # print(os.getcwd())
+    # print(sys.path[0])

@@ -1,8 +1,8 @@
 import torch
 import matplotlib.image as mp_img
 import matplotlib.pyplot as plt
-import Image_extraction as Ie
-import Neural_Networks as Neural
+from Algorithm import Image_extraction as Ie
+from Algorithm import Neural_Networks as Neural
 
 if __name__ == '__main__':
     pic_4 = mp_img.imread('pic4.jpg')

@@ -1,9 +1,10 @@
-import matplotlib.image as mp_img
-import matplotlib.pyplot as plt
-import Image_extraction as Ie
 import numpy as np
-from add_noise import noise, noise_all
-from interpolation import interpolate
+import matplotlib.pyplot as plt
+import matplotlib.image as mp_img
+from Algorithm import Image_extraction as Ie
+from Algorithm.interpolation import interpolate
+from Algorithm.add_noise import noise, noise_all
+
 
 if __name__ == '__main__':
     pic_ = mp_img.imread('pic4.jpg')
