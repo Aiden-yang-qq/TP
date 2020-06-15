@@ -1,9 +1,11 @@
 # scanning_interface.py
 # 扫描接口模块：扫描文件夹，有新的txt文档则调用数据采集模块
 import os
-import sys
 import Config
 import shutil
+import logging
+
+logging.basicConfig(filename='my.log', level=logging.DEBUG)
 
 
 # def scan_path(dir_path):
@@ -34,21 +36,23 @@ def car_no_list():
     conf = Config.ConfigInfo()
     _is_first_scan = conf.is_first_scan()
 
-    original_folder_name = 'Data_pool'
-    backup_folder_name = 'Data_pool_backup'
+    original_folder_name = 'Data_pool'  # 原始数据库的文件夹名称
+    backup_folder_name = 'Data_pool_backup'  # 原始数据库备份的文件夹名称
+    algorithm_folder_name = 'Data_lib'  # 经过算法后的数据库的文件夹名称
+
     cfp = current_file_path()
     data_pool_path = cfp + '/' + original_folder_name
 
     if not os.path.exists(data_pool_path):
-        mkdir(cfp, original_folder_name)    # 创建原始数据的文件夹
+        mkdir(cfp, original_folder_name)  # 创建原始数据库文件夹
+
+    if _is_first_scan:  # 检测是否是第一次扫描文件夹
+        mkdir(cfp, algorithm_folder_name)  # 创建经过算法后的数据库文件夹
 
     top_tuple = scan_path(data_pool_path)
     car_no_folders = top_tuple[1]
 
-    if _is_first_scan:  # 检测是否是第一次扫描文件夹
-        # mkdir(cfp, 'Data_pool_backup')  # 创建原始数据的备份文件夹
-        mkdir(cfp, 'Data_lib')  # 创建经过算法后的数据库
-
+    # 数据库的内容复制
     if len(car_no_folders) != 0:
         for car_no in car_no_folders:
             old_car_data_path = data_pool_path + '/' + car_no
@@ -57,7 +61,9 @@ def car_no_list():
                 shutil.copytree(old_car_data_path, new_car_data_path)
                 shutil.rmtree(old_car_data_path)
             except Exception as e:
+                logging.warning(e)
                 print('异常：', e)
+        logging.info('----------------------------------------------------------------------------------------------')
     return car_no_folders
 
 
