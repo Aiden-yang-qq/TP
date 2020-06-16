@@ -26,5 +26,5 @@ TP项目包含以下模块：
 
 TP项目包含以下文件：
 
-|- car_no_list.py 主程序文件
+|- main.py 主程序文件
 |- README.md 说明文件

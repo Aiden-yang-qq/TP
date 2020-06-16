@@ -5,12 +5,7 @@ import Config
 import shutil
 import logging
 
-logging.basicConfig(filename='my.log', level=logging.DEBUG)
-
-
-# def scan_path(dir_path):
-#     # os.path.isdir(dir)
-#     os.listdir(dir_path)
+logging.basicConfig(filename='logging_file.log', level=logging.DEBUG)
 
 
 def current_file_path():
@@ -32,7 +27,7 @@ def mkdir(path, folder_name):
         print('%s文件夹已存在！' % folder_name)
 
 
-def car_no_list():
+def database_creation():
     conf = Config.ConfigInfo()
     _is_first_scan = conf.is_first_scan()
 
@@ -42,17 +37,19 @@ def car_no_list():
 
     cfp = current_file_path()
     data_pool_path = cfp + '/' + original_folder_name
+    top_tuple = scan_path(data_pool_path)
+    car_no_folders = top_tuple[1]
 
     if not os.path.exists(data_pool_path):
         mkdir(cfp, original_folder_name)  # 创建原始数据库文件夹
 
     if _is_first_scan:  # 检测是否是第一次扫描文件夹
-        mkdir(cfp, algorithm_folder_name)  # 创建经过算法后的数据库文件夹
+        try:
+            mkdir(cfp, algorithm_folder_name)  # 创建经过算法后的数据库文件夹
+        except Exception as e:
+            logging.warning(e)
 
-    top_tuple = scan_path(data_pool_path)
-    car_no_folders = top_tuple[1]
-
-    # 数据库的内容复制
+    # 创建备份数据库，同时将原始数据库中的内容复制进去
     if len(car_no_folders) != 0:
         for car_no in car_no_folders:
             old_car_data_path = data_pool_path + '/' + car_no
@@ -62,13 +59,10 @@ def car_no_list():
                 shutil.rmtree(old_car_data_path)
             except Exception as e:
                 logging.warning(e)
-                print('异常：', e)
+                # print('异常：', e)
         logging.info('----------------------------------------------------------------------------------------------')
     return car_no_folders
 
 
-# def car_file_backup():
-
-
 if __name__ == '__main__':
-    folders = car_no_list()
+    folders = database_creation()
