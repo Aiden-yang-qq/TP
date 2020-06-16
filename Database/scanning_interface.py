@@ -4,6 +4,7 @@ import os
 import Config
 import shutil
 import logging
+from Database.data_collection import collection
 
 logging.basicConfig(filename='logging_file.log', level=logging.DEBUG)
 
@@ -37,11 +38,12 @@ def database_creation():
 
     cfp = current_file_path()
     data_pool_path = cfp + '/' + original_folder_name
-    top_tuple = scan_path(data_pool_path)
-    car_no_folders = top_tuple[1]
 
     if not os.path.exists(data_pool_path):
         mkdir(cfp, original_folder_name)  # 创建原始数据库文件夹
+
+    top_tuple = scan_path(data_pool_path)
+    car_no_folders = top_tuple[1]
 
     if _is_first_scan:  # 检测是否是第一次扫描文件夹
         try:
@@ -56,11 +58,16 @@ def database_creation():
             new_car_data_path = backup_folder_name + '/' + car_no
             try:
                 shutil.copytree(old_car_data_path, new_car_data_path)
-                shutil.rmtree(old_car_data_path)
+                # shutil.rmtree(old_car_data_path)
             except Exception as e:
                 logging.warning(e)
                 # print('异常：', e)
         logging.info('----------------------------------------------------------------------------------------------')
+
+    # TODO 判断car_no_folder，空则等待数据传输，有内容则调用data_collection模块进行算法
+    if len(car_no_folders) != 0:
+        collection()
+
     return car_no_folders
 
 
