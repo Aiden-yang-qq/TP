@@ -32,7 +32,7 @@ def main(file):
         date_time_list.append(date_time)
         data_list.append(float(data))
         datetime_list.append(date_time_type)
-
+    '''
     # 根据时间整理坐标系（时间——x轴）
     x_data = []
     start_datetime = datetime_list[0]
@@ -51,9 +51,11 @@ def main(file):
     # plt.plot(x_data, noise)
     # plt.ylim(-0.01, 0.01)
     plt.grid()
-    return data_list
+    '''
+    # return data_list
+    return file_list
 
 
 if __name__ == '__main__':
-    fl = 'D:\\jaysk\\Desktop\\TP\\dcs数据格式.txt'
-    data = main(fl)
+    fl = 'E:\\GitLab\\YTKN002018001\\wheelsource\\wheelForecast\\metaData\\HXD1D-0323\\HXD1D-0323#0#1#WD.txt'
+    d = main(fl)

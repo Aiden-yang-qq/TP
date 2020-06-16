@@ -65,10 +65,12 @@ def database_creation():
         logging.info('----------------------------------------------------------------------------------------------')
 
     # TODO 判断car_no_folder，空则等待数据传输，有内容则调用data_collection模块进行算法
+    all_car = {}
     if len(car_no_folders) != 0:
-        collection()
+        all_car = collection(data_pool_path, car_no_folders)
 
-    return car_no_folders
+    # return car_no_folders, all_car
+    return all_car
 
 
 if __name__ == '__main__':
