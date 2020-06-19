@@ -42,6 +42,7 @@ def database_creation():
 
     cfp = current_file_path()
     data_pool_path = cfp + '/' + original_folder_name
+    data_pool_back_path = cfp + '/' + backup_folder_name
     data_lib_path = cfp + '/' + algorithm_folder_name
 
     if not os.path.exists(data_pool_path):
@@ -63,7 +64,7 @@ def database_creation():
         all_car = optical_fiber_collection(data_pool_path, car_no_folders)    # 进行数据采集
         for car_no in car_no_folders:
             old_car_data_path = data_pool_path + '/' + car_no
-            new_car_data_path = backup_folder_name + '/' + car_no
+            new_car_data_path = data_pool_back_path + '/' + car_no
             try:
                 shutil.copytree(old_car_data_path, new_car_data_path)
                 shutil.rmtree(old_car_data_path)
