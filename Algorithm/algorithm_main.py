@@ -26,13 +26,13 @@ def main(file):
     file_list = read_txt(file)
 
     for file in file_list:
-        date_time = file[:23]
-        data = file[30:39]
+        date_time = file.split(',')[0]  # 提取时间
+        data = file.split(',')[4]   # 提取数据
         date_time_type = datetime.datetime.fromisoformat(date_time)
         date_time_list.append(date_time)
         data_list.append(float(data))
         datetime_list.append(date_time_type)
-    '''
+
     # 根据时间整理坐标系（时间——x轴）
     x_data = []
     start_datetime = datetime_list[0]
@@ -46,16 +46,16 @@ def main(file):
 
     noise = np.array(data_list) - np.array(a_list)
 
-    plt.figure()
-    plt.plot(x_data, data_list)
-    # plt.plot(x_data, noise)
-    # plt.ylim(-0.01, 0.01)
-    plt.grid()
-    '''
+    # plt.figure()
+    # plt.plot(x_data, data_list)
+    # # plt.plot(x_data, noise)
+    # # plt.ylim(-0.01, 0.01)
+    # plt.grid()
     # return data_list
-    return file_list
+    return x_data, data_list
 
 
 if __name__ == '__main__':
-    fl = 'E:\\GitLab\\YTKN002018001\\wheelsource\\wheelForecast\\metaData\\HXD1D-0323\\HXD1D-0323#0#1#WD.txt'
+    # fl = 'E:\\GitLab\\YTKN002018001\\wheelsource\\wheelForecast\\metaData\\HXD1D-0323\\HXD1D-0323#0#1#WD.txt'
+    fl = 'E:\\Python\\Pyinstaller\\TP\\DF4-1111#0#1#WD.txt'
     d = main(fl)
