@@ -42,6 +42,7 @@ def database_creation():
 
     cfp = current_file_path()
     data_pool_path = cfp + '/' + original_folder_name
+    data_lib_path = cfp + '/' + algorithm_folder_name
 
     if not os.path.exists(data_pool_path):
         make_directory(cfp, original_folder_name)  # 创建原始数据库文件夹
@@ -49,7 +50,7 @@ def database_creation():
     top_tuple = scan_path(data_pool_path)
     car_no_folders = top_tuple[1]
 
-    if _is_first_scan:  # 检测是否是第一次扫描文件夹
+    if not os.path.exists(data_lib_path):
         try:
             make_directory(cfp, algorithm_folder_name)  # 创建经过算法后的数据库文件夹
         except Exception as e:
@@ -70,9 +71,6 @@ def database_creation():
                 logging.warning(e)
                 # print('异常：', e)
         logging.info('----------------------------------------------------------------------------------------------')
-
-    # TODO 判断Data_lib文件夹，空则不做输出，有内容则调用data_storage模块进行数据输出
-
     return all_car
 
 

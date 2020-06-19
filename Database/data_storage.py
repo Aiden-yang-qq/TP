@@ -1,11 +1,7 @@
 # 将数据存成txt文档，文件名称以车号命名
-import os
 
 
-def data_to_txt(path, file_name, each_wheel_data):
-    alg_datalib_path = os.path.dirname(path) + '/' + 'Data_lib'
-    algorithm_path = alg_datalib_path + '/' + file_name
-
+def data_to_txt(path, each_wheel_data):
     if len(each_wheel_data) != 0:
         if len(each_wheel_data[0]) == len(each_wheel_data[1]):
             ewd_all = []
@@ -15,7 +11,7 @@ def data_to_txt(path, file_name, each_wheel_data):
 
             ea = "\n".join(ewd_all)
             # print('Done')
-            with open(algorithm_path, 'w') as f:
+            with open(path, 'w') as f:
                 f.write(ea)
 
 # if __name__ == '__main__':

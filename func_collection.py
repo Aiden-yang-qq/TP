@@ -3,7 +3,7 @@ import os
 
 
 def make_directory(path, folder_name):
-    sub_path = ''
+    sub_path = path + '/' + folder_name
     folder = os.listdir(path)
     if folder_name not in folder:
         sub_path = path + '/' + folder_name
