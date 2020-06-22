@@ -1,16 +1,15 @@
-import os
+from os import path
 from configparser import ConfigParser
 
 
 class ConfigInfo:
     def __init__(self):
-        self.path = os.path.split(__file__)[0]  # 取出当前文件所处路径
-        self.file_path = self.path + '\\Config.ini'
+        self.cf_path = path.split(__file__)[0]  # 取出当前文件所处路径
+        self.file_path = self.cf_path + '\\Config.ini'
         self.cp = ConfigParser()
         self.cp.read(self.file_path)
 
     def is_first_scan(self):
-        # self.cp.read(self.file_path)
         first_scan = self.cp.get('SCAN', 'is_first_scan')  # SCAN中的FIRST_SCAN值
         fs = str_to_bool(first_scan)
         if fs:
@@ -28,8 +27,3 @@ class ConfigInfo:
 
 def str_to_bool(string):
     return True if string.lower() == 'true' else False
-
-
-if __name__ == '__main__':
-    conf = ConfigInfo()
-    f = conf.is_first_scan()

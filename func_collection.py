@@ -1,13 +1,13 @@
 # Function 功能模块
-import os
+from os import listdir, makedirs
 
 
-def make_directory(path, folder_name):
-    sub_path = path + '/' + folder_name
-    folder = os.listdir(path)
+def make_directory(md_path, folder_name):
+    sub_path = md_path + '/' + folder_name
+    folder = listdir(md_path)
     if folder_name not in folder:
-        sub_path = path + '/' + folder_name
-        os.makedirs(sub_path)
+        sub_path = md_path + '/' + folder_name
+        makedirs(sub_path)
     else:
         print('%s文件夹已存在！' % folder_name)
     return sub_path

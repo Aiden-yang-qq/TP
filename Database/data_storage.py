@@ -10,11 +10,5 @@ def data_to_txt(path, each_wheel_data):
                 ewd_all.append(ewd)
 
             ea = "\n".join(ewd_all)
-            # print('Done')
             with open(path, 'w') as f:
                 f.write(ea)
-
-# if __name__ == '__main__':
-#     path = 'E:\\Python\\Pyinstaller\\TP\\Database\\Data_pool'
-#
-#     data_to_txt()
