@@ -28,12 +28,14 @@ def database_creation(dc_path):
     odb_dir, new_folder_name = original_db_scanning(dc_path)
 
     data_base_name = 'DB'
+    odb_folder_name = 'Original_DB'
     original_folder_name = 'Data_pool'  # 原始数据库的文件夹名称
     backup_folder_name = 'Data_pool_backup'  # 原始数据库备份的文件夹名称
     algorithm_folder_name = 'Data_lib'  # 经过算法后的数据库的文件夹名称
 
     # cfp = current_file_path()
     cfp = dc_path + '\\' + data_base_name
+    odb = dc_path + '\\' + odb_folder_name
 
     if not path.exists(cfp):
         make_directory(dc_path, data_base_name)
@@ -50,15 +52,22 @@ def database_creation(dc_path):
     if len(new_folder_name) > 1:
         new_fo_name = new_folder_name.replace(':', '_')
         car_folder_dir = data_pool_path + '\\' + new_fo_name
-        if not path.exists(car_folder_dir):
-            make_directory(data_pool_path, new_fo_name)
-            try:
-                odb_list = listdir(odb_dir)
-                for f in odb_list:
-                    odb_file_dir = odb_dir + '/' + f
-                    move(odb_file_dir, car_folder_dir)
-            except Exception as e:
-                info(e)
+        car_folder_backup_dir = data_pool_back_path + '\\' + new_fo_name
+        if not path.exists(car_folder_backup_dir):  # 判断'Data_pool_backup'是否已经有计算过的文件夹存在
+            if not path.exists(car_folder_dir):
+                make_directory(data_pool_path, new_fo_name)
+                try:
+                    odb_list = listdir(odb_dir)
+                    for f in odb_list:
+                        odb_file_dir = odb_dir + '/' + f
+                        move(odb_file_dir, car_folder_dir)
+                except Exception as e:
+                    info(e)
+        else:
+            print('%s文件夹在%s中已存在，%s中的数据已经过计算，请重新检查数据！' % (new_fo_name, backup_folder_name, odb_folder_name))
+            info('%s文件夹在%s中已存在，%s中的数据已经过计算，请重新检查数据！' % (new_fo_name, backup_folder_name, odb_folder_name))
+            rmtree(odb)  # 删除已经计算过的'Original_DB'文件夹
+            make_directory(dc_path, odb_folder_name)  # 新建'Original_DB'文件夹
 
     top_tuple = scan_path(data_pool_path)
     car_no_folders = top_tuple[1]
@@ -74,14 +83,15 @@ def database_creation(dc_path):
     all_car = {}
     if len(car_no_folders) != 0:
         all_car = optical_fiber_collection(data_pool_path, car_no_folders)  # 进行数据采集
-        for car_no in car_no_folders:
-            old_car_data_path = data_pool_path + '/' + car_no
-            new_car_data_path = data_pool_back_path + '/' + car_no
-            try:
-                copytree(old_car_data_path, new_car_data_path)
-                rmtree(old_car_data_path)
-            except Exception as e:
-                warning(e)
+        if len(all_car) != 0:
+            for car_no in car_no_folders:
+                old_car_data_path = data_pool_path + '/' + car_no
+                new_car_data_path = data_pool_back_path + '/' + car_no
+                try:
+                    copytree(old_car_data_path, new_car_data_path)
+                    rmtree(old_car_data_path)
+                except Exception as e:
+                    warning(e)
     return all_car
 
 
