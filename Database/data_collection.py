@@ -1,6 +1,7 @@
 # data_collection.py 数据采集模块
 from os import path, listdir
-from Algorithm.algorithm_main_test import main
+# from Algorithm.algorithm_main_test import main
+from Algorithm.algorithm_main import main
 from Database.data_storage import data_to_txt
 from func_collection import make_directory
 
@@ -25,14 +26,15 @@ def optical_fiber_collection(ofc_path, folders):
             file_list = listdir(file_dir)
 
             for file in file_list:
-                file_path = file_dir + '/' + file
-                data = main(file_path)
+                if file.split('.')[1] == 'txt':
+                    file_path = file_dir + '/' + file
+                    data = main(file_path)
 
-                # 输出到文件夹
-                file_open_path = alg_path + '/' + file
-                data_to_txt(file_open_path, data)
+                    # 输出到文件夹
+                    file_open_path = alg_path + '/' + file
+                    data_to_txt(file_open_path, data)
 
-                # 存成字典备用
-                car.update({file.split('.')[0]: data})  # 将每个车号下的txt文档添加到字典中
-                car_all.update({folder: car})  # 将数据库中的每个车号添加到字典中
+                    # 存成字典备用
+                    car.update({file.split('.')[0]: data})  # 将每个车号下的txt文档添加到字典中
+                    car_all.update({folder: car})  # 将数据库中的每个车号添加到字典中
     return car_all
