@@ -116,8 +116,9 @@ def original_db_scanning(ods_path):
     if odb_folder_name in parent_odb_list:
         odb_path = ods_path + '\\' + odb_folder_name
         aei = search_aei_suffix(odb_path)
-        car_no, date_time, carriage_no = aei_file_analysis(aei)
-        new_folder_name = car_no + '#' + date_time
+        if aei is not None:
+            car_no, date_time, carriage_no = aei_file_analysis(aei)
+            new_folder_name = car_no + '#' + date_time
     else:
         print('Original_DB文件夹不存在，请检查数据是否存放正确！')
         info('Original_DB文件夹不存在，请检查数据是否存放正确！')
@@ -142,9 +143,14 @@ def search_aei_suffix(ss_path):
         if '.AEI' not in sfx_list:
             print('找不到.AEI文件，请重新检查数据！')
             info('找不到.AEI文件，请重新检查数据！')
+            rmtree(ss_path)  # 删除'Original_DB'文件夹
+            make_directory(path.dirname(ss_path), 'Original_DB')  # 新建'Original_DB'文件夹
+            return None
         if '.txt' not in sfx_list:
             print('找不到.txt文件，请重新检查数据！')
             info('找不到.txt文件，请重新检查数据！')
+            rmtree(ss_path)  # 删除'Original_DB'文件夹
+            make_directory(path.dirname(ss_path), 'Original_DB')  # 新建'Original_DB'文件夹
             return None
     else:
         print('Original_DB文件夹中无可用文件，请重新传入文件！')

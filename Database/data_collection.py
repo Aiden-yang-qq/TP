@@ -3,6 +3,7 @@ from os import path, listdir
 from Algorithm.algorithm_main import main
 from Database.data_storage import data_to_txt
 from func_collection import make_directory
+from shutil import rmtree
 
 
 def wheel_no_collection(wnc_path, file_name):
@@ -36,4 +37,7 @@ def optical_fiber_collection(ofc_path, folders):
                         # 存成字典备用
                         car.update({file.split('.')[0]: data})  # 将每个车号下的txt文档添加到字典中
                         car_all.update({folder: car})  # 将数据库中的每个车号添加到字典中
+            else:
+                rmtree(ofc_path)
+                make_directory(path.dirname(ofc_path), 'Data_pool')
     return car_all
