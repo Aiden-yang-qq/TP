@@ -5,7 +5,7 @@ from os import path, walk, listdir
 from shutil import copytree, rmtree, move
 from logging import basicConfig, DEBUG, warning, info
 from Database.data_collection import optical_fiber_collection
-from func_collection import make_directory, read_txt
+from func_collection import make_directory, read_txt, time_reconstruct, year_mon_day_folder_generation
 
 basicConfig(filename='logging_file.log', level=DEBUG)
 
@@ -18,36 +18,52 @@ def current_file_path():
 
 def scan_path(file_path):
     for top_tuple in walk(file_path):
-        return top_tuple    # top -- 根目录下的每一个文件夹(包含它自己), 产生3-元组 (dirpath, dirnames, filenames)【文件夹路径, 文件夹名字, 文件名】。
+        return top_tuple  # top -- 根目录下的每一个文件夹(包含它自己), 产生3-元组 (dirpath, dirnames, filenames)【文件夹路径, 文件夹名字, 文件名】。
 
 
 def database_creation(dc_path):
     # conf = ConfigInfo()
     # _is_first_scan = conf.is_first_scan()
-    odb_dir, new_folder_name = original_db_scanning(dc_path)
 
-    data_base_name = 'DB'
-    odb_folder_name = 'Original_DB'
+    # 数据库文件夹名称命名
+    data_base_name = 'DB'  # 存储所有数据的文件夹
+    odb_folder_name = 'Original_DB'  # 存储原始数据的文件夹
     original_folder_name = 'Data_pool'  # 原始数据库的文件夹名称
     backup_folder_name = 'Data_pool_backup'  # 原始数据库备份的文件夹名称
     algorithm_folder_name = 'Data_lib'  # 经过算法后的数据库的文件夹名称
 
-    # cfp = current_file_path()
-    cfp = dc_path + '\\' + data_base_name
-    odb = dc_path + '\\' + odb_folder_name
+    # 数据库文件夹路径生成
+    cfp = dc_path + '\\' + data_base_name  # “DB”文件夹路径
+    odb = dc_path + '\\' + odb_folder_name  # “Original_DB”文件夹路径
+    data_pool_path = cfp + '\\' + original_folder_name  # “Data_pool”文件夹路径
+    data_pool_back_path = cfp + '\\' + backup_folder_name  # “Data_pool_backup”文件夹路径
+    data_lib_path = cfp + '\\' + algorithm_folder_name  # “Data_lib”文件夹路径
 
-    if not path.exists(cfp):
-        make_directory(dc_path, data_base_name)
-    # else:
-    #     print('DataBase文件夹已存在！')
-    data_pool_path = cfp + '\\' + original_folder_name
-    data_pool_back_path = cfp + '\\' + backup_folder_name
-    data_lib_path = cfp + '\\' + algorithm_folder_name
+    if not path.exists(cfp):  # “DB”路径判断
+        try:
+            make_directory(dc_path, data_base_name)  # 创建数据库根目录文件夹
+        except Exception as e:
+            warning(e)
 
-    if not path.exists(data_pool_path):
-        make_directory(cfp, original_folder_name)  # 创建原始数据库文件夹
+    if not path.exists(data_pool_path):  # “Data_pool”路径判断
+        try:
+            make_directory(cfp, original_folder_name)  # 创建原始数据库文件夹
+        except Exception as e:
+            warning(e)
+
+    if not path.exists(data_lib_path):  # “Data_lib”路径判断
+        try:
+            make_directory(cfp, algorithm_folder_name)  # 创建经过算法后的数据库文件夹
+        except Exception as e:
+            warning(e)
 
     # 生成车号文件夹，并将Original_DB中的文件复制进去
+    odb_dir, new_folder_name = original_db_scanning(dc_path)
+
+    # 在Data_lib和Data_pool_backup文件夹中建立年、月、日文件夹
+    db_folder_date = new_folder_name.split()[0].split('#')[1].split('-')  # 从new_folder_name文件夹中获取年、月
+    year_mon_day_folder_generation(data_lib_path, db_folder_date)  # 在“Data_lib”文件夹下创建年月日文件夹
+
     if len(new_folder_name) > 1:
         new_fo_name = new_folder_name.replace(':', '_')
         car_folder_dir = data_pool_path + '\\' + new_fo_name
@@ -71,20 +87,16 @@ def database_creation(dc_path):
     top_tuple = scan_path(data_pool_path)
     car_no_folders = top_tuple[1]
 
-    if not path.exists(data_lib_path):
-        try:
-            make_directory(cfp, algorithm_folder_name)  # 创建经过算法后的数据库文件夹
-        except Exception as e:
-            warning(e)
-
     # 创建备份数据库，同时将原始数据库中的内容复制进去
     all_car = {}
     if len(car_no_folders) != 0:
         all_car = optical_fiber_collection(data_pool_path, car_no_folders)  # 进行数据采集
         if len(all_car) != 0:
             for car_no in car_no_folders:
-                old_car_data_path = data_pool_path + '/' + car_no
-                new_car_data_path = data_pool_back_path + '/' + car_no
+                cn_date = str(car_no).split()[0].split('#')[1].split('-')
+                car_no_date = cn_date[0] + '\\' + cn_date[1] + '\\' + cn_date[2]
+                old_car_data_path = data_pool_path + '\\' + car_no
+                new_car_data_path = data_pool_back_path + '\\' + car_no_date + '\\' + car_no
                 try:
                     copytree(old_car_data_path, new_car_data_path)
                     rmtree(old_car_data_path)
@@ -155,5 +167,7 @@ def aei_file_analysis(aei_file):
         aei_property = aei_file[0].split(',')
         car_no = aei_property[1]
         date_time = aei_property[2]
+        date_time = time_reconstruct(date_time)
         carriage_no = aei_property[5]
+        print(date_time)
     return car_no, date_time, carriage_no
