@@ -61,8 +61,9 @@ def database_creation(dc_path):
     odb_dir, new_folder_name = original_db_scanning(dc_path)
 
     # 在Data_lib和Data_pool_backup文件夹中建立年、月、日文件夹
-    db_folder_date = new_folder_name.split()[0].split('#')[1].split('-')  # 从new_folder_name文件夹中获取年、月
-    year_mon_day_folder_generation(data_lib_path, db_folder_date)  # 在“Data_lib”文件夹下创建年月日文件夹
+    if new_folder_name is not '':
+        db_folder_date = new_folder_name.split()[0].split('#')[1].split('-')  # 从new_folder_name文件夹中获取年、月
+        year_mon_day_folder_generation(data_lib_path, db_folder_date)  # 在“Data_lib”文件夹下创建年月日文件夹
 
     if len(new_folder_name) > 1:
         new_fo_name = new_folder_name.replace(':', '_')
@@ -120,6 +121,10 @@ def original_db_scanning(ods_path):
     else:
         print('Original_DB文件夹不存在，请检查数据是否存放正确！')
         info('Original_DB文件夹不存在，请检查数据是否存放正确！')
+        try:
+            make_directory(ods_path, odb_folder_name)
+        except Exception as e:
+            warning(e)
     return odb_path, new_folder_name
 
 
