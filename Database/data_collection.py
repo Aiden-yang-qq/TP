@@ -1,5 +1,8 @@
 # data_collection.py 数据采集模块
 from os import path, listdir
+from Picture import picture as pic
+from matplotlib import pyplot as plt
+
 # from Algorithm.algorithm_main_test import main
 from Algorithm.algorithm_main import main
 from Database.data_storage import data_to_txt
@@ -13,6 +16,7 @@ def wheel_no_collection(wnc_path, file_name):
 
 
 def optical_fiber_collection(ofc_path, folders):
+    alg_path = ''
     car_all = {}
     for folder in folders:
         car = {}
@@ -28,7 +32,7 @@ def optical_fiber_collection(ofc_path, folders):
                 for file in file_list:
                     if file.split('.')[1] == 'txt':
                         file_path = file_dir + '/' + file
-                        data = main(file_path)
+                        data = main(file_path)  # 调用算法主程序
 
                         # 输出到文件夹
                         file_open_path = alg_path + '/' + file
@@ -37,4 +41,12 @@ def optical_fiber_collection(ofc_path, folders):
                         # 存成字典备用
                         car.update({file.split('.')[0]: data})  # 将每个车号下的txt文档添加到字典中
                         car_all.update({folder: car})  # 将数据库中的每个车号添加到字典中
+
+                        # # 将data生成图片
+                        # plt.figure()
+                        # plt.plot(data[0], data[1])
+                        # # plt.grid()
+                        # # plt.show()
+                        # plt.savefig('%s.png' % file)
+
     return car_all

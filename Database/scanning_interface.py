@@ -1,6 +1,6 @@
 # scanning_interface.py
 # 扫描接口模块：扫描文件夹，有新的txt文档则调用数据采集模块
-from os import path, walk, listdir, system
+from os import path, walk, listdir
 # from Config import ConfigInfo
 from shutil import copytree, rmtree, move
 from logging import basicConfig, DEBUG, warning, info
@@ -18,8 +18,7 @@ def current_file_path():
 
 def scan_path(file_path):
     for top_tuple in walk(file_path):
-        # print(top_tuple)  # top -- 根目录下的每一个文件夹(包含它自己), 产生3-元组 (dirpath, dirnames, filenames)【文件夹路径, 文件夹名字, 文件名】。
-        return top_tuple
+        return top_tuple    # top -- 根目录下的每一个文件夹(包含它自己), 产生3-元组 (dirpath, dirnames, filenames)【文件夹路径, 文件夹名字, 文件名】。
 
 
 def database_creation(dc_path):
@@ -79,7 +78,6 @@ def database_creation(dc_path):
             warning(e)
 
     # 创建备份数据库，同时将原始数据库中的内容复制进去
-    # TODO 判断car_no_folder，空则等待数据传输，有内容则调用data_collection模块进行算法
     all_car = {}
     if len(car_no_folders) != 0:
         all_car = optical_fiber_collection(data_pool_path, car_no_folders)  # 进行数据采集
