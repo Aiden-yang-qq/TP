@@ -1,6 +1,6 @@
 # Function 功能模块
 from os import listdir, makedirs, path
-from logging import warning
+from logging import warning,info
 
 
 def make_directory(md_path, folder_name):
@@ -11,7 +11,9 @@ def make_directory(md_path, folder_name):
         sub_path = md_path + '\\' + folder_name
         makedirs(sub_path)
     else:
-        print('%s文件夹已存在！' % folder_name)
+        # print('%s文件夹已存在！' % folder_name)
+        print('路径“%s”中已存在“%s”文件夹！' % (md_path, folder_name))
+        info('路径“%s”中已存在“%s”文件夹！' % (md_path, folder_name))
     return sub_path
 
 
