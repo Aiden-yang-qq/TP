@@ -1,6 +1,6 @@
 # Function 功能模块
 from os import listdir, makedirs, path
-from logging import warning,info
+from logging import warning, info
 
 
 def make_directory(md_path, folder_name):
@@ -49,3 +49,12 @@ def year_mon_day_folder_generation(original_path, date_time_list):  # 建立年-
             make_directory(db_lib_month_dir, date_time_list[2])
     except Exception as e:
         warning(e)
+
+
+def folder_creation(fc_parent_path, folder_name):
+    fc_path = fc_parent_path + '\\' + folder_name
+    if not path.exists(fc_path):
+        try:
+            make_directory(fc_parent_path, folder_name)
+        except Exception as e:
+            warning(e)
