@@ -41,16 +41,16 @@ def database_creation(dc_path):
     # 光纤数据库文件夹路径生成
     cfp = dc_path + '\\' + data_base_name  # “DB”文件夹路径
     odb = dc_path + '\\' + odb_folder_name  # “Original_DB”文件夹路径
+    data_lib_path = cfp + '\\' + algorithm_folder_name  # “Data_lib”文件夹路径
     data_pool_path = cfp + '\\' + original_folder_name  # “Data_pool”文件夹路径
     data_pool_back_path = cfp + '\\' + backup_folder_name  # “Data_pool_backup”文件夹路径
-    data_lib_path = cfp + '\\' + algorithm_folder_name  # “Data_lib”文件夹路径
 
     # 压力应变片数据库文件夹路径生成
     cfp_pre = dc_path + '\\' + data_pressure_name  # “DB_pressure”文件夹路径
     odb_pre = dc_path + '\\' + odb_pressure_name  # “Original_DB_pressure”文件夹路径
+    data_lib_pre_path = cfp_pre + '\\' + algorithm_folder_name  # “Data_lib”文件夹路径
     data_pool_pre_path = cfp_pre + '\\' + original_folder_name  # “Data_pool”文件夹路径
     data_pool_back_pre_path = cfp_pre + '\\' + backup_folder_name  # “Data_pool_backup”文件夹路径
-    data_lib_pre_path = cfp_pre + '\\' + algorithm_folder_name  # “Data_lib”文件夹路径
 
     # 光纤数据库文件夹创建
     folder_creation(dc_path, data_base_name)  # 创建数据库根目录"DB"文件夹
@@ -62,14 +62,19 @@ def database_creation(dc_path):
     folder_creation(cfp_pre, original_folder_name)  # 创建原始数据库"Data_pool"文件夹
     folder_creation(cfp_pre, algorithm_folder_name)  # 创建经过算法后的数据库"Data_lib"文件夹
 
-    # 生成车号文件夹，并将Original_DB中的文件复制进去
+    # 生成车号文件夹，并将Original_DB和Original_DB_pressure中的文件复制进去
     odb_dir, new_folder_name = original_db_scanning(dc_path, odb_folder_name)
+    odb_pre_dir, new_folder_pre_name = original_db_scanning(dc_path, odb_pressure_name)
 
-    # 在Data_lib和Data_pool_backup文件夹中建立年、月、日文件夹
+    # 在Data_lib文件夹中建立年、月、日文件夹
     if new_folder_name is not '':
         db_folder_date = new_folder_name.split()[0].split('#')[1].split('-')  # 从new_folder_name文件夹中获取年、月
         year_mon_day_folder_generation(data_lib_path, db_folder_date)  # 在“Data_lib”文件夹下创建年月日文件夹
+    if new_folder_pre_name is not '':
+        db_folder_pre_date = new_folder_pre_name.split()[0].split('#')[1].split('-')  # 从new_folder_name文件夹中获取年、月
+        year_mon_day_folder_generation(data_lib_pre_path, db_folder_pre_date)  # 在“Data_lib”文件夹下创建年月日文件夹
 
+    # 在Data_pool_backup文件夹中建立年、月、日文件夹
     if len(new_folder_name) > 1:
         new_fo_name = new_folder_name.replace(':', '_')
         car_folder_dir = data_pool_path + '\\' + new_fo_name
@@ -115,7 +120,6 @@ def original_db_scanning(ods_path, odb_folder_name):
     # 原始数据存放的文件夹名称：odb_folder_name:Original_DB和Original_DB_pressure
     odb_path = ''
     new_folder_name = ''
-    # odb_folder_name = 'Original_DB'
     parent_odb_list = listdir(ods_path)
 
     if odb_folder_name in parent_odb_list:
@@ -136,7 +140,7 @@ def original_db_scanning(ods_path, odb_folder_name):
 
 def search_aei_suffix(ss_path, odb_folder_name):
     """
-    在ss_path路径下搜索文件后缀，如果存在.AEI文件则对该文件进行读取
+    在ss_path路径下搜索文件后缀，如果存在.AEI和.txt文件则对该文件进行读取
     :param ss_path: 需要搜索AEI文件的路径文件夹
     :param odb_folder_name:
     :return:
