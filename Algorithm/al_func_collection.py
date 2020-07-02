@@ -1,5 +1,5 @@
 # al_func_collection.py:Algorithm functional collection
-from func_collection import read_txt
+from Function.func_collection import read_txt
 from matplotlib import pyplot as plt
 
 

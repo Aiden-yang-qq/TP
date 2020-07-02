@@ -1,7 +1,7 @@
 # algorithm_main.py 算法主程序，仅供数据采集后的程序调用
 # Algorithm文件夹下的程序均由此文件调用
 from datetime import datetime as dt
-from func_collection import read_txt
+from Function.func_collection import read_txt
 
 
 def data_avg(average, length):

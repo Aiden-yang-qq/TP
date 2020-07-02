@@ -4,7 +4,9 @@ from logging import info
 
 from Database.scanning_interface import database_creation
 
-if __name__ == '__main__':
+
+def main_exe():
+    folders = {}
     try:
         info('---------------------------------------')
         info(ctime())
@@ -31,3 +33,8 @@ if __name__ == '__main__':
     # sleep(3)
     # info('本次数据处理已完成，共耗时%.4fs:' % (b - a))
     # info('---------------------------------------')
+    return folders
+
+
+if __name__ == '__main__':
+    main_exe()

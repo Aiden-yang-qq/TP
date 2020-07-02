@@ -1,6 +1,7 @@
-# Function 功能模块
+# Function function module
 from os import listdir, makedirs, path
 from logging import warning, info
+from datetime import datetime
 
 
 def make_directory(md_path, folder_name):
@@ -23,6 +24,11 @@ def read_txt(txt_name):
     return txt_list
 
 
+def write_txt(wt_path, write_file):
+    with open(wt_path, 'w') as fw:
+        fw.writelines(write_file)
+
+
 def time_reconstruct(date_time):
     """
     原始时间格式：例如：20200611 08:53:30
@@ -34,6 +40,15 @@ def time_reconstruct(date_time):
     if len(date_time) == 17:
         new_date_time = date_time[:4] + '-' + date_time[4:6] + '-' + date_time[6:8] + date_time[8:]
     return new_date_time
+
+
+def date_time2datetime(date_time_str):
+    """
+    'YYYY-MM-DD HH:MM:SS'字符串格式的时间转换成datetime格式的时间
+    :param date_time_str:
+    :return:
+    """
+    return datetime.fromisoformat(date_time_str)
 
 
 def year_mon_day_folder_generation(original_path, date_time_list):  # 建立年-月-日文件夹

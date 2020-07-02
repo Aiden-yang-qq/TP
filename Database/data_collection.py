@@ -2,7 +2,7 @@
 from os import path, listdir
 from Algorithm.algorithm_main import main
 from Database.data_storage import data_to_txt
-from func_collection import make_directory
+from Function.func_collection import make_directory
 from shutil import rmtree
 
 

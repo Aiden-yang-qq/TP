@@ -1,6 +1,6 @@
 # picture_generation.py 图像生成
 from os import path
-from func_collection import read_txt
+from Function.func_collection import read_txt
 
 
 def pic_generation(pg_path, file_name):

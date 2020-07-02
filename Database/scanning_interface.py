@@ -5,7 +5,7 @@ from os import path, walk, listdir
 from shutil import copytree, rmtree, move
 from logging import basicConfig, DEBUG, warning, info
 from Database.data_collection import optical_fiber_collection
-from func_collection import make_directory, read_txt, time_reconstruct, year_mon_day_folder_generation, folder_creation
+from Function.func_collection import make_directory, read_txt, time_reconstruct, year_mon_day_folder_generation, folder_creation
 
 basicConfig(filename='logging_file.log', level=DEBUG)
 
