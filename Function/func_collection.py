@@ -24,9 +24,14 @@ def read_txt(txt_name):
     return txt_list
 
 
-def write_txt(wt_path, write_file):
+def writelines_txt(wt_path, write_file):
     with open(wt_path, 'w') as fw:
         fw.writelines(write_file)
+
+
+def write_txt(wt_path, write_file):
+    with open(wt_path, 'w') as fw:
+        fw.write(write_file)
 
 
 def time_reconstruct(date_time):

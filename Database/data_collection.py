@@ -1,6 +1,6 @@
 # data_collection.py 数据采集模块
 from os import path, listdir
-from Algorithm.algorithm_main import main
+from Algorithm.algorithm_main import al_main
 from Database.data_storage import data_to_txt
 from Function.func_collection import make_directory
 from shutil import rmtree
@@ -28,7 +28,7 @@ def optical_fiber_collection(ofc_path, folders):
                 for file in file_list:
                     if file.split('.')[1] == 'txt':
                         file_path = file_dir + '/' + file
-                        data = main(file_path)  # 调用算法主程序
+                        data = al_main(file_path)  # 调用算法主程序
 
                         # 输出到文件夹
                         file_open_path = alg_path + '/' + file

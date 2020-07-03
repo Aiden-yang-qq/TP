@@ -10,7 +10,7 @@ def data_avg(average, length):
     return avg_list
 
 
-def main(file):
+def al_main(file):
     date_time_list = []
     data_list = []
     datetime_list = []

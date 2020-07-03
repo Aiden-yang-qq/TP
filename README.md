@@ -33,6 +33,6 @@ TP项目包含以下模块：
 
 TP项目包含以下文件：
 
-|- main.py 主程序文件
+|- al_main.py 主程序文件
 |- func_collect.py 功能合集模块（各种功能的集合）
 |- README.md 说明文件

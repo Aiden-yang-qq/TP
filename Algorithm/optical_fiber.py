@@ -1,6 +1,7 @@
 from Function.func_collection import read_txt
 from datetime import datetime, timedelta
 from logging import warning, info
+from Function.func_collection import writelines_txt, write_txt
 
 
 def read_fiber_data(rfd_data):
@@ -32,6 +33,7 @@ def read_fiber_data_simple(rfds_data):
         fiber_data = d[3].split()[:6]
         for i in fiber_data:
             # fiber_data_list.append(float(i))
+            # TODO 修改数据格式，float小数点后保留4位小数
             fiber_data_list.append(float(i))
 
         data_all.append([date_time, temperature, fiber_data_list])
@@ -87,10 +89,19 @@ def time_wave(tw_time, tw_wave):
                 tw_list = []
                 for i in range(len(tw_time)):
                     tw_time_str = str(tw_time[i])
-                    if len(tw_time_str) == 26:
-                        tw_list.append(tw_time_str + ' ' + str(wave[i]))
-                    else:
-                        tw_list.append(tw_time_str + '.000000 ' + str(wave[i]))
+                    wave_str = str(wave[i])
+                    if len(tw_time_str) == 19:
+                        tw_time_str += '.000'
+                    elif len(tw_time_str) == 26:
+                        tw_time_str = tw_time_str[:23]
+                    if len(wave_str) != 9:
+                        wave_str += (9 - len(wave_str)) * '0'
+                    # 数据格式：'2020-07-01 16:02:41.600 1534.2053\n'（二者取其一）
+                    # tw_list.append(tw_time_str + ' ' + wave_str + '\n')
+                    # 数据格式：'2020-03-02 11:27:38:041,1,8,1,1550.2507,\n'（二者取其一）
+                    tw_time_str = tw_time_str.replace('.', ':')
+                    tw_list.append(tw_time_str + ',1,8,1,' + wave_str + ',\n')
+
                 tw_all_list.append(tw_list)
         return tw_all_list
     except Exception as e:
@@ -104,7 +115,9 @@ if __name__ == '__main__':
     ttw_date_list, ttw_temp_list, ttw_wave_list = time_temp_wave(d_a)
     wave_all = wave_collection(ttw_wave_list)
 
-    # tw_txt = []
-    # for each_wave in wave_all:
-    #     tw_txt.append(time_wave(ttw_date_list,each_wave))
     tw_txt = time_wave(ttw_date_list, wave_all)
+
+    # 将6个传感器的数据保存成txt
+    save_path = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_160241'
+    for i_tt in range(len(tw_txt)):
+        writelines_txt(save_path + '\\%s.txt' % str(i_tt + 1), tw_txt[i_tt])
