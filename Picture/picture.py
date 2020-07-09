@@ -1,8 +1,10 @@
 # picture_generation.py 图像生成
 from os import path, listdir
-from Function.func_collection import read_txt
+
 from matplotlib import pyplot as plt
-from Algorithm.data_splitting_integration import wheel_data_integration, wheel_data_splitting
+
+from Algorithm.data_splitting_integration import optical_data_splitting, optical_data_to_wheel
+from Function.func_collection import read_txt
 
 
 def txt_to_list(ttp_path):
@@ -61,7 +63,8 @@ if __name__ == '__main__':
     # pic_generation(txt_list)
     # wdi = wheel_data_integration(txt_list)
 
-    w = wheel_data_splitting(txt_list)
+    w = optical_data_splitting(txt_list)
+    wd = optical_data_to_wheel(w)
 
     # plt.figure()
     # plt.plot(wdi[0], wdi[1], 'o')

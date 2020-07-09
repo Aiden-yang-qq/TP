@@ -1,7 +1,8 @@
-from Function.func_collection import read_txt
 from datetime import datetime, timedelta
-from logging import warning, info
-from Function.func_collection import writelines_txt, write_txt
+from logging import info
+
+from Function.func_collection import read_txt
+from Function.func_collection import writelines_txt
 
 
 def read_fiber_data(rfd_data):
@@ -52,8 +53,13 @@ def time_temp_wave(ttw_data):
     # 时间重置到100000microsecond
     counter = 0
     datetime_new_list = []
-    time_microsecond = timedelta(microseconds=100000)
-    for i in range(11):  # 采样频率为10Hz，1s10个数据点，取11为了能全部包含
+    time_microsecond = timedelta(microseconds=100000)  # 默认采集频率是10Hz
+    if datetime_list[100] - datetime_list[0] == timedelta(seconds=1):  # 采集频率是100Hz
+        time_microsecond = timedelta(microseconds=10000)
+    elif datetime_list[2000] - datetime_list[0] == timedelta(seconds=1):  # 采集频率是2kHz
+        time_microsecond = timedelta(microseconds=500)
+
+    for i in range(len(datetime_list) - 1):
         if datetime_list[i + 1] - datetime_list[i] == timedelta(seconds=1):
             counter = i + 1
             break
@@ -109,7 +115,8 @@ def time_wave(tw_time, tw_wave):
 
 
 if __name__ == '__main__':
-    p = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_160241.txt'
+    # p = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_160241.txt'
+    p = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_171736.txt'
     data = read_txt(p)
     d_a = read_fiber_data_simple(data)
     ttw_date_list, ttw_temp_list, ttw_wave_list = time_temp_wave(d_a)
@@ -118,6 +125,7 @@ if __name__ == '__main__':
     tw_txt = time_wave(ttw_date_list, wave_all)
 
     # 将6个传感器的数据保存成txt
-    save_path = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_160241'
+    # save_path = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_160241'
+    save_path = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_171736'
     for i_tt in range(len(tw_txt)):
         writelines_txt(save_path + '\\%s.txt' % str(i_tt + 1), tw_txt[i_tt])

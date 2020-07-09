@@ -1,0 +1,53 @@
+﻿
+{
+  "dataStatus":"0正常，1少车 2少轴 ",
+  "carNo": "车号",
+  "sd": "速度",
+  "sddt": "数据生成检测时间",
+  "edsi": "site identifier站点标识",
+  "fileName": "文件名",
+  "dtOfPass": "检测时间,MM/DD/YYYY HH:MM:SS",
+  "numOfAxle": "总轴数",
+  "numOfCarr": "总车厢数",
+  "trainSpeed": "平均速度",
+  "trainDirection": "列车方向  N F",
+  "sides": "处理哪一端取值B,N,F,blank。B = both sides, N = near side only, F = far side only, blank =both sides failed",
+  "verOfsoftware": "软件版本号",
+  "vi": [
+      {
+        "vid":"32位uuid",
+        "vehicleNo": "车厢号",
+        "carOri": "车厢方向",
+        "axleCount": "轴数",
+        "vehicleType": "车厢类型，5=机车，19=挂车，其他值=其他",
+        "vehicleSeq": "辆序",
+        "bc": [
+          {
+            "bcd":"32id",
+            "rail": "取值NS,FS",
+            "vehicleAxleSeq": "在该车厢的轴序",
+            "axleSeq": "在整个编组中的轴序，取值1-9999",
+            "vehicleSeq": "辆序，取值1-999，对应vi里的seqs",
+            "vehicleNoBC": "车号，对应vi里的vehicleNo",
+            "vehicleSide": "左右侧，取值L,R,U",
+            "axleSpeed": "通过速度mph",
+            "invalidFlag": "数据是否有效，0有效，其他无效",
+            "invalidDesc": "无效描述",
+            "data1": "值,-999.999-999.999",
+            "data2": "值,-999.999-999.999",
+            "data3": "值,-999.999-999.999",
+            "data4": "值,-999.999-999.999",
+            "bearingDefect": "是否有缺陷，0无，1有",
+            "defectType1": "是否有平轮缺陷",
+            "defectType2": "是否有不圆度缺陷",
+            "defectType3": "是否有多边形缺陷",
+            "defectType4": "是否有车辆偏载缺陷",
+            "defectRank": "级别，1-3",
+            "alarmSend": "是否发送报警给用户，1是，0否",
+            "xAxis": [],
+            "yAxis": []
+          }
+        ]
+      }
+    ]
+}
