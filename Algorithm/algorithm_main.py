@@ -19,8 +19,13 @@ def al_main(file):
 
     # 提取时间和数据
     for file in file_list:
-        date_time = file.split(',')[0]
-        data = file.split(',')[4]
+        data = 0.0
+        file_date_data = file.strip().split(',')
+        date_time = file_date_data[0]
+        if len(file_date_data) == 6:
+            data = file_date_data[4]
+        elif len(file_date_data) == 2:
+            data = file_date_data[1]
         date_time_type = dt.fromisoformat(date_time)
         date_time_list.append(date_time)
         data_list.append(float(data))

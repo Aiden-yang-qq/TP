@@ -2,6 +2,8 @@
 # 扫描接口模块：扫描文件夹，有新的txt文档则调用数据采集模块
 from os import path, walk, listdir
 # from Config import ConfigInfo
+from numpy import array, transpose
+from time import localtime, strftime
 from shutil import copytree, rmtree, move
 from logging import basicConfig, DEBUG, warning, info
 from Database.data_collection import optical_fiber_collection
@@ -67,7 +69,7 @@ def database_creation(dc_path):
     # folder_creation(cfp_pre, algorithm_folder_name)  # 创建经过算法后的数据库"Data_lib"文件夹
 
     # 生成车号文件夹，并将Original_DB和Original_DB_pressure中的文件复制进去
-    odb_dir, new_folder_name = original_db_scanning(dc_path, odb_folder_name)
+    odb_dir, new_folder_name, all_car_aei = original_db_scanning(dc_path, odb_folder_name)
     # odb_pre_dir, new_folder_pre_name = original_db_scanning(dc_path, odb_pressure_name)
 
     # 在Data_lib文件夹中建立年、月、日文件夹
@@ -89,7 +91,7 @@ def database_creation(dc_path):
                 try:
                     odb_list = listdir(odb_dir)
                     for f in odb_list:
-                        odb_file_dir = odb_dir + '/' + f
+                        odb_file_dir = odb_dir + '\\' + f
                         move(odb_file_dir, car_folder_dir)
                 except Exception as e:
                     info(e)
@@ -117,21 +119,29 @@ def database_creation(dc_path):
                     rmtree(old_car_data_path)
                 except Exception as e:
                     warning(e)
-    return car_no_folders[0], all_car
+    return car_no_folders[0], all_car, all_car_aei
 
 
 def original_db_scanning(ods_path, odb_folder_name):
     # 原始数据存放的文件夹名称：odb_folder_name:Original_DB和Original_DB_pressure
     odb_path = ''
     new_folder_name = ''
+    all_car_aei = []
     parent_odb_list = listdir(ods_path)
 
     if odb_folder_name in parent_odb_list:
         odb_path = ods_path + '\\' + odb_folder_name
         aei = search_aei_suffix(odb_path, odb_folder_name)
         if aei is not None:
-            car_no, date_time, carriage_no = aei_file_analysis(aei)
+            # car_no, date_time, car_direction, carriage_no, car_axle, all_tran_carriage_list = aei_file_analysis(aei)
+            car_no, date_time, car_direction, carriage_no, car_axle, all_carriage_aei = aei_file_analysis(aei)
             new_folder_name = car_no + '#' + date_time
+            # all_car_aei = [car_no, date_time, car_direction, carriage_no, car_axle, all_tran_carriage_list]
+            all_car_aei = [car_no, date_time, car_direction, carriage_no, car_axle, all_carriage_aei]
+        else:
+            # TODO AEI file is None, algorithm continue
+            new_folder_name = 'Car_NO_Miss#' + strftime('%Y-%m-%d %H_%M_%S', localtime())
+            # print('AEI is None')
     else:
         print('%s文件夹不存在，请检查数据是否存放正确！' % odb_folder_name)
         info('%s文件夹不存在，请检查数据是否存放正确！' % odb_folder_name)
@@ -139,7 +149,7 @@ def original_db_scanning(ods_path, odb_folder_name):
             make_directory(ods_path, odb_folder_name)
         except Exception as e:
             warning(e)
-    return odb_path, new_folder_name
+    return odb_path, new_folder_name, all_car_aei
 
 
 def search_aei_suffix(ss_path, odb_folder_name):
@@ -168,9 +178,14 @@ def search_aei_suffix(ss_path, odb_folder_name):
                 if s not in sfx_list:
                     print('找不到%s文件，请重新检查数据！' % s)
                     info('找不到%s文件，请重新检查数据！' % s)
-                    rmtree(ss_path)  # 删除'Original_DB'文件夹
-                    make_directory(path.dirname(ss_path), odb_folder_name)  # 新建'Original_DB'文件夹
-                    return None
+
+                    # TODO 没有'.AEI'文件
+
+                    # TODO 没有'.txt'文件
+
+                    # rmtree(ss_path)  # 删除'Original_DB'文件夹
+                    # make_directory(path.dirname(ss_path), odb_folder_name)  # 新建'Original_DB'文件夹
+                    # return None
     else:
         print('%s文件夹中无可用文件，请重新传入文件！' % odb_folder_name)
         info('%s文件夹中无可用文件，请重新传入文件！' % odb_folder_name)
@@ -192,12 +207,41 @@ def aei_file_analysis(aei_file):
     """
     car_no = ''
     date_time = ''
-    carriage_no = ''
+    car_direction = ''
+    carriage_count = ''
+    car_axle = ''
+    all_carriage_aei = []
+    # all_tran_carriage_list = []
     if aei_file is not None:
         aei_property = aei_file[0].split(',')
         car_no = aei_property[1]
         date_time = aei_property[2]
         date_time = time_reconstruct(date_time)
-        carriage_no = aei_property[5]
+        car_direction = aei_property[3]
+        carriage_count = aei_property[5]
+        car_axle = aei_property[6]
         # print(date_time)
-    return car_no, date_time, carriage_no
+
+        """
+        carriage_info[0]:'RRE'
+        carriage_info[1]:'001'          序号
+        carriage_info[2]:'R'
+        carriage_info[3]:'       C63'
+        carriage_info[4]:'0000011158'   车厢号
+        carriage_info[5]:'A'
+        carriage_info[6]:'37'           车厢速度
+        carriage_info[7]:'04'
+        """
+        for carriage_aei in aei_file[1:]:
+            carriage_info = carriage_aei.strip().split(',')
+            serial_number = int(carriage_info[1])
+            carriage_no = int(carriage_info[4][5:])
+            carriage_last_no = int(carriage_info[4][-1])
+            carriage_speed = int(carriage_info[6])
+            carriage_simple_info = [serial_number, carriage_last_no, carriage_no, carriage_speed]
+            all_carriage_aei.append(carriage_simple_info)  # all_carriage_aei为[8, 4] 车厢数×参数数
+        # all_carriage_aei_arr = array(all_carriage_aei)
+        # all_tran_carriage = transpose(all_carriage_aei_arr, [1, 0])
+        # all_tran_carriage_list = all_tran_carriage.tolist()  # all_tran_carriage_list为[4， 8] 参数数×车厢数
+    # return car_no, date_time, car_direction, carriage_count, car_axle, all_tran_carriage_list
+    return car_no, date_time, car_direction, carriage_count, car_axle, all_carriage_aei

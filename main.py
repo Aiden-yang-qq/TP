@@ -17,15 +17,15 @@ def main_exe():
         print('数据正在处理，请稍等……')
         a = time()
         main_path = getcwd()
-        json_file_name, folders = database_creation(main_path)
+        json_file_name, folders, all_car_aei = database_creation(main_path)
 
         # TODO 数据库中有txt文件后，对folders读取，并做车轮数据提取整合，然后保存成json文件
         optical_fiber_data = optical_data_splitting(folders, 100)
-        all_wheel_data = optical_data_to_wheel(optical_fiber_data, 100)
+        x_wheel_data, all_wheel_data = optical_data_to_wheel(optical_fiber_data, 100)
 
         # 将车轮数据保存成json文件
         # json_file = read_json()
-        all_car_set_json = car_json_integration(json_file_name, all_wheel_data)
+        all_car_set_json = car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_aei)
         write_json(json_file_name, all_car_set_json)
 
         b = time()

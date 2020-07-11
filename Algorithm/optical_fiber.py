@@ -103,10 +103,10 @@ def time_wave(tw_time, tw_wave):
                     if len(wave_str) != 9:
                         wave_str += (9 - len(wave_str)) * '0'
                     # 数据格式：'2020-07-01 16:02:41.600 1534.2053\n'（二者取其一）
-                    # tw_list.append(tw_time_str + ' ' + wave_str + '\n')
+                    tw_list.append(tw_time_str.replace('.', ':') + ',' + wave_str + '\n')
                     # 数据格式：'2020-03-02 11:27:38:041,1,8,1,1550.2507,\n'（二者取其一）
-                    tw_time_str = tw_time_str.replace('.', ':')
-                    tw_list.append(tw_time_str + ',1,8,1,' + wave_str + ',\n')
+                    # tw_time_str = tw_time_str.replace('.', ':')
+                    # tw_list.append(tw_time_str + ',1,8,1,' + wave_str + ',\n')
 
                 tw_all_list.append(tw_list)
         return tw_all_list

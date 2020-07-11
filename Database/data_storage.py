@@ -1,10 +1,12 @@
 # 将数据存成txt文档，文件名称以车号命名
-from json import load, dump, dumps
-from math import ceil
-from uuid import uuid1
+from json import load, dump
 from logging import info
-from Function.func_collection import write_txt
+from uuid import uuid1
+from numpy import array, transpose
+# from math import ceil
+from time import strftime, localtime
 from Algorithm.data_splitting_integration import data_normalization
+from Function.func_collection import write_txt
 
 
 def data_to_txt(path, each_wheel_data):
@@ -43,58 +45,58 @@ def write_json(json_name, json_data):
         dump(json_data, f)
 
 
-def car_json(car_no, file_name='', sddt='', wheel_no=64, all_carriage_json=[]):
+def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train_speed, train_direction,
+             sides, all_carriage_json):
     car = {
-        "dataStatus": "",  # 0正常，1少车 2少轴
+        "dataStatus": "%s" % data_status,  # 0正常，1少车 2少轴
         "carNo": "%s" % car_no,  # 车号
         "sd": "",  # 速度
-        "sddt": "%s" % sddt,  # 数据生成检测时间
-        "edsi": "",  # site identifier站点标识
+        "sddt": "%s" % strftime('%Y-%m-%d %H:%M:%S', localtime()),  # 数据生成检测时间
+        "edsi": "",  # site identifier 站点标识：深圳
         "fileName": "%s" % file_name,  # 文件名
-        "dtOfPass": "",  # 检测时间,MM/DD/YYYY HH:MM:SS
-        "numOfAxle": "%s" % int(wheel_no / 2),  # 总轴数（根据车厢换算：轴数=车厢数×4）
-        "numOfCarr": "%s" % int(wheel_no / 8),  # 总车厢数
-        "trainSpeed": "",  # ""%s" % train_speed,  # 平均速度（列车的速度根据8节车厢的平均速度来给定）
-        "trainDirection": "",  # 列车方向  N F
-        "sides": "",  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "",  # 软件版本号
-        "vi": all_carriage_json  # TODO 根据实际车厢数修改txt文件
+        "dtOfPass": "%s" % pass_time,  # 检测时间,MM/DD/YYYY HH:MM:SS 车号文件
+        "numOfAxle": "%s" % num_axle,  # 总轴数（根据车厢换算：轴数=车厢数×4）
+        "numOfCarr": "%s" % num_car,  # 总车厢数
+        "trainSpeed": "%s" % train_speed,  # 平均速度（列车的速度根据8节车厢的平均速度来给定）
+        "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
+        "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
+        "verOfsoftware": "v2.3.0",  # 软件版本号
+        "vi": all_carriage_json
     }
     return car
 
 
-def carriage_json(axle_count, all_wheel_json):
+def carriage_json(vehicle_no, car_ori, axle_count, vehicle_seq, all_wheel_json):
     carriage = {
         "vid": "%s" % uuid1(),  # 32位uuid
-        "vehicleNo": "",  # ""%s" % vehicle_no_bc,  # 车厢号
-        "carOri": "",  # 车厢方向
+        "vehicleNo": "%s" % vehicle_no,  # 车厢号（车号文件）
+        "carOri": "%s" % car_ori,  # 车厢方向
         "axleCount": "%d" % axle_count,  # 轴数
         "vehicleType": "",  # 车厢类型，5=机车，19=挂车，其他值=其他
-        "vehicleSeq": "",  # 辆序
+        "vehicleSeq": "%s" % vehicle_seq,  # 辆序：（1-8）车号文件
         "bc": all_wheel_json  # TODO 根据实际轮数修改txt文件
     }
     return carriage
 
 
-def wheel_json(rail, axle_seq, invalid_flag=0, x_axis=[], y_axis=[]):
-    # x_axis = []
-    # y_axis = []
+def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, vehicle_side, speed, x_axis, y_axis,
+               invalid_flag=0, bearing_defect=0):
     car_wheel = {
         "bcd": "%s" % uuid1(),
         "rail": "%s" % rail,  # 取值NS,FS
-        "vehicleAxleSeq": "%s" % axle_seq,  # 在该车厢的轴序
-        "axleSeq": "",  # 在整个编组中的轴序，取值1-9999（指8节车厢中的哪一节车厢）
-        "vehicleSeq": "",  # 辆序，取值1-999，对应vi里的seqs
-        "vehicleNoBC": "",  # ""%s" % vehicle_no_bc,  # 车号，对应vi里的vehicleNo
-        "vehicleSide": "",  # 左右侧，取值L,R,U
-        "axleSpeed": "",  # "%d mph" % speed,  # 通过速度mph（车轮的速度根据车厢来给定）
+        "vehicleAxleSeq": "%s" % vehicle_axle_seq,  # 在该车厢的轴序（1-4）
+        "axleSeq": "%s" % axle_seq,  # 在整个编组中的轴序，取值1-9999（指8节车厢中的哪一节车厢，1-32）
+        "vehicleSeq": "%s" % vehicle_seq,  # 辆序，取值1-999，对应vi里的seqs
+        "vehicleNoBC": "%s" % vehicle_no_bc,  # 车号，对应vi里的vehicleNo
+        "vehicleSide": "%s" % vehicle_side,  # 左右侧，取值L,R,U
+        "axleSpeed": "%s" % speed,  # 通过速度mph（车轮的速度根据车厢来给定）
         "invalidFlag": "%s" % invalid_flag,  # 数据是否有效，0有效，其他无效
         "invalidDesc": "",  # 无效描述
         "data1": "",  # 值,-999.999-999.999
         "data2": "",  # 值,-999.999-999.999
         "data3": "",  # 值,-999.999-999.999
         "data4": "",  # 值,-999.999-999.999
-        "bearingDefect": "",  # 是否有缺陷，0无，1有
+        "bearingDefect": "%s" % bearing_defect,  # 是否有缺陷，0无，1有
         "defectType1": "",  # 是否有平轮缺陷
         "defectType2": "",  # 是否有不圆度缺陷
         "defectType3": "",  # 是否有多边形缺陷
@@ -107,35 +109,119 @@ def wheel_json(rail, axle_seq, invalid_flag=0, x_axis=[], y_axis=[]):
     return car_wheel
 
 
-def car_json_integration(json_name, all_wheel_data):
-    all_wheel_no = len(all_wheel_data)
-    car_no = json_name[:4]
+def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_aei):
+    all_car_json = {}
+    try:
+        car_no = ''
+        date_time = ''
+        direction = ''
+        all_axle_count = ''
+        all_carriage_info = ''
+        all_carriage_count = ''
+        all_carriage_info_tran = ''
+        all_axle_no = len(all_wheel_data)
+        if len(all_car_aei) != 0:
+            car_no = all_car_aei[0]
+            date_time = all_car_aei[1]
+            direction = all_car_aei[2]
+            all_carriage_count = all_car_aei[3]
+            all_axle_count = all_car_aei[4]
+            all_carriage_info = all_car_aei[5]
+        if len(all_carriage_info) != 0:
+            all_carriage_info_arr = array(all_carriage_info)
+            all_carriage_info_tran = transpose(all_carriage_info_arr, [1, 0])
 
-    # 各个车轮json数据
-    all_wheel_json = []
-    all_wheel_set_json = []
-    for i in range(all_wheel_no):
-        if i % 2 == 0:
-            rail = 'NS'
+        # 各个车轮json数据
+        all_wheel_json = []
+        all_wheel_set_json = []
+        for i in range(all_axle_no):
+            for j in range(len(all_wheel_data[i])):
+                if j == 0:
+                    rail = 'NS'
+                    vehicle_side = 'L'
+                else:
+                    rail = 'FS'
+                    vehicle_side = 'R'
+
+                vehicle_axle_seq = (i + 1) % 4
+                if vehicle_axle_seq == 0:
+                    vehicle_axle_seq = 4
+
+                speed = ''
+                vehicle_seq = ''
+                vehicle_no_bc = ''
+                axle_seq = i + 1
+                if len(all_car_aei) != 0:
+                    vehicle_seq = all_car_aei[5][i // 4][1]
+                    vehicle_no_bc = all_car_aei[5][i // 4][2]
+                    speed = all_car_aei[5][i // 4][3]
+
+                wheel_single_json = wheel_json(rail=rail, vehicle_axle_seq=vehicle_axle_seq, axle_seq=axle_seq,
+                                               vehicle_seq=vehicle_seq, vehicle_no_bc=vehicle_no_bc,
+                                               vehicle_side=vehicle_side, speed=speed,
+                                               x_axis=x_wheel_data, y_axis=all_wheel_data[i][j])
+                all_wheel_json.append(wheel_single_json)
+            if len(all_wheel_json) % 8 == 0:
+                all_wheel_set_json.append(all_wheel_json)
+                all_wheel_json = []
+
+        # 各个车厢json数据
+        count_carriage = 0
+        all_carriage_json = []
+        # for i in range(len(all_wheel_set_json)):
+        #     axle_count = int(len(all_wheel_set_json[i]) / 2)
+        #     carriage_single_json = carriage_json(vehicle_no=vehicle_no, axle_count=axle_count, vehicle_seq=vehicle_seq,
+        #                                          all_wheel_json=all_wheel_set_json[i])
+        #     all_carriage_json.append(carriage_single_json)
+        if len(all_carriage_info) != 0:
+            for i in range(len(all_carriage_info)):
+                carriage_num = all_carriage_info[i][2]
+                vehicle_seq = all_carriage_info[i][1]
+                if i + 1 <= len(all_wheel_set_json):
+                    wheel_set_json = all_wheel_set_json[i]
+                    axle_count = int(len(wheel_set_json) / 2)
+                    carriage_single_json = carriage_json(vehicle_no=carriage_num, car_ori=direction,
+                                                         axle_count=axle_count, vehicle_seq=vehicle_seq,
+                                                         all_wheel_json=wheel_set_json)
+                else:
+                    axle_count = 0
+                    carriage_single_json = carriage_json(vehicle_no=carriage_num, car_ori=direction,
+                                                         axle_count=axle_count, vehicle_seq=vehicle_seq,
+                                                         all_wheel_json=[])
+                    count_carriage += 1
+                all_carriage_json.append(carriage_single_json)
         else:
-            rail = 'FS'
+            for i in range(len(all_wheel_set_json)):
+                carriage_num = ''
+                vehicle_seq = ''
+                wheel_set_json = all_wheel_set_json[i]
+                axle_count = int(len(wheel_set_json) / 2)
+                carriage_single_json = carriage_json(vehicle_no=carriage_num, car_ori=direction,
+                                                     axle_count=axle_count, vehicle_seq=vehicle_seq,
+                                                     all_wheel_json=wheel_set_json)
+                all_carriage_json.append(carriage_single_json)
 
-        axle_seq = ceil((i + 1) / 2)
-        wheel_single_json = wheel_json(rail=rail, axle_seq=axle_seq, x_axis=all_wheel_data[i][0],
-                                       y_axis=all_wheel_data[i][1])
-        all_wheel_json.append(wheel_single_json)
-        if len(all_wheel_json) % 8 == 0:
-            all_wheel_set_json.append(all_wheel_json)
+        # 整车json数据
+        data_status = 0
+        if count_carriage != 0 or len(all_car_aei) == 0:
+            data_status = 1
+        # 计算列车平均速度
+        if len(all_carriage_info_tran) != 0:
+            speed_tran = all_carriage_info_tran[3].tolist()
+            average_speed = int(sum(speed_tran) / len(speed_tran))
 
-    # 各个车厢json数据
-    all_carriage_json = []
-    for i in range(len(all_wheel_set_json)):
-        axle_count = int(len(all_wheel_set_json[i]) / 2)
-        carriage_single_json = carriage_json(axle_count, all_wheel_json=all_wheel_set_json[i])
-        all_carriage_json.append(carriage_single_json)
-
-    # 整车json数据
-    all_car_json = car_json(car_no=car_no, wheel_no=all_wheel_no, all_carriage_json=all_carriage_json)
+            all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
+                                    pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,
+                                    train_speed=average_speed, train_direction=direction, sides=direction,
+                                    all_carriage_json=all_carriage_json)
+        else:
+            average_speed = ''
+            all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
+                                    pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,
+                                    train_speed=average_speed, train_direction=direction, sides=direction,
+                                    all_carriage_json=all_carriage_json)
+    except Exception as e:
+        print(e)
     return all_car_json
 
 

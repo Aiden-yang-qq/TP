@@ -4,6 +4,7 @@ from Algorithm.algorithm_main import al_main
 from Database.data_storage import data_to_txt
 from Function.func_collection import make_directory
 from shutil import rmtree
+from logging import info
 
 
 def wheel_no_collection(wnc_path, file_name):
@@ -13,35 +14,38 @@ def wheel_no_collection(wnc_path, file_name):
 
 
 def optical_fiber_collection(ofc_path, folders):
-    car_all = {}
-    # all_optical = []
     all_nor_optical = []
-    for folder in folders:
-        car = {}
-        folder_date = folder.split()[0].split('#')[1].split('-')
-        parent_path = path.dirname(ofc_path)
-        data_lib_path = parent_path + '\\Data_lib\\' + folder_date[0] + '\\' + folder_date[1] + '\\' + folder_date[2]
-        if path.exists(data_lib_path):  # 在Data_lib文件夹中新建各个车厢的文件夹
-            alg_path = make_directory(data_lib_path, folder)
-            if alg_path is not None:
-                file_dir = ofc_path + '/' + folder
-                file_list = listdir(file_dir)
+    try:
+        car_all = {}
+        all_nor_optical = []
+        for folder in folders:
+            car = {}
+            fd = folder.split()[0].split('#')[1].split('-')  # fd:folder_date
+            parent_path = path.dirname(ofc_path)
+            data_lib_path = parent_path + '\\Data_lib\\' + fd[0] + '\\' + fd[1] + '\\' + fd[2]
+            if path.exists(data_lib_path):  # 在Data_lib文件夹中新建各个车厢的文件夹
+                alg_path = make_directory(data_lib_path, folder)
+                if alg_path is not None:
+                    file_dir = ofc_path + '\\' + folder
+                    file_list = listdir(file_dir)
 
-                for file in file_list:
-                    if file.split('.')[1] == 'txt':
-                        file_path = file_dir + '/' + file
-                        data = al_main(file_path)  # 调用算法主程序
+                    for file in file_list:
+                        if file.split('.')[1] == 'txt':
+                            file_path = file_dir + '/' + file
+                            data = al_main(file_path)  # 调用算法主程序
 
-                        # 输出到文件夹
-                        file_open_path = alg_path + '/' + file
-                        each_nor_optical = data_to_txt(file_open_path, data)
-                        all_nor_optical.append(each_nor_optical)
+                            # 输出到文件夹
+                            file_open_path = alg_path + '/' + file
+                            each_nor_optical = data_to_txt(file_open_path, data)
+                            all_nor_optical.append(each_nor_optical)
 
-                        # 存成字典备用
-                        car.update({file.split('.')[0]: data})  # 将每个车号下的txt文档添加到字典中
-                        car_all.update({folder: car})  # 将数据库中的每个车号添加到字典中
-                # all_optical.append(all_nor_optical)
-            else:
-                rmtree(ofc_path)
-                make_directory(path.dirname(ofc_path), 'Data_pool')
+                            # 存成字典备用
+                            car.update({file.split('.')[0]: data})  # 将每个车号下的txt文档添加到字典中
+                            car_all.update({folder: car})  # 将数据库中的每个车号添加到字典中
+                else:
+                    rmtree(ofc_path)
+                    make_directory(path.dirname(ofc_path), 'Data_pool')
+    except Exception as e:
+        info(e)
+        print(e)
     return all_nor_optical
