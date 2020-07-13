@@ -26,7 +26,7 @@ def data_to_txt(path, each_wheel_data):
                 write_txt(path, ea)
                 return each_normalization_wheel
     except Exception as e:
-        info(e)
+        info('data_storage:', e)
 
 
 def read_json():
@@ -39,10 +39,13 @@ def read_json():
 
 
 def write_json(json_name, json_data):
-    json_path = 'D:\\json_file_TP'
-    json_dir = json_path + '\\' + json_name + '.json'
-    with open(json_dir, 'w') as f:
-        dump(json_data, f)
+    try:
+        json_path = 'D:\\json_file_TP'
+        json_dir = json_path + '\\' + json_name + '.json'
+        with open(json_dir, 'w') as f:
+            dump(json_data, f)
+    except Exception as e:
+        info('data_storage:', e)
 
 
 def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train_speed, train_direction,
@@ -168,11 +171,6 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_a
         # 各个车厢json数据
         count_carriage = 0
         all_carriage_json = []
-        # for i in range(len(all_wheel_set_json)):
-        #     axle_count = int(len(all_wheel_set_json[i]) / 2)
-        #     carriage_single_json = carriage_json(vehicle_no=vehicle_no, axle_count=axle_count, vehicle_seq=vehicle_seq,
-        #                                          all_wheel_json=all_wheel_set_json[i])
-        #     all_carriage_json.append(carriage_single_json)
         if len(all_carriage_info) != 0:
             for i in range(len(all_carriage_info)):
                 carriage_num = all_carriage_info[i][2]
@@ -215,6 +213,7 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_a
                                     train_speed=average_speed, train_direction=direction, sides=direction,
                                     all_carriage_json=all_carriage_json)
         else:
+            car_no = 'unknown'
             average_speed = ''
             all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
                                     pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,

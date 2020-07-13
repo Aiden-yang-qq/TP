@@ -2,6 +2,16 @@
 from os import listdir, makedirs, path
 from logging import warning, info
 from datetime import datetime
+from shutil import rmtree
+
+
+def folder_creation(fc_parent_path, folder_name):
+    fc_path = fc_parent_path + '\\' + folder_name
+    if not path.exists(fc_path):
+        try:
+            make_directory(fc_parent_path, folder_name)
+        except Exception as e:
+            warning(e)
 
 
 def make_directory(md_path, folder_name):
@@ -12,13 +22,17 @@ def make_directory(md_path, folder_name):
         sub_path = md_path + '\\' + folder_name
         makedirs(sub_path)
     else:
-        # print('%s文件夹已存在！' % folder_name)
         print('路径“%s”中已存在“%s”文件夹！' % (md_path, folder_name))
         info('路径“%s”中已存在“%s”文件夹！' % (md_path, folder_name))
     return sub_path
 
 
 def read_txt(txt_name):
+    """
+    .txt文件读取
+    :param txt_name: 完整txt文件路径，例：'E:\\Python\\Pyinstaller\\TP\\Original_DB\\01.txt'
+    :return:
+    """
     with open(txt_name, 'r') as f:
         txt_list = f.readlines()
     return txt_list
@@ -71,10 +85,12 @@ def year_mon_day_folder_generation(original_path, date_time_list):  # 建立年-
         warning(e)
 
 
-def folder_creation(fc_parent_path, folder_name):
-    fc_path = fc_parent_path + '\\' + folder_name
-    if not path.exists(fc_path):
-        try:
-            make_directory(fc_parent_path, folder_name)
-        except Exception as e:
-            warning(e)
+def make_empty_folder(mef_path, folder_name):
+    """
+    空文件夹创建
+    :param mef_path: 创建路径
+    :param folder_name: 空文件夹名称
+    :return:
+    """
+    rmtree(mef_path+'\\'+folder_name)
+    folder_creation(mef_path, folder_name)

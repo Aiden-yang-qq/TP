@@ -1,14 +1,14 @@
 # scanning_interface.py
 # 扫描接口模块：扫描文件夹，有新的txt文档则调用数据采集模块
-from os import path, walk, listdir
 # from Config import ConfigInfo
-from numpy import array, transpose
+# from numpy import array, transpose
+from os import path, walk, listdir
 from time import localtime, strftime
 from shutil import copytree, rmtree, move
 from logging import basicConfig, DEBUG, warning, info
 from Database.data_collection import optical_fiber_collection
 from Function.func_collection import make_directory, read_txt, time_reconstruct, year_mon_day_folder_generation, \
-    folder_creation
+    folder_creation, make_empty_folder
 
 basicConfig(filename='logging_file.log', level=DEBUG)
 
@@ -94,32 +94,41 @@ def database_creation(dc_path):
                         odb_file_dir = odb_dir + '\\' + f
                         move(odb_file_dir, car_folder_dir)
                 except Exception as e:
-                    info(e)
+                    info('scanning_interface:', e)
         else:
             print('%s文件夹在%s中已存在，%s中的数据已经过计算，请重新检查数据！' % (new_fo_name, backup_folder_name, odb_folder_name))
             info('%s文件夹在%s中已存在，%s中的数据已经过计算，请重新检查数据！' % (new_fo_name, backup_folder_name, odb_folder_name))
             rmtree(odb)  # 删除已经计算过的'Original_DB'文件夹
             make_directory(dc_path, odb_folder_name)  # 新建'Original_DB'文件夹
 
+    car_no_folders_name = ''
     top_tuple = scan_path(data_pool_path)
     car_no_folders = top_tuple[1]
+    if len(car_no_folders) != 0:
+        car_no_folders_name = car_no_folders[0]
 
     # 创建备份数据库，同时将原始数据库中的内容复制进去
     all_car = {}
-    if len(car_no_folders) != 0:
-        all_car = optical_fiber_collection(data_pool_path, car_no_folders)  # 进行数据采集
-        if len(all_car) != 0:
-            for car_no in car_no_folders:
-                cn_date = str(car_no).split()[0].split('#')[1].split('-')
-                car_no_date = cn_date[0] + '\\' + cn_date[1] + '\\' + cn_date[2]
-                old_car_data_path = data_pool_path + '\\' + car_no
-                new_car_data_path = data_pool_back_path + '\\' + car_no_date + '\\' + car_no
-                try:
-                    copytree(old_car_data_path, new_car_data_path)
-                    rmtree(old_car_data_path)
-                except Exception as e:
-                    warning(e)
-    return car_no_folders[0], all_car, all_car_aei
+    try:
+        if len(car_no_folders) != 0:
+            all_car = optical_fiber_collection(data_pool_path, car_no_folders)  # 进行数据采集
+            if len(all_car) != 0:
+                for car_no in car_no_folders:
+                    cn_date = str(car_no).split()[0].split('#')[1].split('-')
+                    car_no_date = cn_date[0] + '\\' + cn_date[1] + '\\' + cn_date[2]
+                    old_car_data_path = data_pool_path + '\\' + car_no
+                    new_car_data_path = data_pool_back_path + '\\' + car_no_date + '\\' + car_no
+                    try:
+                        copytree(old_car_data_path, new_car_data_path)
+                        rmtree(old_car_data_path)
+                    except Exception as e:
+                        warning(e)
+
+        # 清空Data_pool文件夹，方便下次的文件计算
+        make_empty_folder(cfp, original_folder_name)
+    except Exception as e:
+        info('scanning_interface:', e)
+    return car_no_folders_name, all_car, all_car_aei
 
 
 def original_db_scanning(ods_path, odb_folder_name):
@@ -139,9 +148,9 @@ def original_db_scanning(ods_path, odb_folder_name):
             # all_car_aei = [car_no, date_time, car_direction, carriage_no, car_axle, all_tran_carriage_list]
             all_car_aei = [car_no, date_time, car_direction, carriage_no, car_axle, all_carriage_aei]
         else:
-            # TODO AEI file is None, algorithm continue
-            new_folder_name = 'Car_NO_Miss#' + strftime('%Y-%m-%d %H_%M_%S', localtime())
-            # print('AEI is None')
+            # AEI file is None, algorithm continue
+            if len(listdir(odb_path)) != 0:
+                new_folder_name = 'Car_NO_Miss#' + strftime('%Y-%m-%d %H_%M_%S', localtime())
     else:
         print('%s文件夹不存在，请检查数据是否存放正确！' % odb_folder_name)
         info('%s文件夹不存在，请检查数据是否存放正确！' % odb_folder_name)

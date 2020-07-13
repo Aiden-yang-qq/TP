@@ -25,16 +25,17 @@ def main_exe():
 
         # 将车轮数据保存成json文件
         # json_file = read_json()
-        all_car_set_json = car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_aei)
-        write_json(json_file_name, all_car_set_json)
+        if len(json_file_name) != 0:
+            all_car_set_json = car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_aei)
+            write_json(json_file_name, all_car_set_json)
 
         b = time()
         print('数据处理耗时:%.4fs，程序结束！' % (b - a))
-        sleep(3)
+        sleep(1)
         info('本次数据处理已完成，共耗时%.4fs:' % (b - a))
         info('---------------------------------------')
     except Exception as e:
-        info(e)
+        info('main_error:', e)
 
     # info('---------------------------------------')
     # info(ctime())

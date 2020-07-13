@@ -111,7 +111,7 @@ def time_wave(tw_time, tw_wave):
                 tw_all_list.append(tw_list)
         return tw_all_list
     except Exception as e:
-        info(e)
+        info('optical_fiber:', e)
 
 
 if __name__ == '__main__':
