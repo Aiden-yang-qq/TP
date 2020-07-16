@@ -19,7 +19,7 @@ def data_to_txt(path, each_wheel_data):
                 each_normalization_wheel.append(each_wheel_data[0])
                 each_normalization_wheel.append(each_wheel_nor_data)
                 for i in range(len(each_wheel_data[0])):
-                    ewd = str(round(each_wheel_data[0][i], 3)) + ' ' + str(each_wheel_nor_data[i])  # 保留小数位数越多越精确
+                    ewd = str(round(each_wheel_data[0][i], 6)) + ' ' + str(each_wheel_nor_data[i])  # 保留小数位数越多越精确
                     ewd_all.append(ewd)
 
                 ea = "\n".join(ewd_all)

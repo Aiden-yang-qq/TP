@@ -22,13 +22,20 @@ def al_main(file):
         data = 0.0
         file_date_data = file.strip().split(',')
         date_time = file_date_data[0]
+        date_time_list.append(date_time)
+
+        # 数据整合
         if len(file_date_data) == 6:
             data = file_date_data[4]
         elif len(file_date_data) == 2:
             data = file_date_data[1]
-        date_time_type = dt.fromisoformat(date_time)
-        date_time_list.append(date_time)
         data_list.append(float(data))
+
+        # 时间格式整合
+        date_time_type = ''
+        if len(date_time) != 26:
+            datetime_format = date_time + (26 - len(date_time)) * '0'
+            date_time_type = dt.fromisoformat(datetime_format)
         datetime_list.append(date_time_type)
 
     # 根据时间整理坐标系（时间——x轴）

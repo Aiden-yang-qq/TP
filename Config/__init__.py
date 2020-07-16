@@ -1,12 +1,15 @@
+from sys import argv
 from os import path
 from configparser import ConfigParser
 
 
 class ConfigInfo:
     def __init__(self):
-        self.cf_path = path.split(__file__)[0]  # 取出当前文件所处路径
-        self.file_path = self.cf_path + '\\Config.ini'
+        self.cf_path = path.dirname(path.realpath(argv[0]))  # 取出当前文件所处路径
+        self.file_path = self.cf_path + '\\Config\\config.ini'
+        # print('config_path:', path.realpath(self.file_path))
         self.cp = ConfigParser()
+        # self.cp.read(self.file_path, encoding='utf-8-sig')
         self.cp.read(self.file_path)
 
     def is_first_scan(self):
@@ -23,6 +26,18 @@ class ConfigInfo:
             # TODO 获取新增数据列表
             # TODO 调用算法程序
         return fs
+
+    def get_original_db_name(self):
+        original_db_name = self.cp.get('DATABASE', 'original_db_name')
+        return original_db_name
+
+    def get_original_temp_db_name(self):
+        original_temp_db_name = self.cp.get('DATABASE', 'original_temp_db_name')
+        return original_temp_db_name
+
+    def get_optical_fiber_frequency(self):
+        optical_fiber_frequency = self.cp.get('PRE_SET', 'optical_fiber_frequency')
+        return optical_fiber_frequency
 
 
 def str_to_bool(string):

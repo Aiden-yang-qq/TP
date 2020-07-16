@@ -1,17 +1,29 @@
 # data_splitting_integration.py 数据分割、整合模块
 # from matplotlib import pyplot as plt
+from Config import ConfigInfo
 from numpy import array, transpose, append as np_ap
 from logging import info
 
+conf = ConfigInfo()
+o_f_frequency = int(conf.get_optical_fiber_frequency())  # 获取采样频率
+
+if o_f_frequency == 100:
+    time_gap = 4
+elif o_f_frequency == 2000:
+    time_gap = 0.3
+
 
 def data_normalization(wheel_data):
-    nor_data_list = []
-    wd_max = max(wheel_data)
-    wd_min = min(wheel_data)
-    for d in wheel_data:
-        nor_data = round((d - wd_min) / (wd_max - wd_min), 4)
-        nor_data_list.append(nor_data)
-    return nor_data_list
+    try:
+        nor_data_list = []
+        wd_max = max(wheel_data)
+        wd_min = min(wheel_data)
+        for d in wheel_data:
+            nor_data = round((d - wd_min) / (wd_max - wd_min), 4)
+            nor_data_list.append(nor_data)
+        return nor_data_list
+    except Exception as e:
+        info('data_splitting_integration:', e)
 
 
 def wheel_data_integration(txt_list):
@@ -23,7 +35,7 @@ def wheel_data_integration(txt_list):
     return txt_list[2][0], left_optical
 
 
-def optical_data_splitting(txt_list, frequency=100):
+def optical_data_splitting(txt_list, frequency):
     optical_all_data = []  # 一维的数据：所有传感器的数据；二维的数据：各个传感器所有的峰值
     for each_optical in txt_list:
         x_wheel_set = []
@@ -38,9 +50,9 @@ def optical_data_splitting(txt_list, frequency=100):
 
         max_wheel_single_set.append(x_wheel_set[0])
         for i in range(1, len(x_wheel_set)):
-            if x_wheel_set[i][0] - x_wheel_set[i - 1][0] < 4:  # 4表示两数据之间间隔4秒以上的视为两段，4秒以内的视为一段
+            if x_wheel_set[i][0] - x_wheel_set[i - 1][0] < time_gap:  # 4表示两数据之间间隔4秒以上的视为两段，4秒以内的视为一段
                 max_wheel_single_set.append(x_wheel_set[i])
-            elif x_wheel_set[i][0] - x_wheel_set[i - 1][0] >= 4:
+            elif x_wheel_set[i][0] - x_wheel_set[i - 1][0] >= time_gap:
                 max_wheel_set.append(max_wheel_single_set)
                 max_wheel_single_set = [x_wheel_set[i]]
         if len(max_wheel_single_set) >= 2:
@@ -67,17 +79,31 @@ def optical_data_splitting(txt_list, frequency=100):
 
         x_wheel_list = []
         unit_interval = round(1 / frequency, 4)
+
+        # for x in x_data:
+        #     if x <= 3.0:
+        #         x_list = [round(unit_interval * a, 4) for a in range(6 * frequency)]
+        #         x_wheel_list.append(x_list)
+        #     elif 3.0 <= x <= last_wheel_value - 3.0:
+        #         x_list = [round(unit_interval * a, 4) for a in
+        #                   range(int(frequency * x) - 3 * frequency, int(frequency * x) + 3 * frequency)]
+        #         x_wheel_list.append(x_list)
+        #     else:
+        #         x_list = [round(unit_interval * a, 4) for a in
+        #                   range(int(frequency * last_wheel_value) - 6 * frequency, int(frequency * last_wheel_value))]
+        #         x_wheel_list.append(x_list)
+
         for x in x_data:
-            if x <= 3.0:
-                x_list = [round(unit_interval * a, 4) for a in range(6 * frequency)]
+            if int(x / unit_interval) <= 300:
+                x_list = [round(unit_interval * a, 4) for a in range(600)]
                 x_wheel_list.append(x_list)
-            elif 3.0 <= x <= last_wheel_value - 3.0:
+            elif 300 <= int(x / unit_interval) <= int(last_wheel_value / unit_interval) - 300:
                 x_list = [round(unit_interval * a, 4) for a in
-                          range(int(frequency * x) - 3 * frequency, int(frequency * x) + 3 * frequency)]
+                          range(int(frequency * x) - 300, int(frequency * x) + 300)]
                 x_wheel_list.append(x_list)
             else:
                 x_list = [round(unit_interval * a, 4) for a in
-                          range(int(frequency * last_wheel_value) - 6 * frequency, int(frequency * last_wheel_value))]
+                          range(int(frequency * last_wheel_value) - 600, int(frequency * last_wheel_value))]
                 x_wheel_list.append(x_list)
 
         y_wheel = []
@@ -89,11 +115,12 @@ def optical_data_splitting(txt_list, frequency=100):
             y_single_optical.append(y_wheel)
             y_wheel = []
 
+        # optical_all_data的输出格式:三维列表[12个传感器×32个车轮×600个数据][12×32×600]的矩阵
         optical_all_data.append(y_single_optical)
     return optical_all_data
 
 
-def optical_data_to_wheel(optical_all_data, frequency=100):
+def optical_data_to_wheel(optical_all_data, frequency):
     x_wheel = []
     wheel_tran_list = []
     try:
@@ -109,7 +136,8 @@ def optical_data_to_wheel(optical_all_data, frequency=100):
                 oad_arr_all = np_ap(oad_arr_all, oad_single_arr, axis=0)
 
             if optical_no * wheel_no == len(oad_arr_all):
-                oad_arr_all = oad_arr_all.reshape((optical_no, wheel_no, 6 * frequency))
+                # oad_arr_all = oad_arr_all.reshape((optical_no, wheel_no, 6 * frequency))
+                oad_arr_all = oad_arr_all.reshape((optical_no, wheel_no, 600))
 
             # oad_arr_all为12个传感器的ndarray形式，前6个为设备同侧传感器，后6个为设备对面侧传感器
             oad_arr_all_left = oad_arr_all[:6]  # 前6个传感器
@@ -139,24 +167,6 @@ def optical_data_to_wheel(optical_all_data, frequency=100):
             wheel_count = wheel_tran.shape[2]
             unit_interval = round(1 / frequency, 4)
             x_wheel = [round(unit_interval * x, 4) for x in range(wheel_count)]
-
-            # wheel_list_all_left = wheel_arr_all_left.tolist()
-            # wheel_list_all_right = wheel_arr_all_right.tolist()
-
-            # wheel_arr_all = transpose(oad_arr_all, [1, 0, 2])  # 将按传感器分组改成按轮子分组
-            # all_wheel_data = wheel_arr_all.tolist()
-            #
-            # all_wheel = []
-            # unit_interval = round(1 / frequency, 4)
-            # for single_wheel in all_wheel_data:
-            #     single_wheel_all = []
-            #     single_wheel_coordinate = []
-            #     for sw in single_wheel:
-            #         single_wheel_all += sw
-            #     x_wheel = [round(unit_interval * x, 4) for x in range(len(single_wheel_all))]
-            #     single_wheel_coordinate.append(x_wheel)
-            #     single_wheel_coordinate.append(single_wheel_all)
-            #     all_wheel.append(single_wheel_coordinate)
     except Exception as e:
         info(e)
         print(e)

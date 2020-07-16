@@ -1,11 +1,13 @@
 # data_collection.py 数据采集模块
-from os import path, listdir
-from Algorithm.algorithm_main import al_main
-from Database.data_storage import data_to_txt
-from Function.func_collection import make_directory, read_txt,writelines_txt
-from shutil import rmtree
-from logging import info
 from datetime import datetime, timedelta
+from logging import info
+from os import path, listdir
+from shutil import rmtree, move
+
+from Algorithm.algorithm_main import al_main
+from Config import ConfigInfo
+from Database.data_storage import data_to_txt
+from Function.func_collection import make_directory, read_txt, writelines_txt, folder_creation
 
 
 def wheel_no_collection(wnc_path, file_name):
@@ -55,24 +57,48 @@ def optical_fiber_collection(ofc_path, folders):
 
 
 def format_conversion(fc_path):
-    txt_ = read_txt(fc_path)
-    _txt = txt_[2:22]
-    frequency = int(txt_[0])
-    date_time = txt_[1].strip()
+    """
+    # TODO 读文件夹，存在文件则读取并进行格式转换，不存在则退出
+    :param fc_path:该路径为主程序的绝对路径
+    :return:
+    """
+    # 加载配置文件
+    conf = ConfigInfo()
+    original_db = conf.get_original_db_name()  # 获取Original_DB文件夹名称
+    original_temp_db = conf.get_original_temp_db_name()  # 获取Original_temp_DB文件夹名称
+    config_frequency = int(conf.get_optical_fiber_frequency())
+    decimal_places = len(str(1 / config_frequency)) - 2
 
-    datetime_ = datetime.fromisoformat(date_time)
-    time_delay = timedelta(microseconds=(10 ** 6 / frequency))
+    # 创建所需文件夹
+    fc_original_db_path = folder_creation(fc_path, original_db)
+    fc_original_temp_db_path = folder_creation(fc_path, original_temp_db)
 
+    # 从Original_temp_DB下读取文件进行处理
     txt_output = []
-    for i in range(len(_txt)):
-        format_time = str(datetime_ + time_delay * i)[:-1 * (8 - len(str(1 / frequency)))].replace('.', ':')
-        format_single_data = format_time + ',' + _txt[i].strip() + ','
-        txt_output.append(format_single_data)
+    txt_content = listdir(fc_original_temp_db_path)
+    if len(txt_content) != 0:
+        for txt_file_name in txt_content:
+            if txt_file_name[-4:] == '.txt':
+                txt_ = read_txt(fc_original_temp_db_path + '\\' + txt_file_name)  # txt文档读取
+                _txt = txt_[1:]  # 数据截取
 
-    # writelines_txt()
-    return txt_output
+                # 时间格式获取
+                date_time = txt_[0].strip()
+                datetime_ = datetime.fromisoformat(date_time)
+                time_delay = timedelta(microseconds=(10 ** 6 / config_frequency))
 
+                for i in range(len(_txt)):
+                    time_ = str(datetime_ + time_delay * i)
+                    if len(_txt[i]) > 1:
+                        format_time = ''
+                        if len(time_) == 26:
+                            format_time = time_[:20 + decimal_places].replace('.', ':')
+                        elif len(time_) == 19:
+                            format_time = time_ + ':' + '0' * decimal_places
+                        format_single_data = format_time + ',' + _txt[i].strip() + '\n'
+                        txt_output.append(format_single_data)
 
-if __name__ == '__main__':
-    txt_paht = 'D:\\jaysk\\Desktop\\TP\\document\\data_standard_format.txt'
-    fc = format_conversion(txt_paht)
+                writelines_txt(fc_original_db_path + '\\' + txt_file_name, txt_output)
+                txt_output = []
+            elif txt_file_name[-4:] == '.AEI':
+                move(fc_original_temp_db_path + '\\' + txt_file_name, fc_original_db_path + '\\' + txt_file_name)

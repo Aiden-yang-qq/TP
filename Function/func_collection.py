@@ -1,7 +1,7 @@
 # Function function module
-from os import listdir, makedirs, path
-from logging import warning, info
 from datetime import datetime
+from logging import warning, info
+from os import listdir, makedirs, path
 from shutil import rmtree
 
 
@@ -12,10 +12,10 @@ def folder_creation(fc_parent_path, folder_name):
             make_directory(fc_parent_path, folder_name)
         except Exception as e:
             warning(e)
+    return fc_path
 
 
 def make_directory(md_path, folder_name):
-    # sub_path = md_path + '\\' + folder_name
     sub_path = None
     folder = listdir(md_path)
     if folder_name not in folder:
@@ -25,6 +25,17 @@ def make_directory(md_path, folder_name):
         print('路径“%s”中已存在“%s”文件夹！' % (md_path, folder_name))
         info('路径“%s”中已存在“%s”文件夹！' % (md_path, folder_name))
     return sub_path
+
+
+def make_empty_folder(mef_path, folder_name):
+    """
+    空文件夹创建
+    :param mef_path: 创建路径
+    :param folder_name: 空文件夹名称
+    :return:
+    """
+    rmtree(mef_path + '\\' + folder_name)
+    folder_creation(mef_path, folder_name)
 
 
 def read_txt(txt_name):
@@ -39,8 +50,11 @@ def read_txt(txt_name):
 
 
 def writelines_txt(wt_path, write_file):
-    with open(wt_path, 'w') as fw:
-        fw.writelines(write_file)
+    try:
+        with open(wt_path, 'w') as fw:
+            fw.writelines(write_file)
+    except Exception as e:
+        info('func_collection:', e)
 
 
 def write_txt(wt_path, write_file):
@@ -83,14 +97,3 @@ def year_mon_day_folder_generation(original_path, date_time_list):  # 建立年-
             make_directory(db_lib_month_dir, date_time_list[2])
     except Exception as e:
         warning(e)
-
-
-def make_empty_folder(mef_path, folder_name):
-    """
-    空文件夹创建
-    :param mef_path: 创建路径
-    :param folder_name: 空文件夹名称
-    :return:
-    """
-    rmtree(mef_path+'\\'+folder_name)
-    folder_creation(mef_path, folder_name)

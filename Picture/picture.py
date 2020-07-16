@@ -2,9 +2,12 @@
 from os import path, listdir
 
 from matplotlib import pyplot as plt
-
+from Config import ConfigInfo
 from Algorithm.data_splitting_integration import optical_data_splitting, optical_data_to_wheel
 from Function.func_collection import read_txt
+
+conf = ConfigInfo()
+o_f_frequency = conf.get_optical_fiber_frequency()
 
 
 def txt_to_list(ttp_path):
@@ -58,16 +61,21 @@ def pic_generation(txt_set):
 # def wheel_
 
 if __name__ == '__main__':
-    p = 'E:\\Python\\Pyinstaller\\TP\\DB\\Data_lib\\2020\\06\\11\\1130#2020-06-11 08_53_30'
+    # p = 'E:\\Python\\Pyinstaller\\TP\\DB\\Data_lib\\2020\\06\\11\\1130#2020-06-11 08_53_30'
+    p = 'E:\\Python\\Pyinstaller\\TP\\DB\\Data_lib\\2020\\06\\10\\1133#2020-06-10 18_55_15'
     txt_list = txt_to_list(p)
     # pic_generation(txt_list)
     # wdi = wheel_data_integration(txt_list)
 
-    w = optical_data_splitting(txt_list)
-    wd = optical_data_to_wheel(w)
+    # w = optical_data_splitting(txt_list, o_f_frequency)
+    # wd = optical_data_to_wheel(w, o_f_frequency)
 
     # plt.figure()
     # plt.plot(wdi[0], wdi[1], 'o')
     # plt.plot(wdi[0], wdi[1])
     # plt.grid()
     # plt.show()
+    plt.figure()
+    plt.plot(txt_list[0][0], txt_list[0][1])
+    plt.grid()
+    plt.show()
