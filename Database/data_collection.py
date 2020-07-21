@@ -39,7 +39,8 @@ def optical_fiber_collection(ofc_path, folders):
                             # 输出到文件夹
                             file_open_path = alg_path + '/' + file
                             each_nor_optical = data_to_txt(file_open_path, data)
-                            all_nor_optical.append(each_nor_optical)
+                            if len(each_nor_optical) != 0:
+                                all_nor_optical.append(each_nor_optical)
 
                             # 存成字典备用
                             car.update({file.split('.')[0]: data})  # 将每个车号下的txt文档添加到字典中
@@ -53,7 +54,10 @@ def optical_fiber_collection(ofc_path, folders):
     except Exception as e:
         info(e)
         print(e)
-    return all_nor_optical
+    if len(all_nor_optical) > 0:
+        return all_nor_optical
+    else:
+        return {}
 
 
 def format_conversion(fc_path):

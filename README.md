@@ -89,3 +89,8 @@ README.md
 7.picture.py 增加配置文件读取;
 8.main.py 主程序中在数据处理之前，加入了配置信息读取、主程序路径读取及数据预处理。
 *.本版本添加了新的文件夹：Original_temp_DB，用于存放（光纤和压力应变片）传感器采集到的原始数据，并将其转换到所需的格式，然后存放到Original_DB文件夹。
+
+20200721
+小版本更新：v2.5.2
+1.Config.__init__.py 增加配置函数json_storage_path()，json文件的保存位置可以在config.ini文件中配置
+2.加入判断语句，修改数据量少导致的Bug：data_collection.py/data_storage.py/data_splitting_integration.py

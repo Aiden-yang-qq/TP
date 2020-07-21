@@ -7,6 +7,9 @@ from numpy import array, transpose
 from time import strftime, localtime
 from Algorithm.data_splitting_integration import data_normalization
 from Function.func_collection import write_txt
+from Config import ConfigInfo
+
+conf = ConfigInfo()
 
 
 def data_to_txt(path, each_wheel_data):
@@ -16,15 +19,19 @@ def data_to_txt(path, each_wheel_data):
             if len(each_wheel_data[0]) == len(each_wheel_data[1]):
                 ewd_all = []
                 each_wheel_nor_data = data_normalization(each_wheel_data[1])
-                each_normalization_wheel.append(each_wheel_data[0])
-                each_normalization_wheel.append(each_wheel_nor_data)
-                for i in range(len(each_wheel_data[0])):
-                    ewd = str(round(each_wheel_data[0][i], 6)) + ' ' + str(each_wheel_nor_data[i])  # 保留小数位数越多越精确
-                    ewd_all.append(ewd)
+                if len(each_wheel_data) != 0 and len(each_wheel_nor_data) != 0:
+                    each_normalization_wheel.append(each_wheel_data[0])
+                    each_normalization_wheel.append(each_wheel_nor_data)
+                    for i in range(len(each_wheel_data[0])):
+                        ewd = str(round(each_wheel_data[0][i], 6)) + ' ' + str(each_wheel_nor_data[i])  # 保留小数位数越多越精确
+                        ewd_all.append(ewd)
 
-                ea = "\n".join(ewd_all)
-                write_txt(path, ea)
-                return each_normalization_wheel
+                    ea = "\n".join(ewd_all)
+                    write_txt(path, ea)
+                if len(each_normalization_wheel) != 0:
+                    return each_normalization_wheel
+                else:
+                    return ''
     except Exception as e:
         info('data_storage:', e)
 
@@ -40,7 +47,7 @@ def read_json():
 
 def write_json(json_name, json_data):
     try:
-        json_path = 'D:\\json_file_TP'
+        json_path = conf.json_storage_path()
         json_dir = json_path + '\\' + json_name + '.json'
         with open(json_dir, 'w') as f:
             dump(json_data, f)

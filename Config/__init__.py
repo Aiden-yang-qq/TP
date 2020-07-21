@@ -39,6 +39,10 @@ class ConfigInfo:
         optical_fiber_frequency = self.cp.get('PRE_SET', 'optical_fiber_frequency')
         return optical_fiber_frequency
 
+    def json_storage_path(self):
+        json_save_path = self.cp.get('PATH', 'json_save_path')
+        return json_save_path
+
 
 def str_to_bool(string):
     return True if string.lower() == 'true' else False
