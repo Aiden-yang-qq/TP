@@ -70,7 +70,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "trainSpeed": "%s" % train_speed,  # 平均速度（列车的速度根据8节车厢的平均速度来给定）
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.3.0",  # 软件版本号
+        "verOfsoftware": "v2.5.4",  # 软件版本号
         "vi": all_carriage_json
     }
     return car

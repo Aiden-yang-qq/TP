@@ -54,7 +54,7 @@ README.md
 更新：
 1.data_splitting_integration.py 中wheel_data_splitting()函数改为optical_data_splitting()函数，并将内容扩充；新增optical_data_to_wheel()函数，将（12个）传感器分割后的数据拼接成各个轮子的数据；
 2.optical_fiber.py 中的time_temp_wave()函数添加了频率选择功能，目前可选频率为10Hz、100Hz和2KHz，系统根据时间自动判定，不可手动更改；
-3.data_stroage.py 中data_to_txt()函数优化；新增函数：(1)read_json()函数：固定读取.json文件；(2)write_json()函数：将字典类型的数据写成.json的文件；(3)car_json()函数：整车json文件；(4)carriage_json()函数：各车厢json文件；(5)wheel_json()函数：各车轮json文件；(6)car_json_integration()函数：将以上三个json文件函数整合成一个json文件；
+3.data_storage.py 中data_to_txt()函数优化；新增函数：(1)read_json()函数：固定读取.json文件；(2)write_json()函数：将字典类型的数据写成.json的文件；(3)car_json()函数：整车json文件；(4)carriage_json()函数：各车厢json文件；(5)wheel_json()函数：各车轮json文件；(6)car_json_integration()函数：将以上三个json文件函数整合成一个json文件；
 4.scanning_interface.py 中的压力应变片相关内容注释掉，后期要分开来写；
 5.main.py 中新增对json文件的读取、转换及保存；
 6.部分代码更新优化：data_collection.py；picture.py。
@@ -94,3 +94,9 @@ README.md
 小版本更新：v2.5.2
 1.Config.__init__.py 增加配置函数json_storage_path()，json文件的保存位置可以在config.ini文件中配置
 2.加入判断语句，修改数据量少导致的Bug：data_collection.py/data_storage.py/data_splitting_integration.py
+
+20200723
+小版本更新：v2.5.4
+1.data_splitting_integration.py / scanning_interface.py 调整配置调用结构
+2.main.py 调整配置调用结构，增加配置文件缺失提示
+3.data_storage.py 软件版本号迭代更新

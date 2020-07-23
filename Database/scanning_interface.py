@@ -1,16 +1,18 @@
 # scanning_interface.py
 # 扫描接口模块：扫描文件夹，有新的txt文档则调用数据采集模块
-from Config import ConfigInfo
+from logging import warning, info
 # from numpy import array, transpose
 from os import path, walk, listdir
-from time import localtime, strftime
 from shutil import copytree, rmtree, move
-from logging import basicConfig, DEBUG, warning, info
+from time import localtime, strftime
+
+from Config import ConfigInfo
 from Database.data_collection import optical_fiber_collection
 from Function.func_collection import make_directory, read_txt, time_reconstruct, year_mon_day_folder_generation, \
     folder_creation, make_empty_folder
 
-basicConfig(filename='logging_file.log', level=DEBUG)
+
+# basicConfig(filename='logging_file.log', level=DEBUG)
 
 
 def current_file_path():

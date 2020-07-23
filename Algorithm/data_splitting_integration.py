@@ -1,17 +1,10 @@
 # data_splitting_integration.py 数据分割、整合模块
 # from matplotlib import pyplot as plt
+from logging import info
 from Config import ConfigInfo
 from numpy import array, transpose, append as np_ap
 
-from logging import info
-
 conf = ConfigInfo()
-o_f_frequency = int(conf.get_optical_fiber_frequency())  # 获取采样频率
-
-if o_f_frequency == 100:
-    time_gap = 4
-elif o_f_frequency == 2000:
-    time_gap = 0.3
 
 
 def data_normalization(wheel_data):
@@ -40,6 +33,14 @@ def wheel_data_integration(txt_list):
 
 
 def optical_data_splitting(txt_list, frequency):
+    time_gap = 1    # 设置默认时间间隔
+    # 获取采样频率，对于不同采集频率设定不同的时间间隔
+    o_f_frequency = int(conf.get_optical_fiber_frequency())
+    if o_f_frequency == 100:
+        time_gap = 4
+    elif o_f_frequency == 2000:
+        time_gap = 0.3
+
     optical_all_data = []  # 一维的数据：所有传感器的数据；二维的数据：各个传感器所有的峰值
     if len(txt_list) != 0:
         for each_optical in txt_list:
