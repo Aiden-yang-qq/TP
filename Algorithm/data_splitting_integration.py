@@ -33,7 +33,8 @@ def wheel_data_integration(txt_list):
 
 
 def optical_data_splitting(txt_list, frequency):
-    time_gap = 1    # 设置默认时间间隔
+    time_gap = 1  # 设置默认时间间隔
+    wheel_count = 0  # 车轮数量计数
     # 获取采样频率，对于不同采集频率设定不同的时间间隔
     o_f_frequency = int(conf.get_optical_fiber_frequency())
     if o_f_frequency == 100:
@@ -121,9 +122,14 @@ def optical_data_splitting(txt_list, frequency):
                 y_single_optical.append(y_wheel)
                 y_wheel = []
 
+            if len(y_single_optical) == 32:
+                wheel_count += 1
             # optical_all_data的输出格式:三维列表[12个传感器×32个车轮×600个数据][12×32×600]的矩阵
             optical_all_data.append(y_single_optical)
-    return optical_all_data
+    if wheel_count == 12:
+        return optical_all_data
+    else:
+        return []
 
 
 def optical_data_to_wheel(optical_all_data, frequency):

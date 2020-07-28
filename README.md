@@ -100,3 +100,10 @@ README.md
 1.data_splitting_integration.py / scanning_interface.py 调整配置调用结构
 2.main.py 调整配置调用结构，增加配置文件缺失提示
 3.data_storage.py 软件版本号迭代更新
+
+20200728
+小版本更新：v2.5.5
+1.data_splitting_integration.py 修改Bug，将不符合数据格式的数据置空
+2.data_collection.py 新增原始数据格式处理方式
+3.data_storage.py 迭代版本号
+4.main.py 新增注释

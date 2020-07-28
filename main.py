@@ -3,7 +3,7 @@ from logging import basicConfig, DEBUG, info
 from os import getcwd, path
 from time import time, sleep, ctime
 
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from Algorithm.data_splitting_integration import optical_data_splitting, optical_data_to_wheel
 from Config import ConfigInfo
 from Database.data_storage import car_json_integration, write_json
@@ -44,8 +44,9 @@ def main_exe():
             json_file_name, folders, all_car_aei = database_creation(main_path)
 
             # 数据库中有txt文件后，对folders读取，并做车轮数据提取整合，然后保存成json文件
+            # optical_fiber_data的输出格式：三维列表[12个传感器×32个车轮车×600个数据][12×32×600]的矩阵
             optical_fiber_data = optical_data_splitting(folders, o_f_frequency)
-            # all_wheel_data的输出格式:三维列表[32个车轮×2个车轮车×3600个数据][32×2×3600]的矩阵
+            # all_wheel_data的输出格式:三维列表[32个车轮×2个车轮×3600个数据][32×2×3600]的矩阵
             x_wheel_data, all_wheel_data = optical_data_to_wheel(optical_fiber_data, o_f_frequency)
 
             # 将车轮数据保存成json文件
@@ -82,7 +83,8 @@ def main_exe():
 if __name__ == '__main__':
     x, y = main_exe()
 
-    plt.figure()
-    plt.plot(x, y[0][0])
+    # plt.figure()
+    # plt.plot(x, y[0][0])
+    # # plt.plot(folders[0][0], folders[0][1])
     # plt.grid()
-    plt.show()
+    # plt.show()

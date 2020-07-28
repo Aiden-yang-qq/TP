@@ -99,8 +99,15 @@ def format_conversion(fc_path):
                             format_time = time_[:20 + decimal_places].replace('.', ':')
                         elif len(time_) == 19:
                             format_time = time_ + ':' + '0' * decimal_places
-                        format_single_data = format_time + ',' + _txt[i].strip() + '\n'
-                        txt_output.append(format_single_data)
+                        txt_data = _txt[i].strip()
+                        if len(txt_data) == 7:
+                            txt_new_ = txt_data[:4] + '.' + txt_data[4:] + '0\n'
+                            format_single_data = format_time + ',' + txt_new_
+                            txt_output.append(format_single_data)
+                        else:
+                            # format_single_data = format_time + ',' + _txt[i].strip() + '\n'
+                            format_single_data = format_time + ',' + _txt[i]
+                            txt_output.append(format_single_data)
 
                 writelines_txt(fc_original_db_path + '\\' + txt_file_name, txt_output)
                 txt_output = []
