@@ -7,7 +7,7 @@ from Algorithm.data_splitting_integration import optical_data_splitting, optical
 from Function.func_collection import read_txt
 
 conf = ConfigInfo()
-o_f_frequency = conf.get_optical_fiber_frequency()
+o_f_frequency = conf.get_optical_fiber_frequency()  # 频率取不到，因为picture.py的路径不在main.py的路径上
 
 
 def txt_to_list(ttp_path):
@@ -62,7 +62,8 @@ def pic_generation(txt_set):
 
 if __name__ == '__main__':
     # p = 'E:\\Python\\Pyinstaller\\TP\\DB\\Data_lib\\2020\\06\\11\\1130#2020-06-11 08_53_30'
-    p = 'E:\\Python\\Pyinstaller\\TP\\DB\\Data_lib\\2020\\06\\10\\1133#2020-06-10 18_55_15'
+    # p = 'E:\\Python\\Pyinstaller\\TP\\DB\\Data_lib\\2020\\06\\10\\1133#2020-06-10 18_55_15'
+    p = 'E:\\Python\\Pyinstaller\\TP\\DB\\Data_lib\\2020\\06\\11\\1130#2020-06-11 08_53_30'
     txt_list = txt_to_list(p)
     # pic_generation(txt_list)
     # wdi = wheel_data_integration(txt_list)

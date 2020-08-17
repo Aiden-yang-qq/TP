@@ -107,3 +107,8 @@ README.md
 2.data_collection.py 新增原始数据格式处理方式
 3.data_storage.py 迭代版本号
 4.main.py 新增注释
+
+20200817
+小版本更新：v2.5.6
+1.data_storage.py 修改了车号文件丢失的情况，pass_time的显示问题；迭代版本号
+2.picture.py 中添加了频率采集错误的问题描述（错误注释）

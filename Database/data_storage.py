@@ -70,7 +70,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "trainSpeed": "%s" % train_speed,  # 平均速度（列车的速度根据8节车厢的平均速度来给定）
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.5.5",  # 软件版本号
+        "verOfsoftware": "v2.5.6",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
@@ -84,7 +84,7 @@ def carriage_json(vehicle_no, car_ori, axle_count, vehicle_seq, all_wheel_json):
         "axleCount": "%d" % axle_count,  # 轴数
         "vehicleType": "",  # 车厢类型，5=机车，19=挂车，其他值=其他
         "vehicleSeq": "%s" % vehicle_seq,  # 辆序：（1-8）车号文件
-        "bc": all_wheel_json  # TODO 根据实际轮数修改txt文件
+        "bc": all_wheel_json
     }
     return carriage
 
@@ -222,6 +222,7 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_a
         else:
             car_no = 'unknown'
             average_speed = ''
+            date_time = strftime('%Y-%m-%d %H:%M:%S', localtime())
             all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
                                     pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,
                                     train_speed=average_speed, train_direction=direction, sides=direction,
