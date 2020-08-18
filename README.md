@@ -112,3 +112,15 @@ README.md
 小版本更新：v2.5.6
 1.data_storage.py 修改了车号文件丢失的情况，pass_time的显示问题；迭代版本号
 2.picture.py 中添加了频率采集错误的问题描述（错误注释）
+
+20200818
+大版本更新：v2.6.0
+1.data_splitting_integration.py 
+    |- 根据采样频率设定不同的时间间隔，以此采集每个车轮数据
+    1）optical_data_splitting()函数：
+        |- ①车轮选取峰值分割线以所有车轮数据均值+0.3作为选取标准；
+        |- ②横坐标取值范围重新制定
+        |- ③不足32个车轮的数据照常输出，有多少输出多少（重点更新）
+    2）optical_data_to_wheel()函数
+        |- ①根据采样频率和时间间隔重新构建数组
+2.data_storage.py 迭代版本号
