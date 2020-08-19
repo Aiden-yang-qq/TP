@@ -124,3 +124,11 @@ README.md
     2）optical_data_to_wheel()函数
         |- ①根据采样频率和时间间隔重新构建数组
 2.data_storage.py 迭代版本号
+
+20200819
+小版本更新：v2.6.1
+1.data_splitting_integration.py 
+    |- 修改了每个轮子选取的数量
+    |- 修改了坐标系（将整个坐标系上移，使得当没有列车经过时的图像在x轴上）
+    |- 根据经验值修改了分割线的数值
+2.data_storage.py 迭代版本号

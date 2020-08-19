@@ -15,17 +15,22 @@ elif o_f_frequency == 2000:
     # time_gap = 0.3
     time_gap = 0.08
 
-single_wheel_data_count = int(o_f_frequency * time_gap)
+single_wheel_data_count = int(o_f_frequency * time_gap) + 140
 
 
 def data_normalization(wheel_data):
     try:
         nor_data_list = []
-        wd_max = max(wheel_data)
-        wd_min = min(wheel_data)
+        wd_max = max(wheel_data)  # 车轮压力波长数据最大值
+        wd_min = min(wheel_data)  # 车轮压力波长数据最小值
+        wd_base_line = wd_min
+        if len(wheel_data) >= o_f_frequency:
+            wd_base_line = round(sum(wheel_data[-1 * o_f_frequency:]) / o_f_frequency, 6)   # 车轮压力波长数据的基准线
         for d in wheel_data:
-            molecule = d - wd_min
-            denominator = wd_max - wd_min
+            # molecule = d - wd_min  # 分子
+            # denominator = wd_max - wd_min  # 分母
+            molecule = d - wd_base_line  # 分子
+            denominator = wd_max - wd_base_line  # 分母
             if denominator != 0:
                 nor_data = round(molecule / denominator, 4)
                 nor_data_list.append(nor_data)
@@ -62,7 +67,7 @@ def optical_data_splitting(txt_list, frequency):
             max_wheel_set = []
             max_wheel_single_set = []
             # dividing_line = round(max(each_optical[1]) - 0.08, 6)
-            dividing_line = round(sum(each_optical[1]) / len(each_optical[1]) + 0.3, 6)
+            dividing_line = round(sum(each_optical[1]) / len(each_optical[1]) + 0.35, 6)    # 0.35为经验值
             # print('dividing_line:', dividing_line)
             for i in range(len(each_optical[1])):
                 if each_optical[1][i] > dividing_line:
@@ -71,7 +76,7 @@ def optical_data_splitting(txt_list, frequency):
 
             max_wheel_single_set.append(x_wheel_set[0])
             for i in range(1, len(x_wheel_set)):
-                if x_wheel_set[i][0] - x_wheel_set[i - 1][0] < time_gap:  # 4表示两数据之间间隔4秒以上的视为两段，4秒以内的视为一段
+                if x_wheel_set[i][0] - x_wheel_set[i - 1][0] < time_gap:  # 两数据之间间隔>=time_gap则视为两段，<time_gap视为一段
                     max_wheel_single_set.append(x_wheel_set[i])
                 elif x_wheel_set[i][0] - x_wheel_set[i - 1][0] >= time_gap:
                     max_wheel_set.append(max_wheel_single_set)

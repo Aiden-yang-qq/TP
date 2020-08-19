@@ -18,7 +18,7 @@ def data_to_txt(path, each_wheel_data):
             each_normalization_wheel = []
             if len(each_wheel_data[0]) == len(each_wheel_data[1]):
                 ewd_all = []
-                each_wheel_nor_data = data_normalization(each_wheel_data[1])
+                each_wheel_nor_data = data_normalization(each_wheel_data[1])    # 数据归一化
                 if len(each_wheel_data) != 0 and len(each_wheel_nor_data) != 0:
                     each_normalization_wheel.append(each_wheel_data[0])
                     each_normalization_wheel.append(each_wheel_nor_data)
@@ -70,7 +70,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "trainSpeed": "%s" % train_speed,  # 平均速度（列车的速度根据8节车厢的平均速度来给定）
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.6.0",  # 软件版本号
+        "verOfsoftware": "v2.6.1",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
