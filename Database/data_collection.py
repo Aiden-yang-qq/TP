@@ -4,7 +4,7 @@ from logging import info
 from os import path, listdir
 from shutil import rmtree, move
 
-from Algorithm.algorithm_main import al_main
+from Algorithm.algorithm_main import al_main_1
 from Config import ConfigInfo
 from Database.data_storage import data_to_txt
 from Function.func_collection import make_directory, read_txt, writelines_txt, folder_creation
@@ -34,7 +34,7 @@ def optical_fiber_collection(ofc_path, folders):
                     for file in file_list:
                         if file.split('.')[1] == 'txt':
                             file_path = file_dir + '/' + file
-                            data = al_main(file_path)  # 调用算法主程序
+                            data = al_main_1(file_path)  # 调用算法主程序
 
                             # 输出到文件夹
                             file_open_path = alg_path + '/' + file
@@ -108,7 +108,28 @@ def format_conversion(fc_path):
                             # format_single_data = format_time + ',' + _txt[i].strip() + '\n'
                             format_single_data = format_time + ',' + _txt[i]
                             txt_output.append(format_single_data)
-
+                if txt_file_name == '4.txt':
+                    txt_file_name = '3.txt'
+                elif txt_file_name == '5.txt':
+                    txt_file_name = '4.txt'
+                elif txt_file_name == '6.txt':
+                    txt_file_name = '5.txt'
+                elif txt_file_name == '3.txt':
+                    txt_file_name = '6.txt'
+                elif txt_file_name == '12.txt':
+                    txt_file_name = '7.txt'
+                elif txt_file_name == '11.txt':
+                    txt_file_name = '8.txt'
+                elif txt_file_name == '10.txt':
+                    txt_file_name = '9.txt'
+                elif txt_file_name == '8.txt':
+                    txt_file_name = '10.txt'
+                elif txt_file_name == '7.txt':
+                    txt_file_name = '11.txt'
+                elif txt_file_name == '9.txt':
+                    txt_file_name = '12.txt'
+                if len(txt_file_name) == 5:
+                    txt_file_name = '0' + txt_file_name  # 统一文件名称：01.txt~12.txt
                 writelines_txt(fc_original_db_path + '\\' + txt_file_name, txt_output)
                 txt_output = []
             elif txt_file_name[-4:] == '.AEI':

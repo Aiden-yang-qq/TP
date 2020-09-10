@@ -1,6 +1,8 @@
 # algorithm_main.py 算法主程序，仅供数据采集后的程序调用
 # Algorithm文件夹下的程序均由此文件调用
 from datetime import datetime as dt
+from Algorithm.wheel_analysis import read_wheel_data
+
 from Function.func_collection import read_txt
 
 
@@ -10,7 +12,7 @@ def data_avg(average, length):
     return avg_list
 
 
-def al_main(file):
+def al_main_1(file):
     date_time_list = []
     data_list = []
     datetime_list = []
@@ -46,3 +48,7 @@ def al_main(file):
         x_time = 24 * 3600 * time_delay.days + time_delay.seconds + (time_delay.microseconds / 10 ** 6)
         x_data.append(x_time)
     return x_data, data_list
+
+
+def al_main_2(all_wheel_data):
+    read_wheel_data(all_wheel_data)

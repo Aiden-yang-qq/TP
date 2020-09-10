@@ -1,8 +1,10 @@
 # data_splitting_integration.py 数据分割、整合模块
-# from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 from logging import info
 from Config import ConfigInfo
 from numpy import array, transpose, append as np_ap
+from collections import Counter
+from math import sqrt
 
 conf = ConfigInfo()
 # 获取采样频率，对于不同采集频率设定不同的时间间隔
@@ -13,30 +15,44 @@ if o_f_frequency == 100:
     time_gap = 4
 elif o_f_frequency == 2000:
     # time_gap = 0.3
-    time_gap = 0.08
+    time_gap = 0.07
 
 single_wheel_data_count = int(o_f_frequency * time_gap) + 140
 
 
-def data_normalization(wheel_data):
+def data_standardization(wheel_data):
+    """
+    车轮波长数据标准化
+    :param wheel_data: 
+    :return: 
+    """
     try:
         nor_data_list = []
         wd_max = max(wheel_data)  # 车轮压力波长数据最大值
         wd_min = min(wheel_data)  # 车轮压力波长数据最小值
         wd_base_line = wd_min
         if len(wheel_data) >= o_f_frequency:
-            wd_base_line = round(sum(wheel_data[-1 * o_f_frequency:]) / o_f_frequency, 6)   # 车轮压力波长数据的基准线
+            wd_base_line = round(sum(wheel_data[-1 * o_f_frequency:]) / o_f_frequency, 6)  # 车轮压力波长数据的基准线
         for d in wheel_data:
             # molecule = d - wd_min  # 分子
             # denominator = wd_max - wd_min  # 分母
             molecule = d - wd_base_line  # 分子
             denominator = wd_max - wd_base_line  # 分母
             if denominator != 0:
-                nor_data = round(molecule / denominator, 4)
+                # nor_data = round(molecule / denominator, 4)  # 做归一化
+                nor_data = round(molecule, 4)
                 nor_data_list.append(nor_data)
         return nor_data_list
     except Exception as e:
         info('data_splitting_integration:', e)
+
+
+def data_normalization(data_n):
+    normalization_data = []
+    max_data = max(data_n)
+    for d in data_n:
+        normalization_data.append(round(d / max_data, 4))
+    return normalization_data
 
 
 def wheel_data_integration(txt_list):
@@ -62,21 +78,50 @@ def optical_data_splitting(txt_list, frequency):
 
     optical_all_data = []  # 一维的数据：所有传感器的数据；二维的数据：各个传感器所有的峰值
     if len(txt_list) != 0:
+        all_each_optical_normalization = []
         for each_optical in txt_list:
             x_wheel_set = []
             max_wheel_set = []
             max_wheel_single_set = []
             # dividing_line = round(max(each_optical[1]) - 0.08, 6)
-            dividing_line = round(sum(each_optical[1]) / len(each_optical[1]) + 0.35, 6)    # 0.35为经验值
+            # dividing_line = round(sum(each_optical[1]) / len(each_optical[1]) + 0.35, 6)  # 0.35为经验值
+            # dividing_line = 0.045
+
             # print('dividing_line:', dividing_line)
+
+            each_optical_normalization = data_normalization(each_optical[1])
+            all_each_optical_normalization.append(each_optical_normalization)
+
+            max_single = []
+            for i in range(0, len(each_optical_normalization) - 2000, 2000):
+                m = max(each_optical_normalization[i:i + 2000])
+                if 0.4 < m:
+                    max_single.append(m)
+
+            mean_line = sum(max_single) / len(max_single)
+            average = sum(max_single) / len(max_single)
+            variance = sum([(x - average) ** 2 for x in max_single]) / len(max_single)
+            standard_deviation = sqrt(variance)
+
+            if 0.8 <= mean_line:
+                dividing_line = round(mean_line / 2, 4)
+            elif 0.7 <= mean_line < 0.8:
+                dividing_line = round(mean_line - 0.3, 4)
+            elif 0.6 <= mean_line < 0.7:
+                dividing_line = round(mean_line - 0.2, 4)
+            else:
+                dividing_line = mean_line
+
+            # for i in range(len(each_optical[1])):
+            #     if each_optical[1][i] > dividing_line:
             for i in range(len(each_optical[1])):
-                if each_optical[1][i] > dividing_line:
+                if each_optical_normalization[i] > dividing_line:
                     wheel_set = [round(each_optical[0][i], 4), each_optical[1][i]]
                     x_wheel_set.append(wheel_set)
 
             max_wheel_single_set.append(x_wheel_set[0])
-            for i in range(1, len(x_wheel_set)):
-                if x_wheel_set[i][0] - x_wheel_set[i - 1][0] < time_gap:  # 两数据之间间隔>=time_gap则视为两段，<time_gap视为一段
+            for i in range(1, len(x_wheel_set)):  # 两数据之间间隔>=time_gap则视为两段，<time_gap视为一段
+                if x_wheel_set[i][0] - x_wheel_set[i - 1][0] < time_gap:
                     max_wheel_single_set.append(x_wheel_set[i])
                 elif x_wheel_set[i][0] - x_wheel_set[i - 1][0] >= time_gap:
                     max_wheel_set.append(max_wheel_single_set)
@@ -84,12 +129,11 @@ def optical_data_splitting(txt_list, frequency):
             if len(max_wheel_single_set) >= 2:
                 max_wheel_set.append(max_wheel_single_set)
 
-            # plt.figure()
-            # plt.plot(each_optical[0], each_optical[1], 'o')
-            # plt.plot(each_optical[0], each_optical[1])
-            # plt.plot(each_optical[0], [dividing_line] * len(each_optical[0]))
-            # plt.grid()
-            # plt.show()
+            plt.figure()
+            plt.plot(each_optical_normalization)
+            plt.plot([dividing_line] * len(each_optical[0]))
+            plt.grid()
+            plt.show()
 
             x_data = []
             if len(max_wheel_set) != 0:
@@ -166,6 +210,29 @@ def optical_data_splitting(txt_list, frequency):
     #     return optical_all_data
     # else:
     #     return []
+
+    # 新增optical_all_data的size不一致的处理
+    len_list = []
+    for optical_data in optical_all_data:
+        len_opt_data = len(optical_data)
+        len_list.append(len_opt_data)
+
+    zero_list = []
+    len_count = Counter(len_list)
+    len_ = max(len_count, key=len_count.get)
+    if len(len_count) != 1:
+        zero_ = [0.0] * single_wheel_data_count
+        for i in range(len_):
+            zero_list.append(zero_)
+
+        len_new_list = []
+        for i in range(len(optical_all_data)):
+            len_opt_all_data_ = len(optical_all_data[i])
+            if len_opt_all_data_ != len_:
+                optical_all_data[i] = zero_list
+            len_opt_all_data_ = len(optical_all_data[i])
+            len_new_list.append(len_opt_all_data_)
+
     return optical_all_data
 
 

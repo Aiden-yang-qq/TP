@@ -2,11 +2,20 @@
   <dictionary name="Aiden_yang">
     <words>
       <w>edsi</w>
+      <w>fontdict</w>
+      <w>getcwd</w>
+      <w>imread</w>
+      <w>imshow</w>
+      <w>ioff</w>
       <w>jaysk</w>
+      <w>lssj</w>
       <w>ofsoftware</w>
+      <w>optim</w>
       <w>pyinstaller</w>
       <w>rfds</w>
       <w>sddt</w>
+      <w>sprop</w>
+      <w>unsqueeze</w>
     </words>
   </dictionary>
 </component>

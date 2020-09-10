@@ -18,6 +18,7 @@ README.md
     |- main_neural_network.py 神经网络主程序测试模块（用于前期测试验证）
     |- Neural_Networks.py 神经网络模块
     |- optical_fiber.py 光纤模块（做光纤波长数据的前期处理）
+    |- wheel_analysis.py 车轮数据分析模块
     
 3.Config配置信息模块：
     |- __init__.py 配置信息模块
@@ -132,3 +133,17 @@ README.md
     |- 修改了坐标系（将整个坐标系上移，使得当没有列车经过时的图像在x轴上）
     |- 根据经验值修改了分割线的数值
 2.data_storage.py 迭代版本号
+
+20200901
+大版本更新：v2.7.0
+1.algorithm_main.py 新增al_main_2()函数:对车轮数据进行读取；原al_main()函数更名为al_main_1()函数；
+2.data_splitting_integration.py 中
+    |- 将原data_normalization()函数改为data_standardization()函数，只将车轮数据标准化；新增data_normalization()函数。
+    |- optical_data_splitting()函数中，修改了dividing_line参数，根据不同的均值来给定不同的分割线
+    |- optical_data_splitting()函数中，新增optical_all_data的size不一致的处理方式，不同的size使用零矩阵代替
+3.Neural_Network.py 将神经网络过程分模块写成函数，新增tensor_unsqueeze()、optimization_choose()、visualization()、train_neural_network()、neural_network_module()等模块
+4.data_collection.py 将12个传感器的顺序按照现场的顺序进行重新排序（12个txt文档在处理前重新命名）
+5.data_storage.py data_to_txt()函数中将数据归一化改成数据标准化；迭代版本号
+6.main.py 新增车轮数据分析算法
+新增：
+1.Algorithm模块下新增wheel_analysis.py 用于对生成的车轮数据进行分析

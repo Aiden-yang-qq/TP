@@ -5,6 +5,7 @@ from time import time, sleep, ctime
 
 # from matplotlib import pyplot as plt
 from Algorithm.data_splitting_integration import optical_data_splitting, optical_data_to_wheel
+from Algorithm.algorithm_main import al_main_2
 from Config import ConfigInfo
 from Database.data_storage import car_json_integration, write_json
 from Database.data_collection import format_conversion
@@ -33,14 +34,14 @@ def main_exe():
             print('当前采样频率:%sHz' % o_f_frequency)
 
             # 数据预处理
-            format_conversion(main_path)
+            format_conversion(main_path)    # 进行数据预处理，并保存在Original_DB文件夹下
 
             info('---------------------------------------')
             info(ctime())
             print('数据正在处理，请稍等……')
             a = time()
 
-            # 检测数据库中txt和AEI文件并读取
+            # 检测数据库中txt和AEI文件并读取，folders中为12个传感器的数据
             json_file_name, folders, all_car_aei = database_creation(main_path)
 
             # 数据库中有txt文件后，对folders读取，并做车轮数据提取整合，然后保存成json文件
@@ -82,6 +83,7 @@ def main_exe():
 
 if __name__ == '__main__':
     x, y = main_exe()
+    al_main_2(y)
 
     # plt.figure()
     # plt.plot(x, y[0][0])
