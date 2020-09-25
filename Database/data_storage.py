@@ -18,7 +18,7 @@ def data_to_txt(path, each_wheel_data):
             each_normalization_wheel = []
             if len(each_wheel_data[0]) == len(each_wheel_data[1]):
                 ewd_all = []
-                each_wheel_nor_data = data_standardization(each_wheel_data[1])    # 数据标准化
+                each_wheel_nor_data = data_standardization(each_wheel_data[1])  # 数据标准化
                 if len(each_wheel_data) != 0 and len(each_wheel_nor_data) != 0:
                     each_normalization_wheel.append(each_wheel_data[0])
                     each_normalization_wheel.append(each_wheel_nor_data)
@@ -55,7 +55,7 @@ def write_json(json_name, json_data):
         info('data_storage:', e)
 
 
-def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train_speed, train_direction,
+def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train_speed, total_weight, train_direction,
              sides, all_carriage_json):
     car = {
         "dataStatus": "%s" % data_status,  # 0正常，1少车 2少轴
@@ -68,9 +68,10 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "numOfAxle": "%s" % num_axle,  # 总轴数（根据车厢换算：轴数=车厢数×4）
         "numOfCarr": "%s" % num_car,  # 总车厢数
         "trainSpeed": "%s" % train_speed,  # 平均速度（列车的速度根据8节车厢的平均速度来给定）
+        "totalWeight": "%s" % total_weight,  # 总重
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.7.0",  # 软件版本号
+        "verOfsoftware": "v2.8.0",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
@@ -90,7 +91,7 @@ def carriage_json(vehicle_no, car_ori, axle_count, vehicle_seq, all_wheel_json):
 
 
 def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, vehicle_side, speed, x_axis, y_axis,
-               invalid_flag=0, bearing_defect=0):
+               wheel_weight, axle_weight, bogie_weight, invalid_flag=0, bearing_defect=0):
     car_wheel = {
         "bcd": "%s" % uuid1(),
         "rail": "%s" % rail,  # 取值NS,FS
@@ -106,6 +107,9 @@ def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, veh
         "data2": "",  # 值,-999.999-999.999
         "data3": "",  # 值,-999.999-999.999
         "data4": "",  # 值,-999.999-999.999
+        "wheelWeight": "%s" % wheel_weight,  # 轮重
+        "axleWeight": "%s" % axle_weight,  # 轴重
+        "bogieWeight": "%s" % bogie_weight,  # 转向架重
         "bearingDefect": "%s" % bearing_defect,  # 是否有缺陷，0无，1有
         "defectType1": "",  # 是否有平轮缺陷
         "defectType2": "",  # 是否有不圆度缺陷
@@ -119,7 +123,7 @@ def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, veh
     return car_wheel
 
 
-def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_aei):
+def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weight, all_car_aei):
     all_car_json = {}
     try:
         car_no = ''
@@ -140,6 +144,12 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_a
         if len(all_carriage_info) != 0:
             all_carriage_info_arr = array(all_carriage_info)
             all_carriage_info_tran = transpose(all_carriage_info_arr, [1, 0])
+
+        wheel_weight = all_weight[0]
+        axle_weight = all_weight[1]
+        bogie_weight = all_weight[2]
+        # carriage_weight = all_weight[3]
+        total_weight = all_weight[4]
 
         # 各个车轮json数据
         all_wheel_json = []
@@ -168,8 +178,10 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_a
 
                 wheel_single_json = wheel_json(rail=rail, vehicle_axle_seq=vehicle_axle_seq, axle_seq=axle_seq,
                                                vehicle_seq=vehicle_seq, vehicle_no_bc=vehicle_no_bc,
-                                               vehicle_side=vehicle_side, speed=speed,
-                                               x_axis=x_wheel_data, y_axis=all_wheel_data[i][j])
+                                               vehicle_side=vehicle_side, speed=speed, x_axis=x_wheel_data,
+                                               y_axis=all_wheel_data[i][j], wheel_weight=wheel_weight[i][j],
+                                               axle_weight=axle_weight[i], bogie_weight=bogie_weight[i // 2])
+
                 all_wheel_json.append(wheel_single_json)
             if len(all_wheel_json) % 8 == 0:
                 all_wheel_set_json.append(all_wheel_json)
@@ -217,7 +229,7 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_a
 
             all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
                                     pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,
-                                    train_speed=average_speed, train_direction=direction, sides=direction,
+                                    train_speed=average_speed, total_weight=total_weight, train_direction=direction, sides=direction,
                                     all_carriage_json=all_carriage_json)
         else:
             car_no = 'unknown'
@@ -225,7 +237,7 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_a
             date_time = strftime('%Y-%m-%d %H:%M:%S', localtime())
             all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
                                     pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,
-                                    train_speed=average_speed, train_direction=direction, sides=direction,
+                                    train_speed=average_speed, total_weight=total_weight, train_direction=direction, sides=direction,
                                     all_carriage_json=all_carriage_json)
     except Exception as e:
         print(e)

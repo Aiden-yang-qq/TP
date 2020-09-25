@@ -1,10 +1,14 @@
 # data_splitting_integration.py 数据分割、整合模块
-from matplotlib import pyplot as plt
-from logging import info
-from Config import ConfigInfo
-from numpy import array, transpose, append as np_ap
+
 from collections import Counter
-from math import sqrt
+from logging import info
+
+# from math import sqrt
+# from matplotlib import pyplot as plt
+from numpy import array, transpose, append as np_ap
+
+from Algorithm.al_func_collection import fft_func, butter_lowpass_filter
+from Config import ConfigInfo
 
 conf = ConfigInfo()
 # 获取采样频率，对于不同采集频率设定不同的时间间隔
@@ -65,17 +69,7 @@ def wheel_data_integration(txt_list):
 
 
 def optical_data_splitting(txt_list, frequency):
-    # time_gap = 1  # 设置默认时间间隔
     wheel_count = 0  # 车轮数量计数
-    # # 获取采样频率，对于不同采集频率设定不同的时间间隔
-    # o_f_frequency = int(conf.get_optical_fiber_frequency())
-    # # time_gap还需要根据列车行驶速度确定（速度越快，时间间隔越短）
-    # if o_f_frequency == 100:
-    #     time_gap = 4
-    # elif o_f_frequency == 2000:
-    #     # time_gap = 0.3
-    #     time_gap = 0.08
-
     optical_all_data = []  # 一维的数据：所有传感器的数据；二维的数据：各个传感器所有的峰值
     if len(txt_list) != 0:
         all_each_optical_normalization = []
@@ -83,34 +77,55 @@ def optical_data_splitting(txt_list, frequency):
             x_wheel_set = []
             max_wheel_set = []
             max_wheel_single_set = []
-            # dividing_line = round(max(each_optical[1]) - 0.08, 6)
-            # dividing_line = round(sum(each_optical[1]) / len(each_optical[1]) + 0.35, 6)  # 0.35为经验值
-            # dividing_line = 0.045
-
-            # print('dividing_line:', dividing_line)
 
             each_optical_normalization = data_normalization(each_optical[1])
             all_each_optical_normalization.append(each_optical_normalization)
 
+            fre, fft_eon = fft_func(5000, each_optical_normalization)
+            y_after_filter = butter_lowpass_filter(each_optical_normalization, 500, 5000)
+            fre_filter, fft_filter = fft_func(5000, y_after_filter)
+
+            # plt.figure()
+            # plt.plot(each_optical_normalization)
+            # plt.grid()
+            # # plt.show()
+            # plt.figure()
+            # plt.plot(y_after_filter)
+            # plt.grid()
+            # plt.show()
+
+            # print('Done')
+            # plt.figure()
+            # plt.plot(fre, abs(fft_eon))
+            # plt.grid()
+            # plt.show()
+            # plt.figure()
+            # plt.plot(fre_filter, abs(fft_filter))
+            # plt.grid()
+            # plt.show()
+
             max_single = []
-            for i in range(0, len(each_optical_normalization) - 2000, 2000):
-                m = max(each_optical_normalization[i:i + 2000])
+            # for i in range(0, len(each_optical_normalization) - 2000, 2000):
+            for i in range(0, len(y_after_filter) - 200, 200):
+                m = max(y_after_filter[i:i + 200])
                 if 0.4 < m:
                     max_single.append(m)
 
-            mean_line = sum(max_single) / len(max_single)
-            average = sum(max_single) / len(max_single)
-            variance = sum([(x - average) ** 2 for x in max_single]) / len(max_single)
-            standard_deviation = sqrt(variance)
+            dividing_line = min(max_single)-0.05
 
-            if 0.8 <= mean_line:
-                dividing_line = round(mean_line / 2, 4)
-            elif 0.7 <= mean_line < 0.8:
-                dividing_line = round(mean_line - 0.3, 4)
-            elif 0.6 <= mean_line < 0.7:
-                dividing_line = round(mean_line - 0.2, 4)
-            else:
-                dividing_line = mean_line
+            # mean_line = sum(max_single) / len(max_single)
+            # average = sum(max_single) / len(max_single)
+            # variance = sum([(x - average) ** 2 for x in max_single]) / len(max_single)
+            # standard_deviation = sqrt(variance)
+            #
+            # if 0.8 <= mean_line:
+            #     dividing_line = round(mean_line / 2, 4)
+            # elif 0.7 <= mean_line < 0.8:
+            #     dividing_line = round(mean_line - 0.3, 4)
+            # elif 0.6 <= mean_line < 0.7:
+            #     dividing_line = round(mean_line - 0.2, 4)
+            # else:
+            #     dividing_line = mean_line
 
             # for i in range(len(each_optical[1])):
             #     if each_optical[1][i] > dividing_line:
@@ -129,11 +144,11 @@ def optical_data_splitting(txt_list, frequency):
             if len(max_wheel_single_set) >= 2:
                 max_wheel_set.append(max_wheel_single_set)
 
-            plt.figure()
-            plt.plot(each_optical_normalization)
-            plt.plot([dividing_line] * len(each_optical[0]))
-            plt.grid()
-            plt.show()
+            # plt.figure()
+            # plt.plot(each_optical_normalization)
+            # plt.plot([dividing_line] * len(each_optical[0]))
+            # plt.grid()
+            # plt.show()
 
             x_data = []
             if len(max_wheel_set) != 0:
@@ -149,32 +164,6 @@ def optical_data_splitting(txt_list, frequency):
 
             x_wheel_list = []
             unit_interval = round(1 / frequency, 4)
-
-            # for x in x_data:
-            #     if x <= 3.0:
-            #         x_list = [round(unit_interval * a, 4) for a in range(6 * frequency)]
-            #         x_wheel_list.append(x_list)
-            #     elif 3.0 <= x <= last_wheel_value - 3.0:
-            #         x_list = [round(unit_interval * a, 4) for a in
-            #                   range(int(frequency * x) - 3 * frequency, int(frequency * x) + 3 * frequency)]
-            #         x_wheel_list.append(x_list)
-            #     else:
-            #         x_list = [round(unit_interval * a, 4) for a in
-            #                   range(int(frequency * last_wheel_value) - 6 * frequency, int(frequency * last_wheel_value))]
-            #         x_wheel_list.append(x_list)
-
-            # for x in x_data:
-            #     if int(x / unit_interval) <= 300:
-            #         x_list = [round(unit_interval * a, 4) for a in range(600)]
-            #         x_wheel_list.append(x_list)
-            #     elif 300 <= int(x / unit_interval) <= int(last_wheel_value / unit_interval) - 300:
-            #         x_list = [round(unit_interval * a, 4) for a in
-            #                   range(int(frequency * x) - 300, int(frequency * x) + 300)]
-            #         x_wheel_list.append(x_list)
-            #     else:
-            #         x_list = [round(unit_interval * a, 4) for a in
-            #                   range(int(frequency * last_wheel_value) - 600, int(frequency * last_wheel_value))]
-            #         x_wheel_list.append(x_list)
 
             # single_wheel_data_count = int(o_f_frequency * time_gap)
             for x in x_data:

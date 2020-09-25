@@ -5,7 +5,7 @@ from time import time, sleep, ctime
 
 # from matplotlib import pyplot as plt
 from Algorithm.data_splitting_integration import optical_data_splitting, optical_data_to_wheel
-from Algorithm.algorithm_main import al_main_2
+from Algorithm.algorithm_main import al_main_weight
 from Config import ConfigInfo
 from Database.data_storage import car_json_integration, write_json
 from Database.data_collection import format_conversion
@@ -34,7 +34,7 @@ def main_exe():
             print('当前采样频率:%sHz' % o_f_frequency)
 
             # 数据预处理
-            format_conversion(main_path)    # 进行数据预处理，并保存在Original_DB文件夹下
+            format_conversion(main_path)  # 进行数据预处理，并保存在Original_DB文件夹下
 
             info('---------------------------------------')
             info(ctime())
@@ -50,9 +50,13 @@ def main_exe():
             # all_wheel_data的输出格式:三维列表[32个车轮×2个车轮×3600个数据][32×2×3600]的矩阵
             x_wheel_data, all_wheel_data = optical_data_to_wheel(optical_fiber_data, o_f_frequency)
 
+            # 计算车辆相关参数的重量
+            all_weight = al_main_weight(all_wheel_data)
+
             # 将车轮数据保存成json文件
             if len(json_file_name) != 0:
-                all_car_set_json = car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_car_aei)
+                all_car_set_json = car_json_integration(json_file_name, x_wheel_data, all_wheel_data,
+                                                        all_weight, all_car_aei)
                 write_json(json_file_name, all_car_set_json)
 
             b = time()
@@ -83,7 +87,6 @@ def main_exe():
 
 if __name__ == '__main__':
     x, y = main_exe()
-    al_main_2(y)
 
     # plt.figure()
     # plt.plot(x, y[0][0])

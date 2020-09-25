@@ -147,3 +147,19 @@ README.md
 6.main.py 新增车轮数据分析算法
 新增：
 1.Algorithm模块下新增wheel_analysis.py 用于对生成的车轮数据进行分析
+    |- read_wheel_data()读取车轮数据函数
+    |- neural_network_analysis()神经网络分析函数
+
+20200925
+大版本更新：v2.8.0
+1.al_func_collection.py 新增fft_func()快速傅里叶变换函数；新增butter_lowpass_filter()低通滤波器函数；
+2.algorithm_main.py al_main_1()函数名称还原成al_main()；al_main_2()函数名称变更为al_main_weight():对车轮进行称重；
+3.data_splitting_integration.py 中将部分注释删除；
+    |- optical_data_splitting()函数中添加fft及低通滤波的算法，同时将取点区间由2000缩短为200，并重新制定dividing_line的算法；
+4.wheel_analysis.py 新增wheel_weigh()车轮称重函数及wheel_weight_analysis()车轮重量分析函数；
+5.data_collection.py 算法主程序的名称恢复为al_main()
+6.data_storage.py car_json()函数中添加total_weight列车总重字段；
+    |- wheel_json()函数中添加wheel_weight/axle_weight/bogie_weight字段
+    |- car_json_integration()中新增上述添加的字段
+    |- 迭代版本号
+7.main.py 新增计算车辆相关参数的重量的算法 
