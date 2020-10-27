@@ -36,7 +36,9 @@ def data_standardization(wheel_data):
         wd_min = min(wheel_data)  # 车轮压力波长数据最小值
         wd_base_line = wd_min
         if len(wheel_data) >= o_f_frequency:
-            wd_base_line = round(sum(wheel_data[-1 * o_f_frequency:]) / o_f_frequency, 6)  # 车轮压力波长数据的基准线
+            wd_base_ = Counter(wheel_data)
+            wd_base_line = max(wd_base_, key=wd_base_.get)
+            # wd_base_line = round(sum(wheel_data[-1 * o_f_frequency:]) / o_f_frequency, 6)  # 车轮压力波长数据的基准线
         for d in wheel_data:
             # molecule = d - wd_min  # 分子
             # denominator = wd_max - wd_min  # 分母
@@ -111,7 +113,7 @@ def optical_data_splitting(txt_list, frequency):
                 if 0.4 < m:
                     max_single.append(m)
 
-            dividing_line = min(max_single)-0.05
+            dividing_line = min(max_single) - 0.05
 
             # mean_line = sum(max_single) / len(max_single)
             # average = sum(max_single) / len(max_single)

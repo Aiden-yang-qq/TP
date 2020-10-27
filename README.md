@@ -46,7 +46,7 @@ README.md
 
 # == TP项目包含以下文件：== 
 
-|- main.py 主程序文件
+|- odtp_main.py 主程序文件
 |- README.md 说明文件
 
 
@@ -57,7 +57,7 @@ README.md
 2.optical_fiber.py 中的time_temp_wave()函数添加了频率选择功能，目前可选频率为10Hz、100Hz和2KHz，系统根据时间自动判定，不可手动更改；
 3.data_storage.py 中data_to_txt()函数优化；新增函数：(1)read_json()函数：固定读取.json文件；(2)write_json()函数：将字典类型的数据写成.json的文件；(3)car_json()函数：整车json文件；(4)carriage_json()函数：各车厢json文件；(5)wheel_json()函数：各车轮json文件；(6)car_json_integration()函数：将以上三个json文件函数整合成一个json文件；
 4.scanning_interface.py 中的压力应变片相关内容注释掉，后期要分开来写；
-5.main.py 中新增对json文件的读取、转换及保存；
+5.odtp_main.py 中新增对json文件的读取、转换及保存；
 6.部分代码更新优化：data_collection.py；picture.py。
 新增：
 1.TP_json.json模块： 车辆数据存储的格式。
@@ -69,12 +69,12 @@ README.md
 2.data_splitting_integration.py 设定左右传感器（各6个）；
 3.data_storage.py 整车、车厢、车轮的json格式增加参数（参数补全），对car_json_integration()主体函数进行了优化；
 4.scanning_interface.py 对“.txt/.AEI”文件缺失的情况进行json文件的补全（程序继续运算，修改了之前遇到缺失文件直接结束程序的情况）；
-5..小修改：data_collection.py / main.py
+5..小修改：data_collection.py / odtp_main.py
 6.测试调试：optical_fiber.py
 
 20200713
 小版本更新：v2.4.4
-1.Debug:data_splitting_integration.py / optical_fiber.py / data_storage.py / main.py
+1.Debug:data_splitting_integration.py / optical_fiber.py / data_storage.py / odtp_main.py
 2.scanning_interface.py 对有数据无车号的情况，增加了json文件的数据采集；
 3.func_collection.py 多个函数的注释标注；
 4.data_collection.py 新增format_conversion()格式转换函数，修改了删除空文件夹。
@@ -88,7 +88,7 @@ README.md
 5.scanning_interface.py 中database_creation()增加了配置文件的读取，从配置文件中读取文件夹名称;
 6.func_collection.py 中folder_creation()函数添加返回值，返回值为新建文件夹的绝对路径;
 7.picture.py 增加配置文件读取;
-8.main.py 主程序中在数据处理之前，加入了配置信息读取、主程序路径读取及数据预处理。
+8.odtp_main.py 主程序中在数据处理之前，加入了配置信息读取、主程序路径读取及数据预处理。
 *.本版本添加了新的文件夹：Original_temp_DB，用于存放（光纤和压力应变片）传感器采集到的原始数据，并将其转换到所需的格式，然后存放到Original_DB文件夹。
 
 20200721
@@ -99,7 +99,7 @@ README.md
 20200723
 小版本更新：v2.5.4
 1.data_splitting_integration.py / scanning_interface.py 调整配置调用结构
-2.main.py 调整配置调用结构，增加配置文件缺失提示
+2.odtp_main.py 调整配置调用结构，增加配置文件缺失提示
 3.data_storage.py 软件版本号迭代更新
 
 20200728
@@ -107,7 +107,7 @@ README.md
 1.data_splitting_integration.py 修改Bug，将不符合数据格式的数据置空
 2.data_collection.py 新增原始数据格式处理方式
 3.data_storage.py 迭代版本号
-4.main.py 新增注释
+4.odtp_main.py 新增注释
 
 20200817
 小版本更新：v2.5.6
@@ -144,7 +144,7 @@ README.md
 3.Neural_Network.py 将神经网络过程分模块写成函数，新增tensor_unsqueeze()、optimization_choose()、visualization()、train_neural_network()、neural_network_module()等模块
 4.data_collection.py 将12个传感器的顺序按照现场的顺序进行重新排序（12个txt文档在处理前重新命名）
 5.data_storage.py data_to_txt()函数中将数据归一化改成数据标准化；迭代版本号
-6.main.py 新增车轮数据分析算法
+6.odtp_main.py 新增车轮数据分析算法
 新增：
 1.Algorithm模块下新增wheel_analysis.py 用于对生成的车轮数据进行分析
     |- read_wheel_data()读取车轮数据函数
@@ -162,4 +162,22 @@ README.md
     |- wheel_json()函数中添加wheel_weight/axle_weight/bogie_weight字段
     |- car_json_integration()中新增上述添加的字段
     |- 迭代版本号
-7.main.py 新增计算车辆相关参数的重量的算法 
+7.odtp_main.py 新增计算车辆相关参数的重量的算法 
+
+20201027
+大版本更新：2.9.0
+1.algorithm_main.py al_main_weight()函数更新，通过车号文件新增偏载检测；
+2.data_splitting_integration.py data_standardization()函数：修改wd_base_line的计算规则；
+3.optical_fiber.py 添加配置文件；新增data_integration()函数和wave_display()函数；
+4.wheel_analysis.py wheel_weigh()函数中新增通过车号文件分析车轮的重量以及车辆超偏载；wheel_weight_analysis()函数中新增车号文件参数，并修改整辆列车的称重算法；
+    |- 新增unbalanced_loads()偏载函数；
+5.Config.__init__ 中新增weight_data重量数据参数和time_gap_value时间间隔数值参数；config.ini配置文件中新增GAP和WEIGHT初始化参数；
+6.data_storage.py carriage_json()函数中添加defectType1超偏载缺陷字段；
+    |- car_json_integration()中对wheel_single_json添加判断；
+    |- 迭代版本号
+7.scanning_interface.py 删除部分注释程序
+8.main.py 将超偏载结果添加进主程序；
+新增：
+1.Picture.original_data_to_pic.py文件：将12个传感器txt文件中的数据，校零标准化并显示出图片；
+2.TP_test.show_pic.py文件：将txt中的数据校零并显示图片；
+3.主项目目录下新增gongda_test.py文件：用于工大测试并做称重验证；

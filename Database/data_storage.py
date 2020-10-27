@@ -13,6 +13,12 @@ conf = ConfigInfo()
 
 
 def data_to_txt(path, each_wheel_data):
+    """
+    车轮数据标准化
+    :param path:
+    :param each_wheel_data:
+    :return:
+    """
     try:
         if len(each_wheel_data) != 0:
             each_normalization_wheel = []
@@ -71,13 +77,13 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "totalWeight": "%s" % total_weight,  # 总重
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.8.0",  # 软件版本号
+        "verOfsoftware": "v2.9.0",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
 
 
-def carriage_json(vehicle_no, car_ori, axle_count, vehicle_seq, all_wheel_json):
+def carriage_json(vehicle_no, car_ori, axle_count, vehicle_seq, all_wheel_json, is_unbalanced_loads):
     carriage = {
         "vid": "%s" % uuid1(),  # 32位uuid
         "vehicleNo": "%s" % vehicle_no,  # 车厢号（车号文件）
@@ -85,6 +91,7 @@ def carriage_json(vehicle_no, car_ori, axle_count, vehicle_seq, all_wheel_json):
         "axleCount": "%d" % axle_count,  # 轴数
         "vehicleType": "",  # 车厢类型，5=机车，19=挂车，其他值=其他
         "vehicleSeq": "%s" % vehicle_seq,  # 辆序：（1-8）车号文件
+        "defectType1": "%s" % is_unbalanced_loads,  # 是否有超载或左右偏载缺陷
         "bc": all_wheel_json
     }
     return carriage
@@ -114,7 +121,7 @@ def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, veh
         "defectType1": "",  # 是否有平轮缺陷
         "defectType2": "",  # 是否有不圆度缺陷
         "defectType3": "",  # 是否有多边形缺陷
-        "defectType4": "",  # 是否有车辆偏载缺陷
+        "defectType4": "",  # 是否有踏面损伤缺陷
         "defectRank": "",  # 级别，1-3
         "alarmSend": "",  # 是否发送报警给用户，1是，0否
         "xAxis": x_axis,
@@ -123,7 +130,7 @@ def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, veh
     return car_wheel
 
 
-def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weight, all_car_aei):
+def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weight, all_car_aei, is_unbalanced_loads):
     all_car_json = {}
     try:
         car_no = ''
@@ -149,7 +156,8 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
         axle_weight = all_weight[1]
         bogie_weight = all_weight[2]
         # carriage_weight = all_weight[3]
-        total_weight = all_weight[4]
+        # car_weight = all_weight[4]
+        total_weight = all_weight[5]
 
         # 各个车轮json数据
         all_wheel_json = []
@@ -176,11 +184,18 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
                     vehicle_no_bc = all_car_aei[5][i // 4][2]
                     speed = all_car_aei[5][i // 4][3]
 
-                wheel_single_json = wheel_json(rail=rail, vehicle_axle_seq=vehicle_axle_seq, axle_seq=axle_seq,
-                                               vehicle_seq=vehicle_seq, vehicle_no_bc=vehicle_no_bc,
-                                               vehicle_side=vehicle_side, speed=speed, x_axis=x_wheel_data,
-                                               y_axis=all_wheel_data[i][j], wheel_weight=wheel_weight[i][j],
-                                               axle_weight=axle_weight[i], bogie_weight=bogie_weight[i // 2])
+                if i <= len(wheel_weight) - 1:
+                    wheel_single_json = wheel_json(rail=rail, vehicle_axle_seq=vehicle_axle_seq, axle_seq=axle_seq,
+                                                   vehicle_seq=vehicle_seq, vehicle_no_bc=vehicle_no_bc,
+                                                   vehicle_side=vehicle_side, speed=speed, x_axis=x_wheel_data,
+                                                   y_axis=all_wheel_data[i][j], wheel_weight=wheel_weight[i][j],
+                                                   axle_weight=axle_weight[i], bogie_weight=bogie_weight[i // 2])
+                else:
+                    wheel_single_json = wheel_json(rail=rail, vehicle_axle_seq=vehicle_axle_seq, axle_seq=axle_seq,
+                                                   vehicle_seq=vehicle_seq, vehicle_no_bc=vehicle_no_bc,
+                                                   vehicle_side=vehicle_side, speed=speed, x_axis=x_wheel_data,
+                                                   y_axis=all_wheel_data[i][j], wheel_weight='',
+                                                   axle_weight='', bogie_weight='')
 
                 all_wheel_json.append(wheel_single_json)
             if len(all_wheel_json) % 8 == 0:
@@ -199,12 +214,13 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
                     axle_count = int(len(wheel_set_json) / 2)
                     carriage_single_json = carriage_json(vehicle_no=carriage_num, car_ori=direction,
                                                          axle_count=axle_count, vehicle_seq=vehicle_seq,
-                                                         all_wheel_json=wheel_set_json)
+                                                         all_wheel_json=wheel_set_json,
+                                                         is_unbalanced_loads=is_unbalanced_loads[i])
                 else:
                     axle_count = 0
                     carriage_single_json = carriage_json(vehicle_no=carriage_num, car_ori=direction,
                                                          axle_count=axle_count, vehicle_seq=vehicle_seq,
-                                                         all_wheel_json=[])
+                                                         all_wheel_json=[], is_unbalanced_loads=is_unbalanced_loads[i])
                     count_carriage += 1
                 all_carriage_json.append(carriage_single_json)
         else:
@@ -215,7 +231,8 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
                 axle_count = int(len(wheel_set_json) / 2)
                 carriage_single_json = carriage_json(vehicle_no=carriage_num, car_ori=direction,
                                                      axle_count=axle_count, vehicle_seq=vehicle_seq,
-                                                     all_wheel_json=wheel_set_json)
+                                                     all_wheel_json=wheel_set_json,
+                                                     is_unbalanced_loads=is_unbalanced_loads[i])
                 all_carriage_json.append(carriage_single_json)
 
         # 整车json数据
@@ -229,16 +246,16 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
 
             all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
                                     pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,
-                                    train_speed=average_speed, total_weight=total_weight, train_direction=direction, sides=direction,
-                                    all_carriage_json=all_carriage_json)
+                                    train_speed=average_speed, total_weight=total_weight, train_direction=direction,
+                                    sides=direction, all_carriage_json=all_carriage_json)
         else:
             car_no = 'unknown'
             average_speed = ''
             date_time = strftime('%Y-%m-%d %H:%M:%S', localtime())
             all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
                                     pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,
-                                    train_speed=average_speed, total_weight=total_weight, train_direction=direction, sides=direction,
-                                    all_carriage_json=all_carriage_json)
+                                    train_speed=average_speed, total_weight=total_weight, train_direction=direction,
+                                    sides=direction, all_carriage_json=all_carriage_json)
     except Exception as e:
         print(e)
     return all_car_json

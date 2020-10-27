@@ -5,12 +5,14 @@
       <w>edsi</w>
       <w>fontdict</w>
       <w>getcwd</w>
+      <w>gongda</w>
       <w>imread</w>
       <w>imshow</w>
       <w>ioff</w>
       <w>jaysk</w>
       <w>lowpass</w>
       <w>lssj</w>
+      <w>odtp</w>
       <w>ofsoftware</w>
       <w>optim</w>
       <w>pyinstaller</w>
@@ -18,6 +20,7 @@
       <w>sddt</w>
       <w>sprop</w>
       <w>unsqueeze</w>
+      <w>wheelset</w>
     </words>
   </dictionary>
 </component>

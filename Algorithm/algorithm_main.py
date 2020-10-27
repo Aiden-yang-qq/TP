@@ -20,9 +20,9 @@ def al_main(file):
     file_list = read_txt(file)
 
     # 提取时间和数据
-    for file in file_list:
+    for single_file in file_list:
         data = 0.0
-        file_date_data = file.strip().split(',')
+        file_date_data = single_file.strip().split(',')
         date_time = file_date_data[0]
         date_time_list.append(date_time)
 
@@ -50,7 +50,7 @@ def al_main(file):
     return x_data, data_list
 
 
-def al_main_weight(all_wheel_data):
+def al_main_weight(all_wheel_data, all_car_aei):
     # x_tensor, y_tensor, prediction = read_wheel_data(all_wheel_data)
-    all_weight = wheel_weigh(all_wheel_data)
-    return all_weight
+    all_weight, is_unbalanced_loads = wheel_weigh(all_wheel_data, all_car_aei)
+    return all_weight, is_unbalanced_loads

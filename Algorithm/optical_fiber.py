@@ -1,8 +1,14 @@
+import collections
 from datetime import datetime, timedelta
 from logging import info
 
 from Function.func_collection import read_txt
 from Function.func_collection import writelines_txt
+from matplotlib import pyplot as plt
+import numpy as np
+from Config import ConfigInfo
+
+conf = ConfigInfo()
 
 
 def read_fiber_data(rfd_data):
@@ -114,6 +120,68 @@ def time_wave(tw_time, tw_wave):
         info('optical_fiber:', e)
 
 
+def data_integration(tw_time, tw_wave):
+    try:
+        tw_all_list = []
+        wave_max_set = []
+        new_tw_wave = []
+
+        car_weight_data = conf.weight_data()
+        # tw_all_list.append(tw_time)
+        optical_order = [2, 0, 4, 1, 3, 5]
+        for i_oo in optical_order:
+            new_tw_wave.append(tw_wave[i_oo] * 4)
+        new_tw_wave *= 2
+        for wave in new_tw_wave:
+            if len(wave) != 0:
+                # wave_str = [tw_time + '\n']
+                wave_str = []
+                for w in wave:
+                    # w_str = str(int(w * 10000)) + '\n'
+                    w_str = int(w * 10000)
+                    wave_str.append(w_str)
+
+                wave_dict = dict(collections.Counter(wave_str))
+                wave_max = max(wave_dict, key=wave_dict.get)
+                wave_max_set.append(wave_max)
+                tw_all_list.append(wave_str)
+
+        new_wave = []
+        tw_arr = np.array(tw_all_list)
+        if len(tw_arr) == len(wave_max_set):
+            for i, j in zip(tw_arr, wave_max_set):
+                tw_single = i - j
+                new_wave.append(tw_single)
+
+        wave_display(new_wave)
+        return tw_all_list
+    except Exception as e:
+        info('optical_fiber:', e)
+
+
+def wave_display(new_wave):
+    plt.figure()
+    plt.subplot(231)
+    plt.plot(new_wave[0])
+    plt.grid()
+    plt.subplot(232)
+    plt.plot(new_wave[2])
+    plt.grid()
+    plt.subplot(233)
+    plt.plot(new_wave[4])
+    plt.grid()
+    plt.subplot(234)
+    plt.plot(new_wave[1])
+    plt.grid()
+    plt.subplot(235)
+    plt.plot(new_wave[3])
+    plt.grid()
+    plt.subplot(236)
+    plt.plot(new_wave[5])
+    plt.grid()
+    plt.show()
+
+
 if __name__ == '__main__':
     # p = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_160241.txt'
     p = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_171736.txt'
@@ -122,10 +190,12 @@ if __name__ == '__main__':
     ttw_date_list, ttw_temp_list, ttw_wave_list = time_temp_wave(d_a)
     wave_all = wave_collection(ttw_wave_list)
 
-    tw_txt = time_wave(ttw_date_list, wave_all)
+    start_time = str(ttw_date_list[0])[:-7]
+    # tw_txt = time_wave(ttw_date_list, wave_all)
+    tw_txt = data_integration(start_time, wave_all)
 
     # 将6个传感器的数据保存成txt
     # save_path = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_160241'
     save_path = 'D:\\jaysk\\Desktop\\TP\\optical_fiber_data\\2020-07-01\\Available\\Data_20200701_171736'
-    for i_tt in range(len(tw_txt)):
-        writelines_txt(save_path + '\\%s.txt' % str(i_tt + 1), tw_txt[i_tt])
+    for i in range(len(tw_txt)):
+        writelines_txt(save_path + '\\%s.txt' % str(i + 1), tw_txt[i])

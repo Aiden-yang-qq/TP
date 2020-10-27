@@ -28,16 +28,11 @@ def scan_path(file_path):
 
 def database_creation(dc_path):
     conf = ConfigInfo()
-    # _is_first_scan = conf.is_first_scan()
 
     # 光纤数据库文件夹名称命名
     data_base_name = 'DB'  # 存储所有数据的文件夹
     json_base_name = 'json_file_TP'
     odb_folder_name = conf.get_original_db_name()  # 存储原始数据的文件夹Original_DB
-
-    # # 压力应变片数据库文件夹名称命名
-    # data_pressure_name = 'DB_pressure'  # 存储所有数据的文件夹
-    # odb_pressure_name = 'Original_DB_pressure'  # 存储原始数据的文件夹
 
     # 共用数据库文件夹名称命名
     original_folder_name = 'Data_pool'  # 原始数据库的文件夹名称
@@ -52,35 +47,19 @@ def database_creation(dc_path):
     data_pool_path = cfp + '\\' + original_folder_name  # “Data_pool”文件夹路径
     data_pool_back_path = cfp + '\\' + backup_folder_name  # “Data_pool_backup”文件夹路径
 
-    # # 压力应变片数据库文件夹路径生成
-    # cfp_pre = dc_path + '\\' + data_pressure_name  # “DB_pressure”文件夹路径
-    # odb_pre = dc_path + '\\' + odb_pressure_name  # “Original_DB_pressure”文件夹路径
-    # data_lib_pre_path = cfp_pre + '\\' + algorithm_folder_name  # “Data_lib”文件夹路径
-    # data_pool_pre_path = cfp_pre + '\\' + original_folder_name  # “Data_pool”文件夹路径
-    # data_pool_back_pre_path = cfp_pre + '\\' + backup_folder_name  # “Data_pool_backup”文件夹路径
-
     # 光纤数据库文件夹创建
     folder_creation(dc_path, data_base_name)  # 创建数据库根目录"DB"文件夹
     folder_creation('D:\\', json_base_name)  # 创建json文件存储的文件夹
     folder_creation(cfp, original_folder_name)  # 创建原始数据库"Data_pool"文件夹
     folder_creation(cfp, algorithm_folder_name)  # 创建经过算法后的数据库"Data_lib"文件夹
 
-    # # 压力应变片数据库文件夹创建
-    # folder_creation(dc_path, data_pressure_name)  # 创建数据库根目录"DB"文件夹
-    # folder_creation(cfp_pre, original_folder_name)  # 创建原始数据库"Data_pool"文件夹
-    # folder_creation(cfp_pre, algorithm_folder_name)  # 创建经过算法后的数据库"Data_lib"文件夹
-
     # 生成车号文件夹，并将Original_DB和Original_DB_pressure中的文件复制进去
     odb_dir, new_folder_name, all_car_aei = original_db_scanning(dc_path, odb_folder_name)
-    # odb_pre_dir, new_folder_pre_name = original_db_scanning(dc_path, odb_pressure_name)
 
     # 在Data_lib文件夹中建立年、月、日文件夹
     if new_folder_name is not '':
         db_folder_date = new_folder_name.split()[0].split('#')[1].split('-')  # 从new_folder_name文件夹中获取年、月
         year_mon_day_folder_generation(data_lib_path, db_folder_date)  # 在“Data_lib”文件夹下创建年月日文件夹
-    # if new_folder_pre_name is not '':
-    #     db_folder_pre_date = new_folder_pre_name.split()[0].split('#')[1].split('-')  # 从new_folder_name文件夹中获取年、月
-    #     year_mon_day_folder_generation(data_lib_pre_path, db_folder_pre_date)  # 在“Data_lib”文件夹下创建年月日文件夹
 
     # 在Data_pool_backup文件夹中建立年、月、日文件夹
     if len(new_folder_name) > 1:

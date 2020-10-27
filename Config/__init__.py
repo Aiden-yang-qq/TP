@@ -43,6 +43,16 @@ class ConfigInfo:
         json_save_path = self.cp.get('PATH', 'json_save_path')
         return json_save_path
 
+    def weight_data(self):
+        left_wheel_weight = self.cp.get('WEIGHT', 'left_wheel_weight')
+        right_wheel_weight = self.cp.get('WEIGHT', 'right_wheel_weight')
+        axle_weight = self.cp.get('WEIGHT', 'axle_weight')
+        return left_wheel_weight, right_wheel_weight, axle_weight
+
+    def time_gap_value(self):
+        gap_value = self.cp.get('GAP', 'time_gap')
+        return gap_value
+
 
 def str_to_bool(string):
     return True if string.lower() == 'true' else False
