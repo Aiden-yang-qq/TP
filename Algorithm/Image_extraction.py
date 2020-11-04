@@ -1,6 +1,4 @@
 # 曲线提取 curve extraction
-import matplotlib.image as mp_img
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -22,7 +20,6 @@ def extraction(pic_, n_dot=20):
     gap = shape_i // n_dot
     # print(shape_i, n_dot, gap)
     for i in range(shape_i):  # 扫x轴
-    # for i in range(0, shape_i, gap):  # 扫x轴
         for j in range(shape_j):  # 扫y轴
             if int(pic_new[i][j][0]) == 0:
                 count += 1
@@ -51,17 +48,18 @@ def gray_scale(pic_):
                 pic__[i][j] = np.array([255, 255, 255], dtype='uint8')
     return pic__
 
-
-if __name__ == '__main__':
-    pic = mp_img.imread('pic4.jpg')
-    # pic = mp_img.imread('Figure_1.jpg')
-    pic_n = gray_scale(pic)
-    plt.imshow(pic_n)
-
-    xList, yList = extraction(pic, 10)
-    x_arr = np.array(xList)
-    y_arr = np.array(yList)
-
-    # plt.imshow(pic)
-    plt.plot(x_arr, y_arr, 'r.')
-    plt.show()
+# if __name__ == '__main__':
+# import matplotlib.image as mp_img
+# import matplotlib.pyplot as plt
+#     pic = mp_img.imread('pic4.jpg')
+#     # pic = mp_img.imread('Figure_1.jpg')
+#     pic_n = gray_scale(pic)
+#     # plt.imshow(pic_n)
+#
+#     xList, yList = extraction(pic, 10)
+#     x_arr = np.array(xList)
+#     y_arr = np.array(yList)
+#
+#     # plt.imshow(pic)
+#     # plt.plot(x_arr, y_arr, 'r.')
+#     # plt.show()

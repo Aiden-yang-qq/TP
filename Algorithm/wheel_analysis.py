@@ -1,6 +1,6 @@
 from numpy import array as np_array, around, transpose
 
-from Algorithm.Neural_Networks import neural_network_module
+# from Algorithm.Neural_Networks import neural_network_module
 from Algorithm.data_splitting_integration import single_wheel_data_count
 
 
@@ -23,18 +23,13 @@ def read_wheel_data(all_wheel_data):
 def wheel_weigh(wheel_data, all_car_aei_):
     """
     车轮称重
-    :param wheel_data:
+    :param wheel_data:32个轴，每个轴第一个为近端，第二个为远端
     :return:
     """
     peak_car_set = []
     mean_car_set = []
     all_weight = []
     is_unbalanced_loads = []
-    # wheel_weight = []
-    # axle_weight = []
-    # bogie_weight = []
-    # carriage_weight = []
-    # total_weight = []
     if len(wheel_data) != 0:
         for i in range(len(wheel_data)):
             peak_axle_set = []
@@ -72,6 +67,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     final_bogie_weight = []
     final_carriage_weight = []
     final_car_weight = []
+    final_impact_equivalent = []
     total_mean_car_peak = []
 
     mean_car_arr = np_array(mean_car_set_)[::-1]
@@ -169,6 +165,14 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
             final_carriage_weight.append(carriage_weight)
         # carriage_weight_arr = np_array(carriage_weight)
 
+        # 整合冲击当量
+        wheel_equivalent = around(sum(wheel_weight.transpose()), 4)
+        axle_equivalent = around(sum(wheel_axle_weight.transpose()), 4)
+        bogie_equivalent = around(sum(wheel_bogie_weight.transpose()), 4)
+        carriage_equivalent = around(sum(wheel_carriage_weight.transpose()), 4)
+        impact_equivalent = around(wheel_equivalent + axle_equivalent + bogie_equivalent + carriage_equivalent, 2)
+        final_impact_equivalent.append(impact_equivalent)
+
     # 车轮重量信息
     final_wheel_weight_arr = np_array(final_wheel_weight).reshape((-1, 2))
 
@@ -193,33 +197,10 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     # 整列车厢的总重
     total_weight = round(sum(final_car_weight_), 4)
 
-    # each_carriage_wheel_weight = []
-    # if len(wheel_weight) != 0:
-    #     ww_ = wheel_weight.reshape((-1, 8))
-    #     for wheel_ in ww_:
-    #         each_carriage_wheel_weight.append(round(sum(wheel_), 4))
-    # each_carriage_wheel_weight_arr = np_array(each_carriage_wheel_weight)
-    #
-    # each_carriage_axle_weight = []
-    # axle_weight_arr = np_array(axle_weight).reshape((-1, 4))
-    # if len(axle_weight_arr) != 0:
-    #     for axle_ in axle_weight_arr:
-    #         each_carriage_axle_weight.append(round(sum(axle_), 4))
-    # each_carriage_axle_weight_arr = np_array(each_carriage_axle_weight)
-    #
-    # each_carriage_bogie_weight = []
-    # bogie_weight_arr = np_array(bogie_weight).reshape((-1, 2))
-    # if len(bogie_weight_arr) != 0:
-    #     for bogie_ in bogie_weight_arr:
-    #         each_carriage_bogie_weight.append(round(sum(bogie_), 4))
-    # each_carriage_bogie_weight_arr = np_array(each_carriage_bogie_weight)
-
-    # # 八节车厢的重量
-    # all_metro = around(each_carriage_wheel_weight_arr + each_carriage_axle_weight_arr
-    #                    + each_carriage_bogie_weight_arr + carriage_weight_arr, decimals=4)
-
-    return [final_wheel_weight_arr, final_axle_weight_arr, final_bogie_weight_arr,
-            final_carriage_weight_arr, final_car_weight_, total_weight]
+    # 整列车的冲击当量
+    final_impact_equivalent_arr = np_array(final_impact_equivalent).reshape((-1))
+    return [final_wheel_weight_arr, final_axle_weight_arr, final_bogie_weight_arr, final_carriage_weight_arr,
+            final_car_weight_, total_weight, final_impact_equivalent_arr]
 
 
 def unbalanced_loads(all_weight):
@@ -243,7 +224,6 @@ def unbalanced_loads(all_weight):
 
     return is_unbalanced_loads
 
-
-def neural_network_analysis(x_list_, y_list_):
-    x_tensor, y_tensor, prediction = neural_network_module(x_list_, y_list_)
-    return x_tensor, y_tensor, prediction
+# def neural_network_analysis(x_list_, y_list_):
+#     x_tensor, y_tensor, prediction = neural_network_module(x_list_, y_list_)
+#     return x_tensor, y_tensor, prediction

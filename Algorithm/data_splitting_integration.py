@@ -115,22 +115,6 @@ def optical_data_splitting(txt_list, frequency):
 
             dividing_line = min(max_single) - 0.05
 
-            # mean_line = sum(max_single) / len(max_single)
-            # average = sum(max_single) / len(max_single)
-            # variance = sum([(x - average) ** 2 for x in max_single]) / len(max_single)
-            # standard_deviation = sqrt(variance)
-            #
-            # if 0.8 <= mean_line:
-            #     dividing_line = round(mean_line / 2, 4)
-            # elif 0.7 <= mean_line < 0.8:
-            #     dividing_line = round(mean_line - 0.3, 4)
-            # elif 0.6 <= mean_line < 0.7:
-            #     dividing_line = round(mean_line - 0.2, 4)
-            # else:
-            #     dividing_line = mean_line
-
-            # for i in range(len(each_optical[1])):
-            #     if each_optical[1][i] > dividing_line:
             for i in range(len(each_optical[1])):
                 if each_optical_normalization[i] > dividing_line:
                     wheel_set = [round(each_optical[0][i], 4), each_optical[1][i]]
@@ -248,8 +232,8 @@ def optical_data_to_wheel(optical_all_data, frequency):
                 oad_arr_all = oad_arr_all.reshape((optical_no, wheel_no, single_wheel_data_count))
 
             # oad_arr_all为12个传感器的ndarray形式，前6个为设备同侧传感器，后6个为设备对面侧传感器
-            oad_arr_all_left = oad_arr_all[:6]  # 前6个传感器
-            oad_arr_all_right = oad_arr_all[6:]  # 后6个传感器
+            oad_arr_all_left = oad_arr_all[:6]  # 前6个传感器（近端/左侧）
+            oad_arr_all_right = oad_arr_all[6:]  # 后6个传感器（远端/右侧）
 
             wheel_arr_all_left = transpose(oad_arr_all_left, [1, 0, 2])
             wheel_arr_all_right = transpose(oad_arr_all_right, [1, 0, 2])

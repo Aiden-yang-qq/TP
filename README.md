@@ -181,3 +181,12 @@ README.md
 1.Picture.original_data_to_pic.py文件：将12个传感器txt文件中的数据，校零标准化并显示出图片；
 2.TP_test.show_pic.py文件：将txt中的数据校零并显示图片；
 3.主项目目录下新增gongda_test.py文件：用于工大测试并做称重验证；
+
+20201104
+小版本更新：2.9.1
+1.导入模块调整，注释修改删除：al_func_collection.py、algorithm_main.py、data_splitting_integration.py、Image_extraction.py、interpolation.py、data_storage.py、gongda_test.py；
+2.wheel_analysis.py 新增整车冲击当量的计算；
+3.data_storage.py wheel_json()函数中新增冲击当量字段
+    |- car_json_integration()函数中对wheel_json()、carriage_json()进行了debug并修正了bug；
+    |- 迭代版本号
+4.gongda_test.py 新增test_pic_display()函数；

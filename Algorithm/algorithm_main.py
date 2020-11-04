@@ -1,8 +1,8 @@
 # algorithm_main.py 算法主程序，仅供数据采集后的程序调用
 # Algorithm文件夹下的程序均由此文件调用
 from datetime import datetime as dt
-from Algorithm.wheel_analysis import read_wheel_data, wheel_weigh
 
+from Algorithm.wheel_analysis import wheel_weigh
 from Function.func_collection import read_txt
 
 
@@ -51,6 +51,5 @@ def al_main(file):
 
 
 def al_main_weight(all_wheel_data, all_car_aei):
-    # x_tensor, y_tensor, prediction = read_wheel_data(all_wheel_data)
     all_weight, is_unbalanced_loads = wheel_weigh(all_wheel_data, all_car_aei)
     return all_weight, is_unbalanced_loads

@@ -22,7 +22,7 @@ def interpolate(x_old, y_old):
 if __name__ == '__main__':
     import matplotlib.image as mp_img
     import Image_extraction as Ie
-    from add_noise import noise
+    # from add_noise import noise
 
     # pic_ = mp_img.imread('Figure_1.jpg')
     pic_ = mp_img.imread('pic4.jpg')
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     xarr = np.array(x)
     yarr = np.array(y)
 
-    y_n = noise(yarr, 5)
+    # y_n = noise(yarr, 5)
 
     # plt.figure()
     plt.plot(x, y, 'ro')

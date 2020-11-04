@@ -1,9 +1,10 @@
 # al_func_collection.py:Algorithm functional collection
-from Function.func_collection import read_txt
 # from matplotlib import pyplot as plt
 from numpy import ceil, arange, power, log2
 from numpy.fft import fft
-from scipy.signal import butter, lfilter, freqz
+from scipy.signal import butter, lfilter
+
+from Function.func_collection import read_txt
 
 
 def hex2decimal(hd_path):

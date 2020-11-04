@@ -2,23 +2,13 @@ from collections import Counter as c_Counter
 from datetime import datetime
 from logging import basicConfig, info
 from os import getcwd
-# from os import getcwd, path as os_path
-# from sys import path as sys_path
 from time import strftime, localtime
 
 from matplotlib import pyplot as plt
 from numpy import array, around, append as np_append
 from scipy.signal import butter, lfilter
 
-# from Algorithm.al_func_collection import butter_lowpass_filter
-# from Algorithm.data_splitting_integration import data_normalization
-# from Function.func_collection import read_txt
 from Config import ConfigInfo
-
-# print(sys_path)
-# right_now_path = os_path.dirname(__file__)
-# parent_path = os_path.dirname(right_now_path)
-# sys_path.append(parent_path)
 
 basicConfig(filename='Weight_info.log', level='DEBUG')
 
@@ -147,25 +137,6 @@ def time_temp_wave(ttw_data):
             datetime_list.append(d[0])
             temp_list.append(d[1])
             wave_list.append(d[2])
-
-    # # 时间重置到100000microsecond
-    # counter = 0
-    # datetime_new_list = []
-    # time_microsecond = timedelta(microseconds=100000)  # 默认采集频率是10Hz
-    # if datetime_list[100] - datetime_list[0] == timedelta(seconds=1):  # 采集频率是100Hz
-    #     time_microsecond = timedelta(microseconds=10000)
-    # elif datetime_list[2000] - datetime_list[0] == timedelta(seconds=1):  # 采集频率是2kHz
-    #     time_microsecond = timedelta(microseconds=500)
-    #
-    # for i in range(len(datetime_list) - 1):
-    #     if datetime_list[i + 1] - datetime_list[i] == timedelta(seconds=1):
-    #         counter = i + 1
-    #         break
-    # original_datetime = datetime_list[counter]
-    # for j in range(-1 * counter, len(datetime_list) - counter):
-    #     new_datetime = original_datetime + j * time_microsecond
-    #     datetime_new_list.append(new_datetime)
-    # return datetime_new_list, temp_list, wave_list
     return wave_list
 
 
@@ -213,55 +184,33 @@ def time_wave(tw_time, tw_wave):
         info('optical_fiber:', e)
 
 
-# def data_integration(tw_time, tw_wave):
 def data_integration(tw_wave):
     try:
-        # tw_all_list = []
         wave_max_set = []
         new_tw_wave_ = []
         new_arr_wave_ = []
 
-        # tw_all_list.append(tw_time)
         optical_order = [2, 0, 4, 1, 3, 5]
         for i_oo in optical_order:
-            # new_tw_wave_.append(tw_wave[i_oo] * 4)
             new_tw_wave_.append(tw_wave[i_oo])
         new_tw_wave_ *= 2
         tw_arr = array(new_tw_wave_)
 
         for wave in tw_arr:
             if len(wave) != 0:
-                # wave_str = [tw_time + '\n']
-                # wave_str = []
-                # for w in wave:
-                #     # w_str = str(int(w * 10000)) + '\n'
-                #     w_str = int(w * 10000)
-                #     wave_str.append(w_str)
-
-                # wave_dict = dict(c_Counter(wave_str))
                 wave_dict = c_Counter(wave)
                 wave_max = max(wave_dict, key=wave_dict.get)
                 new_arr_wave_.append(wave - wave_max)
                 wave_max_set.append(wave_max)
-                # tw_all_list.append(wave_str)
-                # tw_all_list.append(wave)
 
-        # new_wave = []
-        # # tw_arr = array(tw_all_list)
-        #
-        # if len(tw_arr) == len(wave_max_set):
-        #     for i, j in zip(tw_arr, wave_max_set):
-        #         tw_single = i - j
-        #         new_wave.append(tw_single)
-
-        wave_display(new_arr_wave_)
+        # wave_display(new_arr_wave_)
         return new_tw_wave_, new_arr_wave_
     except Exception as e:
         info('optical_fiber:', e)
 
 
 def wave_display(new_wave):
-    plt.ion()
+    # plt.ion()
     plt.figure()
     plt.subplot(231)
     plt.plot(new_wave[0])
@@ -281,7 +230,7 @@ def wave_display(new_wave):
     plt.subplot(236)
     plt.plot(new_wave[5])
     plt.grid()
-    # plt.show()
+    plt.show()
 
 
 def optical_data_splitting_test(txt_list, frequency):
@@ -334,7 +283,7 @@ def optical_data_splitting_test(txt_list, frequency):
 
                 wheel_dict = {}
                 for i in range(len(each_optical)):
-                    wheel_dict.update({round(x_coordinate[i], 4): round(each_optical[i], 4)})
+                    wheel_dict.update({round(x_coordinate[i], 4): round(each_optical[i], 12)})
                 last_wheel_value = list(wheel_dict)[-1]
 
                 x_wheel_list = []
@@ -423,8 +372,8 @@ def optical_to_wheel(optical_all_data):
                     op_max_right = max(op_right_arr_tran[i][j])
                     op_max_left_set.append(op_max_left)
                     op_max_right_set.append(op_max_right)
-                op_max_left_result = round(sum(op_max_left_set) / len(op_max_left_set), 2)
-                op_max_right_result = round(sum(op_max_right_set) / len(op_max_right_set), 2)
+                op_max_left_result = round(sum(op_max_left_set) / len(op_max_left_set), 12)
+                op_max_right_result = round(sum(op_max_right_set) / len(op_max_right_set), 12)
                 op_left_wheel_value.append(op_max_left_result)
                 op_right_wheel_value.append(op_max_right_result)
         op_list = [op_left_wheel_value, op_right_wheel_value]
@@ -439,7 +388,8 @@ def wheel_weight_algorithm(ww_wheel_value):
         # axle_wheel_value = ww_wheel_value.transpose((1, 0))
         # 经验值：742.585 对应 2.1t ==> 重量系数：2.1 / 742.585
         # sum_left_right = 742.585
-        sum_left_right = 789.85
+        # sum_left_right = 789.85
+        sum_left_right = round(sum(sum(ww_wheel_value)) / len(ww_wheel_value), 12)  # 使用固定值，才能确保重量，否则只能对标到2.1t
         wheelset_standard_weight = standard_left_weight + standard_right_weight + standard_axle_weight
         weight_coefficient = wheelset_standard_weight / sum_left_right
         left_wheel_coefficient = standard_left_weight / (standard_left_weight + standard_axle_weight / 2)
@@ -496,6 +446,27 @@ def weight_info_to_txt(save_path, file_name_, weight_info_):
         info(e)
 
 
+def test_pic_display():
+    try:
+        file_path = getcwd()
+        file_name = input('请输入需要分析重量的文件名称（不包含.txt）:')
+
+        if file_name[-4:] == '.txt':
+            p = file_path + '\\' + file_name
+        else:
+            p = file_path + '\\' + file_name + '.txt'
+
+        data = read_txt(p)
+        d_a = read_fiber_data_simple(data)
+        ttw_wave_list = time_temp_wave(d_a)
+        wave_all = wave_collection(ttw_wave_list)
+
+        new_tw_wave, new_arr_wave_ = data_integration(wave_all)
+        return new_tw_wave, new_arr_wave_
+    except Exception as e:
+        info(e)
+
+
 def test_main():
     try:
         file_path = getcwd()
@@ -511,17 +482,21 @@ def test_main():
         ttw_wave_list = time_temp_wave(d_a)
         wave_all = wave_collection(ttw_wave_list)
 
-        tw_txt, new_tw_wave = data_integration(wave_all)
+        tw_txt, new_arr_wave_ = data_integration(wave_all)
 
-        tw_optical_all_data = optical_data_splitting_test(new_tw_wave, o_f_frequency)
+        tw_optical_all_data = optical_data_splitting_test(new_arr_wave_, o_f_frequency)
         tw_wheel_arr = optical_to_wheel(tw_optical_all_data)  # 整合传感器：12个传感器的数据整合成32个轴的数据
         weight_info = wheel_weight_algorithm(tw_wheel_arr)  # 车轮重量计算
         weight_info_to_txt(file_path, file_name, weight_info)  # 保存重量信息
         # plt.show()
         print('重量信息见 Wheel Weight.txt 文件！')
+        return new_arr_wave_
     except Exception as e:
         info('test_main:', e)
 
 
 if __name__ == '__main__':
-    test_main()
+    new_arr_wave = test_main()
+    wave_display(new_arr_wave)
+    # ntw_wave, narr_wave = test_pic_display()
+    # wave_display(narr_wave)
