@@ -4,6 +4,10 @@ from logging import info
 from os import path, listdir
 from shutil import rmtree, move
 
+# from collections import Counter
+# import matplotlib.pyplot as plt
+from numpy import array, vstack
+
 from Algorithm.algorithm_main import al_main
 from Config import ConfigInfo
 from Database.data_storage import data_to_txt
@@ -54,7 +58,86 @@ def optical_fiber_collection(ofc_path, folders):
     except Exception as e:
         info(e)
         print(e)
+
+    # 对传感器的数据进行修正（基本信号标准统一化）
     if len(all_nor_optical) > 0:
+        new_optical = []
+        move_set = []
+        positive_set = []
+        negative_set = []
+        amplitude_set = []
+        coefficient_set = []
+        new_all_nor_optical_tran = []
+        all_single_nor_optical_arr_tran = []
+
+        all_nor_optical_arr = array(all_nor_optical)
+        all_nor_optical_arr_tran = all_nor_optical_arr.transpose((1, 0, 2))  # 将传感器数据提取出来，后续进行校准
+        for i in range(len(all_nor_optical_arr_tran[1])):
+            positive_ = []
+            negative_ = []
+            positive_value = 0
+            negative_value = 0
+            # amplitude_ = round(sum(abs(all_nor_optical_arr_tran[1][i][-1000:])) / 1000, 4)
+            # amplitude_ = max(abs(all_nor_optical_arr_tran[1][i][-5000:]))
+            # amplitude_counter = Counter(all_nor_optical_arr_tran[1][i][-5000:])
+            for a in all_nor_optical_arr_tran[1][i][-5000:]:
+                if a > 0:
+                    positive_.append(a)
+                elif a < 0:
+                    negative_.append(a)
+
+            if len(positive_) != 0:
+                positive_value = round(sum(positive_) / len(positive_), 5)
+            if len(negative_) != 0:
+                negative_value = round(sum(negative_) / len(negative_), 5)
+
+            need_to_move = round((positive_value + negative_value) / 2, 5)
+
+            positive_set.append(positive_value)
+            negative_set.append(negative_value)
+            move_set.append(need_to_move)
+
+            single_nor_optical_arr_tran = all_nor_optical_arr_tran[1][i] - need_to_move
+            all_single_nor_optical_arr_tran.append(single_nor_optical_arr_tran)
+
+            amplitude_ = round(positive_value - need_to_move, 4)
+            amplitude_set.append(amplitude_)
+
+        mean_positive = round(sum(positive_set) / len(positive_set), 4)
+        mean_negative = round(sum(negative_set) / len(negative_set), 4)
+        mean_standard = round((mean_positive - mean_negative) / 2, 4)
+
+        for i in range(len(all_single_nor_optical_arr_tran)):
+            if len(all_single_nor_optical_arr_tran) == len(amplitude_set):
+                coefficient_ = round(mean_standard / amplitude_set[i], 4)
+                coefficient_set.append(coefficient_)
+                # new_single_optical = all_nor_optical_arr_tran[1][i] * coefficient_
+                new_single_optical = all_single_nor_optical_arr_tran[i] * coefficient_
+                # new_optical.append(new_single_optical)
+                new_optical.append(new_single_optical)
+
+        if len(all_nor_optical_arr_tran[0]) == len(new_optical):
+            new_all_nor_optical = vstack((all_nor_optical_arr_tran[0], new_optical))
+            new_all_nor_optical_reshape = new_all_nor_optical.reshape((2, len(new_optical), -1))
+            new_all_nor_optical_tran = new_all_nor_optical_reshape.transpose((1, 0, 2))
+
+        # plt.ion()
+        # plt.figure()
+        # for i in range(len(all_nor_optical_arr_tran[1])):
+        #     plt.subplot(2, 6, i + 1)
+        #     plt.plot(all_nor_optical_arr_tran[1][i])
+        #     plt.ylim((-0.184, 0.52))
+        #     plt.grid()
+        # # plt.show()
+        # plt.figure()
+        # for i in range(len(new_optical)):
+        #     plt.subplot(2, 6, i + 1)
+        #     plt.plot(new_optical[i])
+        #     plt.ylim((-0.184, 0.52))
+        #     plt.grid()
+        # plt.show()
+
+        # return new_all_nor_optical_tran
         return all_nor_optical
     else:
         return {}
@@ -63,9 +146,10 @@ def optical_fiber_collection(ofc_path, folders):
 def format_conversion(fc_path):
     """
     # TODO 读文件夹，存在文件则读取并进行格式转换，不存在则退出
-    :param fc_path:该路径为主程序的绝对路径
+    :param fc_path:该路径为主程序的相对路径
     :return:
     """
+    fc_path = 'D:'
     # 加载配置文件
     conf = ConfigInfo()
     original_db = conf.get_original_db_name()  # 获取Original_DB文件夹名称

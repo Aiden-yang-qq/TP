@@ -28,7 +28,7 @@ def optimizer_choose(net_, opt=None):
     lr = 0.05
     momentum = 0.7
     alpha = 0.9
-    betas = (0.9, 0.99)
+    betas = (0.92, 0.99)
 
     if str(opt) == '1':
         print('SGD')
@@ -52,13 +52,13 @@ def visualization(i, loss_, x_tensor_, y_tensor_, prediction_):
         plt.grid()
         plt.scatter(x_tensor_.data.numpy(), y_tensor_.data.numpy())
         plt.plot(x_tensor_.data.numpy(), prediction_.data.numpy(), 'k-.', lw=3)
-        plt.text(0, -0.4, 'Loss=%.6f' % loss_.data.numpy(), fontdict={'size': 20, 'color': 'black'})
+        # plt.text(0, -0.4, 'Loss=%.6f' % loss_.data.numpy(), fontdict={'size': 20, 'color': 'black'})
         plt.pause(0.05)
 
 
 def train_neural_network(x_tensor_, y_tensor_, net_, optimizer_, loss_func_):
     prediction_ = None
-    for i in range(50001):
+    for i in range(35001):
         prediction_ = net_(x_tensor_)
         loss_ = loss_func_(prediction_, y_tensor_)
         optimizer_.zero_grad()
@@ -94,8 +94,11 @@ def neural_network_module(x_list_, y_list_):
 if __name__ == '__main__':
     # pic_path = getcwd()
 
+    # pic_ = mp_img.imread('2020-11-19_163900.jpg')
+    # pic_ = mp_img.imread('2020-11-19_165229.jpg')
+    pic_ = mp_img.imread('2020-11-20_092529.jpg')
     # pic_ = mp_img.imread('pic4.jpg')
-    pic_ = mp_img.imread('Figure_1.jpg')
+    # pic_ = mp_img.imread('Figure_1.jpg')
 
     pic_gray = Ie.gray_scale(pic_)
     xList, yList = Ie.extraction(pic_, 60)

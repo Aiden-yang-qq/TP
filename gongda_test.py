@@ -1,11 +1,11 @@
 from collections import Counter as c_Counter
-from datetime import datetime
+# from datetime import datetime
 from logging import basicConfig, info
 from os import getcwd
 from time import strftime, localtime
 
 from matplotlib import pyplot as plt
-from numpy import array, around, append as np_append
+from numpy import array, around, append as np_append, transpose
 from scipy.signal import butter, lfilter
 
 from Config import ConfigInfo
@@ -24,6 +24,18 @@ car_weight_data = conf.weight_data()
 standard_left_weight = float(car_weight_data[0])
 standard_right_weight = float(car_weight_data[1])
 standard_axle_weight = float(car_weight_data[2])
+
+# 获取校准补偿系数
+# adjust_data = conf.adjust_data()
+# adjust_data_0 = adjust_data[0]
+# adjust_data_1 = adjust_data[1]
+# adjust_data_2 = adjust_data[2]
+# adjust_data_3 = adjust_data[3]
+# adjust_data_4 = adjust_data[4]
+# adjust_data_5 = adjust_data[5]
+
+# 获取图像展示区间
+pic_limits = conf.display_limits()
 
 # time_gap还需要根据列车行驶速度确定（速度越快，时间间隔越短）
 time_gap = 0.1
@@ -109,18 +121,24 @@ def read_fiber_data_simple(rfds_data):
 
         else:
             for d in rfds_data:
+                # date_time = None
                 fiber_data_list = []
+                date_time_temp_ = []
                 d = d.replace('\t', ' ').split('|')
                 date_time_temp = d[0].split()
-                date_time = datetime.fromisoformat(date_time_temp[0].replace(',', ' '))
-                temperature = float(date_time_temp[1])
-                fiber_data = d[3].split()[:6]
-                for i in fiber_data:
-                    # fiber_data_list.append(float(i))
-                    # TODO 修改数据格式，float小数点后保留4位小数
-                    fiber_data_list.append(float(i))
+                for da in date_time_temp:
+                    if len(da) > 2:
+                        date_time_temp_.append(da)
+                if len(date_time_temp_) == 8:
+                    # date_time = datetime.fromisoformat(date_time_temp_[0] + ' ' + date_time_temp_[1])
+                    # temperature = float(date_time_temp[1])
+                    fiber_data = date_time_temp_[-6:]
+                    for i in fiber_data:
+                        # fiber_data_list.append(float(i))
+                        # TODO 修改数据格式，float小数点后保留4位小数
+                        fiber_data_list.append(float(i))
 
-                data_all.append([date_time, temperature, fiber_data_list])
+                data_all.append([fiber_data_list])
         return data_all
     except Exception as e:
         info(e)
@@ -137,7 +155,10 @@ def time_temp_wave(ttw_data):
             datetime_list.append(d[0])
             temp_list.append(d[1])
             wave_list.append(d[2])
-    return wave_list
+
+    wave_arr = array(wave_list)
+    wave_arr_tran = wave_arr.transpose((1, 0))
+    return wave_arr_tran
 
 
 def wave_collection(wave_list):
@@ -203,10 +224,31 @@ def data_integration(tw_wave):
                 new_arr_wave_.append(wave - wave_max)
                 wave_max_set.append(wave_max)
 
-        # wave_display(new_arr_wave_)
-        return new_tw_wave_, new_arr_wave_
+        wave_display(new_tw_wave_)
+        new_arr_ = data_calibration(new_arr_wave_)
+        return new_tw_wave_, new_arr_
     except Exception as e:
         info('optical_fiber:', e)
+
+
+def data_calibration(new_arr_wave_):
+    adjust_data = conf.adjust_data()
+    new_arr_ = []
+    if len(new_arr_wave_) != 0:
+        for i in range(len(new_arr_wave_)):
+            new_arr_.append(new_arr_wave_[i] * float(adjust_data[i % 6]))
+    return array(new_arr_)
+
+
+def tw_txt_integration_display(tw_txt):
+    tw_integration_ = []
+    if len(tw_txt) != 0:
+        tw_txt_arr = array(tw_txt)
+        for single_optical in tw_txt_arr:
+            single_set_ = c_Counter(single_optical)
+            single_max_ = max(single_set_, key=single_set_.get)
+            tw_integration_.append(single_optical - single_max_)
+    return tw_integration_
 
 
 def wave_display(new_wave):
@@ -229,6 +271,39 @@ def wave_display(new_wave):
     plt.grid()
     plt.subplot(236)
     plt.plot(new_wave[5])
+    plt.grid()
+    plt.show()
+
+
+def wave_display_limit(new_wave):
+    # y_min = -0.028
+    # y_max = 0.08
+    y_max = float(pic_limits[0])
+    y_min = float(pic_limits[1])
+    plt.figure()
+    plt.subplot(231)
+    plt.plot(new_wave[0])
+    plt.ylim((y_min, y_max))
+    plt.grid()
+    plt.subplot(232)
+    plt.plot(new_wave[2])
+    plt.ylim((y_min, y_max))
+    plt.grid()
+    plt.subplot(233)
+    plt.plot(new_wave[4])
+    plt.ylim((y_min, y_max))
+    plt.grid()
+    plt.subplot(234)
+    plt.plot(new_wave[1])
+    plt.ylim((y_min, y_max))
+    plt.grid()
+    plt.subplot(235)
+    plt.plot(new_wave[3])
+    plt.ylim((y_min, y_max))
+    plt.grid()
+    plt.subplot(236)
+    plt.plot(new_wave[5])
+    plt.ylim((y_min, y_max))
     plt.grid()
     plt.show()
 
@@ -479,10 +554,12 @@ def test_main():
 
         data = read_txt(p)
         d_a = read_fiber_data_simple(data)
-        ttw_wave_list = time_temp_wave(d_a)
-        wave_all = wave_collection(ttw_wave_list)
+        ttw_wave_arr = time_temp_wave(d_a)
+        # wave_all = wave_collection(ttw_wave_list)
 
-        tw_txt, new_arr_wave_ = data_integration(wave_all)
+        tw_txt, new_arr_wave_ = data_integration(ttw_wave_arr)
+        tw_integration_ = tw_txt_integration_display(tw_txt)
+        wave_display(tw_integration_)
 
         tw_optical_all_data = optical_data_splitting_test(new_arr_wave_, o_f_frequency)
         tw_wheel_arr = optical_to_wheel(tw_optical_all_data)  # 整合传感器：12个传感器的数据整合成32个轴的数据
@@ -497,6 +574,6 @@ def test_main():
 
 if __name__ == '__main__':
     new_arr_wave = test_main()
-    wave_display(new_arr_wave)
+    wave_display_limit(new_arr_wave)
     # ntw_wave, narr_wave = test_pic_display()
     # wave_display(narr_wave)

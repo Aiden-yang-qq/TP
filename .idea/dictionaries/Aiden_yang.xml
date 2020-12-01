@@ -8,10 +8,12 @@
       <w>gongda</w>
       <w>imread</w>
       <w>imshow</w>
+      <w>inte</w>
       <w>ioff</w>
       <w>jaysk</w>
       <w>lowpass</w>
       <w>lssj</w>
+      <w>narr</w>
       <w>odtp</w>
       <w>ofsoftware</w>
       <w>optim</w>
@@ -21,6 +23,7 @@
       <w>sprop</w>
       <w>unsqueeze</w>
       <w>wheelset</w>
+      <w>ylim</w>
     </words>
   </dictionary>
 </component>

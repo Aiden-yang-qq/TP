@@ -6,7 +6,8 @@ from configparser import ConfigParser
 class ConfigInfo:
     def __init__(self):
         self.cf_path = path.dirname(path.realpath(argv[0]))  # 取出当前文件所处路径
-        self.file_path = self.cf_path + '\\Config\\config.ini'
+        # self.file_path = self.cf_path + '\\Config\\config.ini'
+        self.file_path = 'D:\\Config\\config.ini'
         # print('config_path:', path.realpath(self.file_path))
         self.cp = ConfigParser()
         # self.cp.read(self.file_path, encoding='utf-8-sig')
@@ -43,6 +44,10 @@ class ConfigInfo:
         json_save_path = self.cp.get('PATH', 'json_save_path')
         return json_save_path
 
+    def json_transfer_path(self):
+        json_trans_path = self.cp.get('PATH', 'json_transfer_path')
+        return json_trans_path
+
     def weight_data(self):
         left_wheel_weight = self.cp.get('WEIGHT', 'left_wheel_weight')
         right_wheel_weight = self.cp.get('WEIGHT', 'right_wheel_weight')
@@ -52,6 +57,39 @@ class ConfigInfo:
     def time_gap_value(self):
         gap_value = self.cp.get('GAP', 'time_gap')
         return gap_value
+
+    def adjust_data(self):
+        adjust_0 = self.cp.get('ADJUST', 'adjust_0')
+        adjust_1 = self.cp.get('ADJUST', 'adjust_1')
+        adjust_2 = self.cp.get('ADJUST', 'adjust_2')
+        adjust_3 = self.cp.get('ADJUST', 'adjust_3')
+        adjust_4 = self.cp.get('ADJUST', 'adjust_4')
+        adjust_5 = self.cp.get('ADJUST', 'adjust_5')
+        return adjust_0, adjust_1, adjust_2, adjust_3, adjust_4, adjust_5
+
+    def display_limits(self):
+        max_limits = self.cp.get('LIMITS', 'limits_max')
+        min_limits = self.cp.get('LIMITS', 'limits_min')
+        return max_limits, min_limits
+
+    def optical_wavelength(self):
+        opt_l1 = self.cp.get('OPTICAL', 'opt_1550')
+        opt_r1 = self.cp.get('OPTICAL', 'opt_1534')
+        opt_l2 = self.cp.get('OPTICAL', 'opt_1562')
+        opt_r2 = self.cp.get('OPTICAL', 'opt_1541')
+        opt_l3 = self.cp.get('OPTICAL', 'opt_1554')
+        opt_r3 = self.cp.get('OPTICAL', 'opt_1566')
+        return opt_l1, opt_r1, opt_l2, opt_r2, opt_l3, opt_r3
+
+    def optical_difference(self):
+        opt_1 = self.cp.get('OPTICAL', 'opt_1st')
+        opt_2 = self.cp.get('OPTICAL', 'opt_2nd')
+        opt_3 = self.cp.get('OPTICAL', 'opt_3rd')
+        return opt_1, opt_2, opt_3
+
+    def optical_wave_diff(self):
+        opt_wave_diff = self.cp.get('OPTICAL', 'opt_wave_diff')
+        return opt_wave_diff
 
 
 def str_to_bool(string):

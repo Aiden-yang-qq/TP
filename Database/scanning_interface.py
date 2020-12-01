@@ -28,6 +28,7 @@ def scan_path(file_path):
 
 def database_creation(dc_path):
     conf = ConfigInfo()
+    dc_path = 'D:'
 
     # 光纤数据库文件夹名称命名
     data_base_name = 'DB'  # 存储所有数据的文件夹
@@ -53,7 +54,7 @@ def database_creation(dc_path):
     folder_creation(cfp, original_folder_name)  # 创建原始数据库"Data_pool"文件夹
     folder_creation(cfp, algorithm_folder_name)  # 创建经过算法后的数据库"Data_lib"文件夹
 
-    # 生成车号文件夹，并将Original_DB和Original_DB_pressure中的文件复制进去
+    # 生成车号文件夹，并将Original_DB中的文件复制进去
     odb_dir, new_folder_name, all_car_aei = original_db_scanning(dc_path, odb_folder_name)
 
     # 在Data_lib文件夹中建立年、月、日文件夹
@@ -118,6 +119,13 @@ def original_db_scanning(ods_path, odb_folder_name):
     new_folder_name = ''
     all_car_aei = []
     parent_odb_list = listdir(ods_path)
+    # 将文件路径及文件夹所包含文件打印到日志中
+    # info(ods_path)
+    # print(ods_path)
+    # info(odb_folder_name)
+    # print(odb_folder_name)
+    # info(parent_odb_list)
+    # print(parent_odb_list)
 
     if odb_folder_name in parent_odb_list:
         odb_path = ods_path + '\\' + odb_folder_name

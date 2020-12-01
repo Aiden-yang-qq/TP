@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from logging import basicConfig, DEBUG, info
+from logging import basicConfig, DEBUG, info,config
 from os import getcwd, path
 from time import time, sleep, ctime
 
@@ -12,6 +12,8 @@ from Database.data_collection import format_conversion
 from Database.scanning_interface import database_creation
 
 basicConfig(filename='logging_file.log', level=DEBUG)
+# config.fileConfig('D:')
+# info('Hello')
 
 
 def main_exe():
@@ -24,7 +26,8 @@ def main_exe():
         # main_path = path.dirname(path.realpath(argv[0]))
 
         # 配置文件确认
-        config_dir = main_path + '\\Config\\config.ini'
+        # config_dir = main_path + '\\Config\\config.ini'
+        config_dir = 'D:\\Config\\config.ini'
         cfp = path.exists(config_dir)
 
         if cfp:

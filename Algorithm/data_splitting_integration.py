@@ -71,144 +71,157 @@ def wheel_data_integration(txt_list):
 
 
 def optical_data_splitting(txt_list, frequency):
-    wheel_count = 0  # 车轮数量计数
-    optical_all_data = []  # 一维的数据：所有传感器的数据；二维的数据：各个传感器所有的峰值
-    if len(txt_list) != 0:
-        all_each_optical_normalization = []
-        for each_optical in txt_list:
-            x_wheel_set = []
-            max_wheel_set = []
-            max_wheel_single_set = []
+    try:
+        wheel_count = 0  # 车轮数量计数
+        optical_all_data = []  # 一维的数据：所有传感器的数据；二维的数据：各个传感器所有的峰值
+        if len(txt_list) != 0:
+            all_each_optical_normalization = []
+            for each_optical in txt_list:
+                x_wheel_set = []
+                max_wheel_set = []
+                max_wheel_single_set = []
 
-            each_optical_normalization = data_normalization(each_optical[1])
-            all_each_optical_normalization.append(each_optical_normalization)
+                each_optical_normalization = data_normalization(each_optical[1])
+                all_each_optical_normalization.append(each_optical_normalization)
 
-            fre, fft_eon = fft_func(5000, each_optical_normalization)
-            y_after_filter = butter_lowpass_filter(each_optical_normalization, 500, 5000)
-            fre_filter, fft_filter = fft_func(5000, y_after_filter)
+                fre, fft_eon = fft_func(5000, each_optical_normalization)
+                y_after_filter = butter_lowpass_filter(each_optical_normalization, 500, 5000)
+                fre_filter, fft_filter = fft_func(5000, y_after_filter)
 
-            # plt.figure()
-            # plt.plot(each_optical_normalization)
-            # plt.grid()
-            # # plt.show()
-            # plt.figure()
-            # plt.plot(y_after_filter)
-            # plt.grid()
-            # plt.show()
+                # # 去噪前后时域图的对比
+                # plt.figure()
+                # plt.plot(each_optical_normalization)
+                # plt.grid()
+                # # plt.show()
+                # plt.figure()
+                # plt.plot(y_after_filter)
+                # plt.grid()
+                # plt.show()
 
-            # print('Done')
-            # plt.figure()
-            # plt.plot(fre, abs(fft_eon))
-            # plt.grid()
-            # plt.show()
-            # plt.figure()
-            # plt.plot(fre_filter, abs(fft_filter))
-            # plt.grid()
-            # plt.show()
+                # 去噪前后频域图的对比
+                # print('Done')
+                # plt.figure()
+                # plt.plot(fre, abs(fft_eon))
+                # plt.grid()
+                # plt.show()
+                # plt.figure()
+                # plt.plot(fre_filter, abs(fft_filter))
+                # plt.grid()
+                # plt.show()
 
-            max_single = []
-            # for i in range(0, len(each_optical_normalization) - 2000, 2000):
-            for i in range(0, len(y_after_filter) - 200, 200):
-                m = max(y_after_filter[i:i + 200])
-                if 0.4 < m:
-                    max_single.append(m)
+                max_single = []
+                # for i in range(0, len(each_optical_normalization) - 2000, 2000):
+                for i in range(0, len(y_after_filter) - 200, 200):
+                    m = max(y_after_filter[i:i + 200])
+                    if 0.4 < m:
+                        max_single.append(m)
 
-            dividing_line = min(max_single) - 0.05
+                dividing_line = min(max_single) - 0.05
 
-            for i in range(len(each_optical[1])):
-                if each_optical_normalization[i] > dividing_line:
-                    wheel_set = [round(each_optical[0][i], 4), each_optical[1][i]]
-                    x_wheel_set.append(wheel_set)
+                for i in range(len(each_optical[1])):
+                    if each_optical_normalization[i] > dividing_line:
+                        wheel_set = [round(each_optical[0][i], 4), each_optical[1][i]]
+                        x_wheel_set.append(wheel_set)
 
-            max_wheel_single_set.append(x_wheel_set[0])
-            for i in range(1, len(x_wheel_set)):  # 两数据之间间隔>=time_gap则视为两段，<time_gap视为一段
-                if x_wheel_set[i][0] - x_wheel_set[i - 1][0] < time_gap:
-                    max_wheel_single_set.append(x_wheel_set[i])
-                elif x_wheel_set[i][0] - x_wheel_set[i - 1][0] >= time_gap:
+                max_wheel_single_set.append(x_wheel_set[0])
+                for i in range(1, len(x_wheel_set)):  # 两数据之间间隔>=time_gap则视为两段，<time_gap视为一段
+                    if x_wheel_set[i][0] - x_wheel_set[i - 1][0] < time_gap:
+                        max_wheel_single_set.append(x_wheel_set[i])
+                    elif x_wheel_set[i][0] - x_wheel_set[i - 1][0] >= time_gap:
+                        max_wheel_set.append(max_wheel_single_set)
+                        max_wheel_single_set = [x_wheel_set[i]]
+                if len(max_wheel_single_set) >= 2:
                     max_wheel_set.append(max_wheel_single_set)
-                    max_wheel_single_set = [x_wheel_set[i]]
-            if len(max_wheel_single_set) >= 2:
-                max_wheel_set.append(max_wheel_single_set)
 
-            # plt.figure()
-            # plt.plot(each_optical_normalization)
-            # plt.plot([dividing_line] * len(each_optical[0]))
-            # plt.grid()
-            # plt.show()
+                # plt.figure()
+                # plt.plot(each_optical_normalization)
+                # plt.plot([dividing_line] * len(each_optical[0]))
+                # plt.grid()
+                # plt.show()
 
-            x_data = []
-            if len(max_wheel_set) != 0:
-                for max_wheel in max_wheel_set:
-                    if len(max_wheel) != 0:
-                        get_no = round(len(max_wheel) / 2)
-                        x_data.append(max_wheel[get_no][0])
+                x_data = []
+                if len(max_wheel_set) != 0:
+                    for max_wheel in max_wheel_set:
+                        if len(max_wheel) != 0:
+                            get_no = round(len(max_wheel) / 2)
+                            x_data.append(max_wheel[get_no][0])
 
-            wheel_dict = {}
-            for i in range(len(each_optical[0])):
-                wheel_dict.update({round(each_optical[0][i], 4): round(each_optical[1][i], 4)})
-            last_wheel_value = list(wheel_dict)[-1]
+                wheel_dict = {}
+                for i in range(len(each_optical[0])):
+                    wheel_dict.update({round(each_optical[0][i], 4): round(each_optical[1][i], 4)})
+                last_wheel_value = list(wheel_dict)[-1]
 
-            x_wheel_list = []
-            unit_interval = round(1 / frequency, 4)
+                x_wheel_list = []
+                unit_interval = round(1 / frequency, 4)
 
-            # single_wheel_data_count = int(o_f_frequency * time_gap)
-            for x in x_data:
-                if int(x / unit_interval) <= int(single_wheel_data_count / 2):
-                    x_list = [round(unit_interval * a, 4) for a in range(single_wheel_data_count)]
-                    x_wheel_list.append(x_list)
-                elif int(single_wheel_data_count / 2) <= int(x / unit_interval) <= int(
-                        last_wheel_value / unit_interval) - int(single_wheel_data_count / 2):
-                    x_list = [round(unit_interval * a, 4) for a in
-                              range(int(frequency * x) - int(single_wheel_data_count / 2),
-                                    int(frequency * x) + int(single_wheel_data_count / 2))]
-                    x_wheel_list.append(x_list)
-                else:
-                    x_list = [round(unit_interval * a, 4) for a in
-                              range(int(frequency * last_wheel_value) - single_wheel_data_count,
-                                    int(frequency * last_wheel_value))]
-                    x_wheel_list.append(x_list)
+                # single_wheel_data_count = int(o_f_frequency * time_gap)
+                for x in x_data:
+                    if int(x / unit_interval) <= int(single_wheel_data_count / 2):
+                        x_list = [round(unit_interval * a, 4) for a in range(single_wheel_data_count)]
+                        x_wheel_list.append(x_list)
+                    elif int(single_wheel_data_count / 2) <= int(x / unit_interval) <= int(
+                            last_wheel_value / unit_interval) - int(single_wheel_data_count / 2):
+                        x_list = [round(unit_interval * a, 4) for a in
+                                  range(int(frequency * x) - int(single_wheel_data_count / 2),
+                                        int(frequency * x) + int(single_wheel_data_count / 2))]
+                        x_wheel_list.append(x_list)
+                    else:
+                        x_list = [round(unit_interval * a, 4) for a in
+                                  range(int(frequency * last_wheel_value) - single_wheel_data_count,
+                                        int(frequency * last_wheel_value))]
+                        x_wheel_list.append(x_list)
 
-            y_wheel = []
-            y_single_optical = []
-            for x_wheel in x_wheel_list:
-                for x_w in x_wheel:
-                    y_w = wheel_dict[x_w]
-                    y_wheel.append(y_w)
-                y_single_optical.append(y_wheel)
                 y_wheel = []
+                y_single_optical = []
+                for x_wheel in x_wheel_list:
+                    for x_w in x_wheel:
+                        y_w = wheel_dict[x_w]
+                        y_wheel.append(y_w)
+                    y_single_optical.append(y_wheel)
+                    y_wheel = []
 
-            if len(y_single_optical) == 32:
-                wheel_count += 1
-            # optical_all_data的输出格式:三维列表[12个传感器×32个车轮×600个数据][12×32×600]的矩阵
-            optical_all_data.append(y_single_optical)
-    # if wheel_count == 12:
-    #     return optical_all_data
-    # else:
-    #     return []
+                # 根据不同的轴数，对曲线数据进行填补
+                len_y_single_optical = len(y_single_optical)
+                if len_y_single_optical == 32:
+                    wheel_count += 1
+                elif len_y_single_optical < 32:
+                    zero_ = [0.0] * single_wheel_data_count
+                    for i in range(32 - len_y_single_optical):
+                        y_single_optical.append(zero_)
+                elif len_y_single_optical > 32:
+                    y_single_optical = y_single_optical[:32]
 
-    # 新增optical_all_data的size不一致的处理
-    len_list = []
-    for optical_data in optical_all_data:
-        len_opt_data = len(optical_data)
-        len_list.append(len_opt_data)
+                # optical_all_data的输出格式:三维列表[12个传感器×32个车轮×600个数据][12×32×600]的矩阵
+                optical_all_data.append(y_single_optical)
+        # if wheel_count == 12:
+        #     return optical_all_data
+        # else:
+        #     return []
 
-    zero_list = []
-    len_count = Counter(len_list)
-    len_ = max(len_count, key=len_count.get)
-    if len(len_count) != 1:
-        zero_ = [0.0] * single_wheel_data_count
-        for i in range(len_):
-            zero_list.append(zero_)
+        # 新增optical_all_data的size不一致的处理
+        len_list = []
+        for optical_data in optical_all_data:
+            len_opt_data = len(optical_data)
+            len_list.append(len_opt_data)
 
-        len_new_list = []
-        for i in range(len(optical_all_data)):
-            len_opt_all_data_ = len(optical_all_data[i])
-            if len_opt_all_data_ != len_:
-                optical_all_data[i] = zero_list
-            len_opt_all_data_ = len(optical_all_data[i])
-            len_new_list.append(len_opt_all_data_)
+        zero_list = []
+        len_count = Counter(len_list)
+        if len(len_count) > 1:
+            len_ = max(len_count, key=len_count.get)
+            zero_ = [0.0] * single_wheel_data_count
+            for i in range(len_):
+                zero_list.append(zero_)
 
-    return optical_all_data
+            len_new_list = []
+            for i in range(len(optical_all_data)):
+                len_opt_all_data_ = len(optical_all_data[i])
+                if len_opt_all_data_ != len_:
+                    optical_all_data[i] = zero_list
+                len_opt_all_data_ = len(optical_all_data[i])
+                len_new_list.append(len_opt_all_data_)
+        return optical_all_data
+    except Exception as e:
+        info('optical_data_splitting:', e)
 
 
 def optical_data_to_wheel(optical_all_data, frequency):

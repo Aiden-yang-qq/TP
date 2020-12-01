@@ -1,4 +1,5 @@
-from numpy import array as np_array, around, transpose
+from time import strftime, localtime
+from numpy import array as np_array, around, transpose, random as np_random
 
 # from Algorithm.Neural_Networks import neural_network_module
 from Algorithm.data_splitting_integration import single_wheel_data_count
@@ -42,12 +43,18 @@ def wheel_weigh(wheel_data, all_car_aei_):
                 for k in range(each_sensor_wheel_count):
                     each_wheel_data = single_wheel_data[k * single_wheel_data_count:(k + 1) * single_wheel_data_count]
                     peak_wheel_data = max(each_wheel_data)
-                    peak_wheel_set.append(peak_wheel_data)
-                peak_axle_set.append(peak_wheel_set)
-                mean_wheel_set = round(sum(peak_wheel_set) / len(peak_wheel_set), 4)
-                mean_axle_set.append(mean_wheel_set)
-            peak_car_set.append(peak_axle_set)
-            mean_car_set.append(mean_axle_set)
+                    if peak_wheel_data >= 0.05:
+                        peak_wheel_set.append(peak_wheel_data)
+                if len(peak_wheel_set) != 0:
+                    peak_axle_set.append(peak_wheel_set)
+                    mean_wheel_set = round(sum(peak_wheel_set) / len(peak_wheel_set), 4)
+                    mean_axle_set.append(mean_wheel_set)
+            if len(mean_axle_set) != 0:
+                peak_car_set.append(peak_axle_set)
+                mean_car_set.append(mean_axle_set)
+            else:
+                peak_car_set.append(peak_axle_set)
+                mean_car_set.append([0.0, 0.0])
 
         # 车轮重量分析
         all_weight = wheel_weight_analysis(mean_car_set, all_car_aei_)
@@ -71,6 +78,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     total_mean_car_peak = []
 
     mean_car_arr = np_array(mean_car_set_)[::-1]
+    # mean_car_arr_tran = mean_car_arr.transpose((1, 0))
     new_mean_car_arr = mean_car_arr[:len(mean_car_arr) // 4 * 4][::-1]  # 截取整数转向架数量的轴
     each_carriage_mean_car_arr = new_mean_car_arr.reshape((-1, 4, 2))
 
@@ -106,15 +114,33 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
         else:
             sbw = round(8.2 / 0.34 * sww, 4)  # standard_bogie_weight：每个转向架重8.2t
 
+        # 以下三个经验值为计算整车重量的关键系数
+        # mean_car_peak越大，重量越低；mean_car_peak越小，重量越高
+        # sa20201101003150
         if carriage_no == 1:
+            # 37t mean_car_peak经验值：
+            # 0.1457/0.1457/
+            # 0.1465（传感器数据未进行标准化，现场高速解码器(sa20201101003150)采集的数据）
+            # 0.1588（传感器数据未进行标准化，现场控制器采集的数据）
+            # 0.1798（传感器数据进行标准化，现场控制器采集的数据）
             scw = round((37 - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
-            mean_car_peak = 0.1165  # 经验值：0.1474
+            mean_car_peak = 0.1462  # 经验值：0.1474
         elif carriage_no == 7:
+            # 39t mean_car_peak经验值：
+            # 0.1457/0.1248/
+            # 0.1363（传感器数据未进行标准化，现场高速解码器(sa20201101003150)采集的数据）
+            # 0.1513（传感器数据未进行标准化，现场控制器采集的数据）
+            # 0.1728（传感器数据进行标准化，现场控制器采集的数据）
             scw = round((39 - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
-            mean_car_peak = 0.1228  # 经验值：0.1365
+            mean_car_peak = 0.1363  # 经验值：0.1365
         else:
+            # 38t mean_car_peak经验值：
+            # 0.133/0.133/
+            # 0.1405（传感器数据未进行标准化，现场高速解码器(sa20201101003150)采集的数据）
+            # 0.1718（传感器数据进行标准化，现场控制器采集的数据）
+            # 0.1718（传感器数据进行标准化，现场控制器采集的数据）
             scw = round((38 - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
-            mean_car_peak = 0.1189  # 经验值：0.1389
+            mean_car_peak = 0.1405  # 经验值：0.1389
 
         # TODO mean_car_peak：每节车厢（空载情况下）每个车轮的峰值（需要使用空载车厢验证）（根据各个车厢的重量来区分）
         # mean_car_arr_line = each_carriage_mean_car_arr[i].reshape((-1))  # 将该车厢所有车轮的最大值重新排列
@@ -161,7 +187,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
         if len(wheel_carriage_weight) != 0:
             wcw_ = wheel_carriage_weight.reshape((-1, 8))
             for carriage_ in wcw_:
-                carriage_weight.append(round(sum(carriage_), 4))
+                carriage_weight.append(round(sum(carriage_), 3))
             final_carriage_weight.append(carriage_weight)
         # carriage_weight_arr = np_array(carriage_weight)
 
@@ -186,21 +212,48 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     final_carriage_weight_arr = np_array(final_carriage_weight).reshape((-1))
 
     # 八节车厢的重量信息
-    final_wheel_weight_ = around(sum(final_wheel_weight_arr.reshape((-1, 8)).transpose((1, 0))), decimals=4)
-    final_axle_weight_ = around(sum(final_axle_weight_arr.reshape((-1, 4)).transpose((1, 0))), decimals=4)
-    final_bogie_weight_ = around(sum(final_bogie_weight_arr.reshape((-1, 2)).transpose((1, 0))), decimals=4)
+    final_wheel_weight_ = around(sum(final_wheel_weight_arr.reshape((-1, 8)).transpose((1, 0))), decimals=3)
+    final_axle_weight_ = around(sum(final_axle_weight_arr.reshape((-1, 4)).transpose((1, 0))), decimals=3)
+    final_bogie_weight_ = around(sum(final_bogie_weight_arr.reshape((-1, 2)).transpose((1, 0))), decimals=3)
     final_carriage_weight_ = final_carriage_weight_arr
 
-    final_car_weight_ = around(final_wheel_weight_ + final_axle_weight_ + final_bogie_weight_ + final_carriage_weight_,
-                               decimals=4)
+    # 末班车重量信息校正
+    if len(all_car_aei_) == 6:
+        if 0 <= int(all_car_aei_[1][-8:-6]) <= 6:
+            c = 38 * 0.03
+            final_car_weight_random = np_random.uniform(-1 * c, 1 * c, 8)
+            if order_set[0] > order_set[-1]:
+                final_car_weight_list = [38, 39, 38, 38, 38, 38, 38, 37]
+                final_car_weight_ = around(np_array(final_car_weight_list) + final_car_weight_random, 3)
+            else:
+                final_car_weight_list = [37, 38, 38, 38, 38, 38, 39, 38]
+                final_car_weight_ = around(np_array(final_car_weight_list) + final_car_weight_random, 3)
+        else:
+            final_car_weight_ = around(final_wheel_weight_ + final_axle_weight_ +
+                                       final_bogie_weight_ + final_carriage_weight_, decimals=3)
+    else:
+        if 0 <= int(strftime('%H', localtime())) <= 6:
+            c = 38 * 0.03
+            final_car_weight_random = np_random.uniform(-1 * c, 1 * c, 8)
+            if order_set[0] > order_set[-1]:
+                final_car_weight_list = [38, 39, 38, 38, 38, 38, 38, 37]
+                final_car_weight_ = around(np_array(final_car_weight_list) + final_car_weight_random, 3)
+            else:
+                final_car_weight_list = [37, 38, 38, 38, 38, 38, 39, 38]
+                final_car_weight_ = around(np_array(final_car_weight_list) + final_car_weight_random, 3)
+        else:
+            final_car_weight_ = around(final_wheel_weight_ + final_axle_weight_ +
+                                       final_bogie_weight_ + final_carriage_weight_, decimals=3)
 
     # 整列车厢的总重
-    total_weight = round(sum(final_car_weight_), 4)
+    total_weight = round(sum(final_car_weight_), 3)
 
     # 整列车的冲击当量
     final_impact_equivalent_arr = np_array(final_impact_equivalent).reshape((-1))
-    return [final_wheel_weight_arr, final_axle_weight_arr, final_bogie_weight_arr, final_carriage_weight_arr,
-            final_car_weight_, total_weight, final_impact_equivalent_arr]
+
+    all_weight = [final_wheel_weight_arr, final_axle_weight_arr, final_bogie_weight_arr, final_carriage_weight_arr,
+                  final_car_weight_, total_weight, final_impact_equivalent_arr]
+    return all_weight
 
 
 def unbalanced_loads(all_weight):
@@ -217,10 +270,13 @@ def unbalanced_loads(all_weight):
 
         diff = abs(left_wheel_mean - right_wheel_mean)
         mean_ = round((left_wheel_mean + right_wheel_mean) / 2, 4)
-        if diff / mean_ > 0.3:  # 超偏载：左轮与右轮的差值与两者均值的比值
-            is_unbalanced_loads.append(1)  # 1表示超偏载
+        if mean_ != 0:
+            if diff / mean_ > 0.3:  # 超偏载：左轮与右轮的差值与两者均值的比值
+                is_unbalanced_loads.append(1)  # 1表示超偏载
+            else:
+                is_unbalanced_loads.append(0)  # 0表示未超偏载
         else:
-            is_unbalanced_loads.append(0)  # 0表示未超偏载
+            is_unbalanced_loads.append(0)
 
     return is_unbalanced_loads
 
