@@ -1,8 +1,12 @@
 from time import strftime, localtime
-from numpy import array as np_array, around, transpose, random as np_random
+
+from numpy import array as np_array, around, random as np_random, append as np_append
 
 # from Algorithm.Neural_Networks import neural_network_module
 from Algorithm.data_splitting_integration import single_wheel_data_count
+from Config import ConfigInfo
+
+conf = ConfigInfo()
 
 
 def read_wheel_data(all_wheel_data):
@@ -58,8 +62,10 @@ def wheel_weigh(wheel_data, all_car_aei_):
 
         # 车轮重量分析
         all_weight = wheel_weight_analysis(mean_car_set, all_car_aei_)
-        # 车辆超偏载分析
+        # 车辆偏载分析
         is_unbalanced_loads = unbalanced_loads(all_weight)
+        # 车辆超载分析
+        is_overload = overload(all_weight)
     return all_weight, is_unbalanced_loads
 
 
@@ -218,6 +224,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     final_carriage_weight_ = final_carriage_weight_arr
 
     # 末班车重量信息校正
+    final_car_weight_list = [38, 39, 38, 38, 38, 38, 38, 37]
     if len(all_car_aei_) == 6:
         if 0 <= int(all_car_aei_[1][-8:-6]) <= 6:
             c = 38 * 0.03
@@ -247,38 +254,96 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
 
     # 整列车厢的总重
     total_weight = round(sum(final_car_weight_), 3)
+    if total_weight <= 304 * 0.97:  # 如果列车总重低于294.88t，则显示0.0t
+        total_weight = 0.0
 
     # 整列车的冲击当量
     final_impact_equivalent_arr = np_array(final_impact_equivalent).reshape((-1))
 
     all_weight = [final_wheel_weight_arr, final_axle_weight_arr, final_bogie_weight_arr, final_carriage_weight_arr,
-                  final_car_weight_, total_weight, final_impact_equivalent_arr]
+                  final_car_weight_, total_weight, final_impact_equivalent_arr, final_car_weight_list]
     return all_weight
 
 
 def unbalanced_loads(all_weight):
+    """
+    车辆偏载统计
+    :param all_weight:
+    :return:
+    """
+    unbalanced_loads_coe = float(conf.unbalanced_loads_coe())  # （空载时的）偏载系数
+
+    # 每列车厢左右轮重统计
     wheel_weight = all_weight[0]
-    wheel_weight_arr = np_array(wheel_weight)
-    wheel_weight_transpose = transpose(wheel_weight_arr, (1, 0))
-    new_wheel_weight_tran = wheel_weight_transpose.reshape((2, -1, 4))
-    new_tran_shape = new_wheel_weight_tran.shape
+    wheel_weight_arr = wheel_weight.reshape((-1, 4, 2))
+    wheel_weight_arr_trans = wheel_weight_arr.transpose((1, 0, 2))
+    wheel_weight_sum = sum(wheel_weight_arr_trans)
 
+    # 每列车厢左右轴重统计
+    axle_weight = all_weight[1]
+    axle_weight_arr = axle_weight.reshape((-1, 4))
+    axle_weight_arr_trans = axle_weight_arr.transpose((1, 0))
+    axle_weight_arr_trans_sum = sum(axle_weight_arr_trans)
+    axle_weight_arr_trans_half = axle_weight_arr_trans_sum / 2
+    axle_weight_new_sum = np_append(axle_weight_arr_trans_half, axle_weight_arr_trans_half)
+    axle_weight_sum = around(axle_weight_new_sum.reshape((2, -1)).transpose((1, 0)), 4)
+
+    # 每列车厢左右转向架重统计
+    bogie_weight = all_weight[2]
+    bogie_weight_arr = bogie_weight.reshape((-1, 2)).transpose((1, 0))
+    bogie_weight_arr_sum = sum(bogie_weight_arr)
+    bogie_weight_arr_half = bogie_weight_arr_sum / 2
+    bogie_weight_new_sum = np_append(bogie_weight_arr_half, bogie_weight_arr_half)
+    bogie_weight_sum = around(bogie_weight_new_sum.reshape((2, -1)).transpose((1, 0)), 4)
+
+    # 每列车厢左右车厢重统计
+    carriage_weight = all_weight[3]
+    carriage_weight_arr_half = carriage_weight / 2
+    carriage_weight_new_sum = np_append(carriage_weight_arr_half, carriage_weight_arr_half)
+    carriage_weight_sum = around(carriage_weight_new_sum.reshape((2, -1)).transpose((1, 0)), 4)
+
+    # 整辆列车左右重量统计
+    total_car_weight = wheel_weight_sum + axle_weight_sum + bogie_weight_sum + carriage_weight_sum
+
+    # 各个车厢偏载统计
+    diff_set = []
     is_unbalanced_loads = []
-    for i in range(new_tran_shape[1]):
-        left_wheel_mean = round(sum(new_wheel_weight_tran[0][i]) / new_tran_shape[2], 4)
-        right_wheel_mean = round(sum(new_wheel_weight_tran[1][i]) / new_tran_shape[2], 4)
+    for each_carriage_weight in total_car_weight:
+        left_carriage_weight = each_carriage_weight[0]
+        right_carriage_weight = each_carriage_weight[1]
+        diff = round(abs(left_carriage_weight - right_carriage_weight), 4)
+        mean_each_carriage_weight = round((left_carriage_weight + right_carriage_weight) / 2, 4)
+        each_carriage_coe = unbalanced_loads_coe * sum(each_carriage_weight) / 38
+        diff_set.append(diff)
 
-        diff = abs(left_wheel_mean - right_wheel_mean)
-        mean_ = round((left_wheel_mean + right_wheel_mean) / 2, 4)
-        if mean_ != 0:
-            if diff / mean_ > 0.3:  # 超偏载：左轮与右轮的差值与两者均值的比值
-                is_unbalanced_loads.append(1)  # 1表示超偏载
+        if mean_each_carriage_weight != 0:
+            if diff > each_carriage_coe:  # 偏载：左右车厢的重量差值
+                is_unbalanced_loads.append(1)  # 1表示偏载
             else:
-                is_unbalanced_loads.append(0)  # 0表示未超偏载
+                is_unbalanced_loads.append(0)  # 0表示未偏载
         else:
             is_unbalanced_loads.append(0)
-
     return is_unbalanced_loads
+
+
+def overload(all_weight):
+    """
+    车辆超载统计
+    :param all_weight:
+    :return:
+    """
+    is_overload = []
+    each_car_weight = all_weight[4]
+    # total_weight = all_weight[5]
+    standard_weight = all_weight[7]
+
+    if len(each_car_weight) == len(standard_weight):
+        for i in range(len(each_car_weight)):
+            if each_car_weight[i] >= standard_weight[i] + 24:
+                is_overload.append(1)
+            else:
+                is_overload.append(0)
+    return is_overload
 
 # def neural_network_analysis(x_list_, y_list_):
 #     x_tensor, y_tensor, prediction = neural_network_module(x_list_, y_list_)

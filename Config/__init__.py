@@ -58,6 +58,10 @@ class ConfigInfo:
         gap_value = self.cp.get('GAP', 'time_gap')
         return gap_value
 
+    def unbalanced_loads_coe(self):
+        unbalanced_coefficient = self.cp.get('LOADS', 'unbalances_loads_')
+        return unbalanced_coefficient
+
     def adjust_data(self):
         adjust_0 = self.cp.get('ADJUST', 'adjust_0')
         adjust_1 = self.cp.get('ADJUST', 'adjust_1')

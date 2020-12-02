@@ -210,3 +210,11 @@ README.md
 7.gongda_test.py 新增data_calibration()、tw_txt_integration_display()、wave_display_limit()函数；
 新增：
 1.gongda_static_test.py 用于工大测试重量的程序；
+
+20201202
+小版本更新：2.9.6
+1.wheel_analysis.py 新增偏载系数配置；
+    |- 新增超重检测函数overload()；
+    |- 修改了偏载检测程序，使用各个车厢的重量进行判断；
+2.Config.__init__.py 新增偏载系数配置程序；
+3.data_storage.py 迭代版本号；
