@@ -116,7 +116,9 @@ def optical_data_splitting(txt_list, frequency):
                     if 0.4 < m:
                         max_single.append(m)
 
-                dividing_line = min(max_single) - 0.05
+                dividing_line = 0.0
+                if len(max_single) != 0:    # 对分界线做规定
+                    dividing_line = min(max_single) - 0.05
 
                 for i in range(len(each_optical[1])):
                     if each_optical_normalization[i] > dividing_line:

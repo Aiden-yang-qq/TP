@@ -1,7 +1,6 @@
 # 将数据存成txt文档，文件名称以车号命名
 from json import load, dump
 from logging import info
-# from math import ceil
 from time import strftime, localtime
 from uuid import uuid1
 
@@ -10,6 +9,8 @@ from numpy import array, transpose
 from Algorithm.data_splitting_integration import data_standardization
 from Config import ConfigInfo
 from Function.func_collection import write_txt, folder_creation
+
+# from base64 import b64encode
 
 conf = ConfigInfo()
 
@@ -63,10 +64,14 @@ def write_json(json_name, json_data):
         folder_creation(json_path.split('\\')[0], json_path.split('\\')[1])
         folder_creation(json_trans_path.split('\\')[0], json_trans_path.split('\\')[1])
 
+        # 生成json文件
         with open(json_dir, 'w') as f:
             dump(json_data, f)
         with open(json_trans_dir, 'w') as f_trans:
             dump(json_data, f_trans)
+
+        # #  将json文件打包压缩
+        # pack_json(json_dir, json_trans_path)
     except Exception as e:
         info('data_storage:', e)
 
@@ -87,7 +92,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "totalWeight": "%s" % total_weight,  # 总重
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.9.6",  # 软件版本号
+        "verOfsoftware": "v2.9.7",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
@@ -163,6 +168,11 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
         if len(all_carriage_info) != 0:
             all_carriage_info_arr = array(all_carriage_info)
             all_carriage_info_tran = transpose(all_carriage_info_arr, [1, 0])
+        # # 转换成base64格式
+        # x_wheel_data_encode = b''
+        # if len(x_wheel_data) != 0:
+        #     x_wheel_data_bytes = bytes(('%s' % x_wheel_data).encode())
+        #     x_wheel_data_encode = b64encode(x_wheel_data_bytes).decode()
 
         wheel_weight = all_weight[0]
         axle_weight = all_weight[1]
@@ -197,6 +207,9 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
                     vehicle_no_bc = all_car_aei[5][i // 4][2]
                     speed = all_car_aei[5][i // 4][3]
 
+                # # 转换成base64格式
+                # y_wheel_data_bytes = bytes(('%s' % all_wheel_data[i][j]).encode())
+                # y_wheel_data_encode = b64encode(y_wheel_data_bytes).decode()
                 if i <= len(wheel_weight) - 1:
                     wheel_single_json = wheel_json(rail=rail, vehicle_axle_seq=vehicle_axle_seq, axle_seq=axle_seq,
                                                    vehicle_seq=vehicle_seq, vehicle_no_bc=vehicle_no_bc,

@@ -218,3 +218,12 @@ README.md
     |- 修改了偏载检测程序，使用各个车厢的重量进行判断；
 2.Config.__init__.py 新增偏载系数配置程序；
 3.data_storage.py 迭代版本号；
+
+20201204
+小版本更新：2.9.7
+1.data_splitting_integration.py 修改bug，dividing_line的数值进行规定
+2.data_storage.py 
+    |- write_json()函数中，添加对json文件进行打包压缩的代码；
+    |- car_json_integration()函数中，添加将信息进行base64编码的程序（未使用上，增加了文件的大小）；
+    |- 迭代版本号；
+3.func_collection.py 新增pack_json()——json文件打包压缩函数；

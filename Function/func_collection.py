@@ -4,6 +4,8 @@ from logging import warning, info
 from os import listdir, makedirs, path
 from shutil import rmtree
 
+from zipfile import ZipFile, ZIP_DEFLATED
+
 
 def folder_creation(fc_parent_path, folder_name):
     fc_path = fc_parent_path + '\\' + folder_name
@@ -97,3 +99,17 @@ def year_mon_day_folder_generation(original_path, date_time_list):  # 建立年-
             make_directory(db_lib_month_dir, date_time_list[2])
     except Exception as e:
         warning(e)
+
+
+def pack_json(json_dir, json_trans_path):
+    """
+    json文件打包压缩函数
+    :param json_dir:
+    :param json_trans_path:
+    :return:
+    """
+    json_name = json_dir.split('\\')[-1]
+    json_zip_name = json_name.replace('.json', '.zip')
+    json_zip_dir = json_trans_path + '\\' + json_zip_name
+    with ZipFile(json_zip_dir, 'w', ZIP_DEFLATED) as f:
+        f.write(json_dir, json_name)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from logging import basicConfig, DEBUG, info,config
+from logging import basicConfig, DEBUG, info, config
 from os import getcwd, path
 from time import time, sleep, ctime
 
@@ -39,6 +39,7 @@ def main_exe():
             # 数据预处理
             format_conversion(main_path)  # 进行数据预处理，并保存在Original_DB文件夹下
 
+            # 算法程序开始
             info('---------------------------------------')
             info(ctime())
             print('数据正在处理，请稍等……')
@@ -62,6 +63,7 @@ def main_exe():
                                                         all_weight, all_car_aei, is_unbalanced_loads)
                 write_json(json_file_name, all_car_set_json)
 
+            # 算法程序结束
             b = time()
             print('数据处理耗时:%.4fs，程序结束！' % (b - a))
             sleep(1)
