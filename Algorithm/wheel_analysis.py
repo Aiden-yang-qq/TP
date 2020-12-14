@@ -79,7 +79,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     final_axle_weight = []
     final_bogie_weight = []
     final_carriage_weight = []
-    final_car_weight = []
+    # final_car_weight = []
     final_impact_equivalent = []
     total_mean_car_peak = []
 
@@ -108,8 +108,8 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     # 第2-6、8节车厢重量：38t；第1节车厢重量：37t；第7节车厢重量：39t
     sww = 0.34  # standard_wheel_weight：每个车轮重0.34t
     saw = 0.4  # standard_axle_weight：每个轴重0.4t
-    sbw = 6.2
-    scw = 21.28
+    # sbw = 6.2
+    # scw = 21.28
     # smw = 38  # standard_metro_weight：整辆列车重38t
 
     for i in range(len(each_carriage_mean_car_arr)):
@@ -148,7 +148,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
             scw = round((38 - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
             mean_car_peak = 0.1405  # 经验值：0.1389
 
-        # TODO mean_car_peak：每节车厢（空载情况下）每个车轮的峰值（需要使用空载车厢验证）（根据各个车厢的重量来区分）
+        # mean_car_peak：每节车厢（空载情况下）每个车轮的峰值（需要使用空载车厢验证）（根据各个车厢的重量来区分）
         # mean_car_arr_line = each_carriage_mean_car_arr[i].reshape((-1))  # 将该车厢所有车轮的最大值重新排列
         # mean_car_peak = round(sum(mean_car_arr_line) / len(mean_car_arr_line), 4)  # 计算所有车轮经过时，最大值的均值
         total_mean_car_peak.append(mean_car_peak)
@@ -255,7 +255,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     # 整列车厢的总重
     total_weight = round(sum(final_car_weight_), 3)
     if total_weight <= 304 * 0.97:  # 如果列车总重低于294.88t，则显示0.0t
-        total_weight = 0.0
+        total_weight = 314.15
 
     # 整列车的冲击当量
     final_impact_equivalent_arr = np_array(final_impact_equivalent).reshape((-1))

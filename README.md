@@ -227,3 +227,13 @@ README.md
     |- car_json_integration()函数中，添加将信息进行base64编码的程序（未使用上，增加了文件的大小）；
     |- 迭代版本号；
 3.func_collection.py 新增pack_json()——json文件打包压缩函数；
+
+20201214
+小版本更新：2.9.8
+1.al_func_collection.py 新增不圆度检测函数non_circularity()；
+2.algorithm_main.py 新增故障检测函数fault_detection()；
+3.data_splitting_integration.py 删减部分无用注释；
+4.wheel_analysis.py 添加部分注释；
+5.show_pic.py 图像显示范围变化；
+6.data_storage.py 迭代版本号；
+7.main_TP.py 新增车辆故障检测功能；

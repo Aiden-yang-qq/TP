@@ -3,6 +3,7 @@
 from datetime import datetime as dt
 
 from Algorithm.wheel_analysis import wheel_weigh
+from Algorithm.al_func_collection import non_circularity
 from Function.func_collection import read_txt
 
 
@@ -53,3 +54,8 @@ def al_main(file):
 def al_main_weight(all_wheel_data, all_car_aei):
     all_weight, is_unbalanced_loads = wheel_weigh(all_wheel_data, all_car_aei)
     return all_weight, is_unbalanced_loads
+
+
+def fault_detection(x_wheel_data, all_wheel_data):
+    is_non_circularity = non_circularity(x_wheel_data, all_wheel_data)
+    return is_non_circularity

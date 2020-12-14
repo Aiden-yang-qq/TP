@@ -5,7 +5,7 @@ from time import time, sleep, ctime
 
 # from matplotlib import pyplot as plt
 from Algorithm.data_splitting_integration import optical_data_splitting, optical_data_to_wheel
-from Algorithm.algorithm_main import al_main_weight
+from Algorithm.algorithm_main import al_main_weight, fault_detection
 from Config import ConfigInfo
 from Database.data_storage import car_json_integration, write_json
 from Database.data_collection import format_conversion
@@ -56,6 +56,9 @@ def main_exe():
 
             # 计算车辆相关参数的重量，是否超偏载
             all_weight, is_unbalanced_loads = al_main_weight(all_wheel_data, all_car_aei)
+            
+            # 车辆故障检测
+            is_non_circularity = fault_detection(x_wheel_data, all_wheel_data)
 
             # 将车轮数据保存成json文件
             if len(json_file_name) != 0:

@@ -1,9 +1,7 @@
 # data_splitting_integration.py 数据分割、整合模块
-
 from collections import Counter
 from logging import info
 
-# from math import sqrt
 # from matplotlib import pyplot as plt
 from numpy import array, transpose, append as np_ap
 
@@ -37,15 +35,11 @@ def data_standardization(wheel_data):
         wd_base_line = wd_min
         if len(wheel_data) >= o_f_frequency:
             wd_base_ = Counter(wheel_data)
-            wd_base_line = max(wd_base_, key=wd_base_.get)
-            # wd_base_line = round(sum(wheel_data[-1 * o_f_frequency:]) / o_f_frequency, 6)  # 车轮压力波长数据的基准线
+            wd_base_line = max(wd_base_, key=wd_base_.get)  # 车轮压力波长数据的基准线
         for d in wheel_data:
-            # molecule = d - wd_min  # 分子
-            # denominator = wd_max - wd_min  # 分母
             molecule = d - wd_base_line  # 分子
             denominator = wd_max - wd_base_line  # 分母
             if denominator != 0:
-                # nor_data = round(molecule / denominator, 4)  # 做归一化
                 nor_data = round(molecule, 4)
                 nor_data_list.append(nor_data)
         return nor_data_list
@@ -117,7 +111,7 @@ def optical_data_splitting(txt_list, frequency):
                         max_single.append(m)
 
                 dividing_line = 0.0
-                if len(max_single) != 0:    # 对分界线做规定
+                if len(max_single) != 0:  # 对分界线做规定
                     dividing_line = min(max_single) - 0.05
 
                 for i in range(len(each_optical[1])):

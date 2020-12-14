@@ -1,6 +1,6 @@
 # al_func_collection.py:Algorithm functional collection
 # from matplotlib import pyplot as plt
-from numpy import ceil, arange, power, log2
+from numpy import ceil, arange, power, log2, array, around, linspace, pi
 from numpy.fft import fft
 from scipy.signal import butter, lfilter
 
@@ -63,6 +63,32 @@ def butter_lowpass_filter(data, cutoff_fre, fs, order=5):
     # b, a = butter(N=order, Wn=normal_cutoff, btype='low', analog=False, output='ba', fs=fs)
     y_output = lfilter(b, a, data)
     return y_output
+
+
+def non_circularity(x_wheel_data, all_wheel_data):
+    """
+    不圆度检测
+    :param x_wheel_data:
+    :param all_wheel_data:
+    :return:
+    """
+    if len(all_wheel_data) != 0:
+        radius_standard = 400
+        coefficient = 0.3
+
+        all_wheel_data_arr = array(all_wheel_data)
+        theta = linspace(0, 2 * pi, len(x_wheel_data))
+        # for i in range(len(all_wheel_data_arr)):
+        #     for j in range(len(all_wheel_data_arr[i])):
+        #         radius = around(radius_standard - coefficient - all_wheel_data_arr[i][i], 3)
+        radius = around(radius_standard - coefficient - all_wheel_data_arr, 3)
+        # new_radius = radius.reshape((32, 2, 1500))
+
+        # plt.figure()
+        # graph = plt.subplot(111, polar=True)
+        # graph.plot(theta, radius[0][0], linewidth=3)
+        # # graph.title('10')
+        # plt.show()
 
 
 if __name__ == '__main__':

@@ -25,5 +25,6 @@ if path.exists(file_path):
 
     plt.figure()
     plt.plot(new_txt)
+    plt.ylim((-100, 250))
     plt.grid()
     plt.show()
