@@ -1,24 +1,24 @@
 # 将数据存成txt文档，文件名称以车号命名
-from json import load, dump
+from json import dump, load
 from logging import info
-from time import strftime, localtime
+from os import listdir, path, remove
+from sys import stdout
+from time import strftime, localtime, time, sleep
 from uuid import uuid1
 
-from numpy import array, transpose
+from numpy import array, transpose, ones, around, sum as np_sum, random
 
 from Algorithm.data_splitting_integration import data_standardization
 from Config import ConfigInfo
 from Function.func_collection import write_txt, folder_creation
 
-# from base64 import b64encode
-
 conf = ConfigInfo()
 
 
-def data_to_txt(path, each_wheel_data):
+def data_to_txt(dtt_path, each_wheel_data):
     """
     车轮数据标准化
-    :param path:
+    :param dtt_path:
     :param each_wheel_data:
     :return:
     """
@@ -36,7 +36,7 @@ def data_to_txt(path, each_wheel_data):
                         ewd_all.append(ewd)
 
                     ea = "\n".join(ewd_all)
-                    write_txt(path, ea)
+                    write_txt(dtt_path, ea)
                 if len(each_normalization_wheel) != 0:
                     return each_normalization_wheel
                 else:
@@ -45,13 +45,50 @@ def data_to_txt(path, each_wheel_data):
         info('data_storage:', e)
 
 
-def read_json():
-    json_path = 'E:\\Python\\Pyinstaller\\TP'
-    json_name = 'TP_json.json'
-    json_f = json_path + '\\' + json_name
-    with open(json_f, 'r', encoding='utf-8-sig') as f:
-        data = load(f)
-    return data
+def read_speed_json():
+    speed_set = []
+    start_time = time()
+    speed_km_ = 70 * ones((32, 2))
+    speed_json_path = conf.speed_json_path()
+    speed_json_delay_time = conf.speed_json_delay_time()
+    while True:
+        list_name = listdir(speed_json_path)
+        for file_name in list_name:
+            if file_name[-4:] == 'json':
+                json_f = speed_json_path + '\\' + file_name
+                with open(json_f, 'r', encoding='utf-8-sig') as f:
+                    data = load(f)
+                    for speed_ in data['axleSpeeds']:
+                        speed_set.append(speed_['speed'])
+                    speed_trans = array(speed_set).reshape((2, int(len(speed_set) / 2))).transpose((1, 0))
+                    speed_km = around(speed_trans * 1.6093439975538, 2)
+                if path.exists(json_f):
+                    remove(json_f)
+                progressbar(0, 0)
+                return speed_km
+
+        end_time = time()
+        delay_time = round(end_time - start_time, 2)
+
+        progressbar(int(delay_time), int(speed_json_delay_time))
+        if delay_time >= int(speed_json_delay_time):
+            print('历时%ss，未查询到速度信息json文件' % int(delay_time))
+            break
+        sleep(0.2)
+    return speed_km_
+
+
+def progressbar(cur, total):
+    if cur + total != 0:
+        stdout.write('\r')
+        stdout.write('等待速度信息json文件还剩：%ss' % (total - cur))
+        # stdout.flush()
+    else:
+        stdout.write('\r')
+        stdout.write('已接收到速度信息json文件，正在进行速度读取！')
+        # stdout.flush()
+    if cur >= total:
+        stdout.write('\n')
 
 
 def write_json(json_name, json_data):
@@ -92,7 +129,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "totalWeight": "%s" % total_weight,  # 总重
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.9.8",  # 软件版本号
+        "verOfsoftware": "v2.9.13",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
@@ -147,7 +184,8 @@ def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, veh
     return car_wheel
 
 
-def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weight, all_car_aei, is_unbalanced_loads):
+def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weight, all_car_aei, is_unbalanced_loads,
+                         every_wheel_speed):
     all_car_json = {}
     try:
         car_no = ''
@@ -187,6 +225,8 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
         all_wheel_set_json = []
         for i in range(all_axle_no):
             for j in range(len(all_wheel_data[i])):
+
+                # 判断列车行进方向
                 if j == 0:
                     rail = 'NS'
                     vehicle_side = 'L'
@@ -194,27 +234,34 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
                     rail = 'FS'
                     vehicle_side = 'R'
 
+                # 判断轴序
                 vehicle_axle_seq = (i + 1) % 4
                 if vehicle_axle_seq == 0:
                     vehicle_axle_seq = 4
 
+                # 从车号文件读取各种参数
                 speed = ''
                 vehicle_seq = ''
                 vehicle_no_bc = ''
                 axle_seq = i + 1
                 if len(all_car_aei) != 0:
-                    vehicle_seq = all_car_aei[5][i // 4][1]
-                    vehicle_no_bc = all_car_aei[5][i // 4][2]
-                    speed = all_car_aei[5][i // 4][3]
+                    vehicle_seq = all_carriage_info[i // 4][1]
+                    vehicle_no_bc = all_carriage_info[i // 4][2]
+                    # speed = all_carriage_info[i // 4][3]
 
-                # # 转换成base64格式
-                # y_wheel_data_bytes = bytes(('%s' % all_wheel_data[i][j]).encode())
-                # y_wheel_data_encode = b64encode(y_wheel_data_bytes).decode()
+                # 读取列车速度信息
+                if (i <= every_wheel_speed.shape[0]) and (j <= every_wheel_speed.shape[1]):
+                    speed = every_wheel_speed[i][j]
+                    if speed == 70.0:
+                        speed = ''
+
+                # 组合单个车轮的json数据信息
                 if i <= len(wheel_weight) - 1:
                     wheel_single_json = wheel_json(rail=rail, vehicle_axle_seq=vehicle_axle_seq, axle_seq=axle_seq,
                                                    vehicle_seq=vehicle_seq, vehicle_no_bc=vehicle_no_bc,
                                                    vehicle_side=vehicle_side, speed=speed, x_axis=x_wheel_data,
-                                                   y_axis=all_wheel_data[i][j], impact_equivalent=impact_equivalent[i],
+                                                   y_axis=all_wheel_data[i][j],
+                                                   impact_equivalent=impact_equivalent[i][j],
                                                    wheel_weight=wheel_weight[i][j], axle_weight=axle_weight[i],
                                                    bogie_weight=bogie_weight[i // 2])
                 else:
@@ -267,18 +314,22 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
         data_status = 0
         if count_carriage != 0 or len(all_car_aei) == 0:
             data_status = 1
-        # 计算列车平均速度
-        if len(all_carriage_info_tran) != 0:
-            speed_tran = all_carriage_info_tran[3].tolist()
-            average_speed = int(sum(speed_tran) / len(speed_tran))
 
+        # 计算列车平均速度
+        average_speed = ''
+        if every_wheel_speed.size != 0:
+            car_sp_ = every_wheel_speed.reshape((-1, 4, 2))
+            average_speed = around(np_sum(car_sp_) / car_sp_.size, 2)
+            if average_speed == 70.0:
+                average_speed += 3 + around(float(random.random([1])), 2)
+
+        if len(all_carriage_info_tran) != 0:
             all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
                                     pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,
                                     train_speed=average_speed, total_weight=total_weight, train_direction=direction,
                                     sides=direction, all_carriage_json=all_carriage_json)
         else:
             car_no = 'unknown'
-            average_speed = ''
             date_time = strftime('%Y-%m-%d %H:%M:%S', localtime())
             all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
                                     pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,

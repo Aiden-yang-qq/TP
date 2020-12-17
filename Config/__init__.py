@@ -48,6 +48,14 @@ class ConfigInfo:
         json_trans_path = self.cp.get('PATH', 'json_transfer_path')
         return json_trans_path
 
+    def speed_json_path(self):
+        speed_json_path = self.cp.get('PATH', 'speed_json_path')
+        return speed_json_path
+
+    def speed_json_delay_time(self):
+        speed_json_delay_time = self.cp.get('GAP', 'speed_json_delay_time')
+        return speed_json_delay_time
+
     def weight_data(self):
         left_wheel_weight = self.cp.get('WEIGHT', 'left_wheel_weight')
         right_wheel_weight = self.cp.get('WEIGHT', 'right_wheel_weight')

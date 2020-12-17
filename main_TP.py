@@ -55,7 +55,7 @@ def main_exe():
             x_wheel_data, all_wheel_data = optical_data_to_wheel(optical_fiber_data, o_f_frequency)
 
             # 计算车辆相关参数的重量，是否超偏载
-            all_weight, is_unbalanced_loads = al_main_weight(all_wheel_data, all_car_aei)
+            all_weight, is_unbalanced_loads, every_wheel_speed = al_main_weight(all_wheel_data, all_car_aei)
             
             # 车辆故障检测
             is_non_circularity = fault_detection(x_wheel_data, all_wheel_data)
@@ -63,7 +63,7 @@ def main_exe():
             # 将车轮数据保存成json文件
             if len(json_file_name) != 0:
                 all_car_set_json = car_json_integration(json_file_name, x_wheel_data, all_wheel_data,
-                                                        all_weight, all_car_aei, is_unbalanced_loads)
+                                                        all_weight, all_car_aei, is_unbalanced_loads, every_wheel_speed)
                 write_json(json_file_name, all_car_set_json)
 
             # 算法程序结束

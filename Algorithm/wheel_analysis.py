@@ -5,6 +5,7 @@ from numpy import array as np_array, around, random as np_random, append as np_a
 # from Algorithm.Neural_Networks import neural_network_module
 from Algorithm.data_splitting_integration import single_wheel_data_count
 from Config import ConfigInfo
+from Database.data_storage import read_speed_json
 
 conf = ConfigInfo()
 
@@ -31,9 +32,10 @@ def wheel_weigh(wheel_data, all_car_aei_):
     :param wheel_data:32个轴，每个轴第一个为近端，第二个为远端
     :return:
     """
+    all_weight = []
     peak_car_set = []
     mean_car_set = []
-    all_weight = []
+    every_wheel_speed = []
     is_unbalanced_loads = []
     if len(wheel_data) != 0:
         for i in range(len(wheel_data)):
@@ -61,12 +63,12 @@ def wheel_weigh(wheel_data, all_car_aei_):
                 mean_car_set.append([0.0, 0.0])
 
         # 车轮重量分析
-        all_weight = wheel_weight_analysis(mean_car_set, all_car_aei_)
+        all_weight, every_wheel_speed = wheel_weight_analysis(mean_car_set, all_car_aei_)
         # 车辆偏载分析
         is_unbalanced_loads = unbalanced_loads(all_weight)
         # 车辆超载分析
         is_overload = overload(all_weight)
-    return all_weight, is_unbalanced_loads
+    return all_weight, is_unbalanced_loads, every_wheel_speed
 
 
 def wheel_weight_analysis(mean_car_set_, all_car_aei_):
@@ -101,6 +103,10 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
             order_set.append(i)
         order_set.reverse()
 
+    # 采集列车速度信息
+    every_wheel_speed = read_speed_json()
+    car_sp_ = every_wheel_speed.reshape((-1, 4, 2))
+
     # 标准重量：
     # 所有车轮重量：0.34t
     # 所有轴重量：0.4t
@@ -112,6 +118,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     # scw = 21.28
     # smw = 38  # standard_metro_weight：整辆列车重38t
 
+    carriage_impact_equivalent = []
     for i in range(len(each_carriage_mean_car_arr)):
         carriage_no = order_set[i]
 
@@ -129,7 +136,8 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
             # 0.1465（传感器数据未进行标准化，现场高速解码器(sa20201101003150)采集的数据）
             # 0.1588（传感器数据未进行标准化，现场控制器采集的数据）
             # 0.1798（传感器数据进行标准化，现场控制器采集的数据）
-            scw = round((37 - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
+            smw = 37
+            scw = round((smw - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
             mean_car_peak = 0.1462  # 经验值：0.1474
         elif carriage_no == 7:
             # 39t mean_car_peak经验值：
@@ -137,7 +145,8 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
             # 0.1363（传感器数据未进行标准化，现场高速解码器(sa20201101003150)采集的数据）
             # 0.1513（传感器数据未进行标准化，现场控制器采集的数据）
             # 0.1728（传感器数据进行标准化，现场控制器采集的数据）
-            scw = round((39 - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
+            smw = 39
+            scw = round((smw - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
             mean_car_peak = 0.1363  # 经验值：0.1365
         else:
             # 38t mean_car_peak经验值：
@@ -145,7 +154,8 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
             # 0.1405（传感器数据未进行标准化，现场高速解码器(sa20201101003150)采集的数据）
             # 0.1718（传感器数据进行标准化，现场控制器采集的数据）
             # 0.1718（传感器数据进行标准化，现场控制器采集的数据）
-            scw = round((38 - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
+            smw = 38
+            scw = round((smw - 8 * sww - 4 * saw - 2 * sbw) / 0.34 * sww, 4)  # standard_carriage_weight：每节车厢重__t
             mean_car_peak = 0.1405  # 经验值：0.1389
 
         # mean_car_peak：每节车厢（空载情况下）每个车轮的峰值（需要使用空载车厢验证）（根据各个车厢的重量来区分）
@@ -198,12 +208,22 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
         # carriage_weight_arr = np_array(carriage_weight)
 
         # 整合冲击当量
-        wheel_equivalent = around(sum(wheel_weight.transpose()), 4)
-        axle_equivalent = around(sum(wheel_axle_weight.transpose()), 4)
-        bogie_equivalent = around(sum(wheel_bogie_weight.transpose()), 4)
-        carriage_equivalent = around(sum(wheel_carriage_weight.transpose()), 4)
-        impact_equivalent = around(wheel_equivalent + axle_equivalent + bogie_equivalent + carriage_equivalent, 2)
-        final_impact_equivalent.append(impact_equivalent)
+        # wheel_equivalent = around(sum(wheel_weight.transpose()), 4)
+        # axle_equivalent = around(sum(wheel_axle_weight.transpose()), 4)
+        # bogie_equivalent = around(sum(wheel_bogie_weight.transpose()), 4)
+        # carriage_equivalent = around(sum(wheel_carriage_weight.transpose()), 4)
+        # impact_equivalent = around(wheel_equivalent + axle_equivalent + bogie_equivalent + carriage_equivalent, 2)
+        # final_impact_equivalent.append(impact_equivalent)
+        wheel_total_weight = wheel_weight + wheel_axle_weight + wheel_bogie_weight + wheel_carriage_weight
+        wheel_single_weight = sww + saw / 2 + sbw / 4 + scw / 8
+        wheel_load_weight = wheel_total_weight - wheel_single_weight
+
+        for m in range(wheel_load_weight.shape[0]):
+            axle_impact_equivalent = []
+            for n in range(wheel_load_weight.shape[1]):
+                wheel_impact_equivalent_ = impact_equivalent_algorithm(wheel_load_weight[m][n], smw, car_sp_[i][m][n])
+                axle_impact_equivalent.append(wheel_impact_equivalent_)
+            carriage_impact_equivalent.append(axle_impact_equivalent)
 
     # 车轮重量信息
     final_wheel_weight_arr = np_array(final_wheel_weight).reshape((-1, 2))
@@ -258,11 +278,30 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
         total_weight = 314.15
 
     # 整列车的冲击当量
-    final_impact_equivalent_arr = np_array(final_impact_equivalent).reshape((-1))
+    # final_impact_equivalent_arr = np_array(final_impact_equivalent).reshape((-1))
+    final_impact_equivalent_arr = np_array(carriage_impact_equivalent)
 
     all_weight = [final_wheel_weight_arr, final_axle_weight_arr, final_bogie_weight_arr, final_carriage_weight_arr,
                   final_car_weight_, total_weight, final_impact_equivalent_arr, final_car_weight_list]
-    return all_weight
+    return all_weight, every_wheel_speed
+
+
+def impact_equivalent_algorithm(wheel_load, car_empty_weight, speed):
+    # speed = 43.0
+    a1 = (0.145 - 0.0552) / (84 - 24)
+    b1 = 0.145 - 84 * a1
+    a0 = car_empty_weight * a1 + b1
+
+    a2 = (18.91 - 11.51) / (84 - 24)
+    b2 = 18.91 - 84 * a2
+    b0 = car_empty_weight * a2 + b2
+
+    dynamic_increment = speed * a0 + b0  # 动态增量回归方程
+    impact_equivalent_ = round((dynamic_increment + 1.6 * (105 - wheel_load * 9.8) +
+                                (40.0 - speed) * (0.13 * wheel_load * 9.8 + 0.0834)) / 9.8, 2)
+    if impact_equivalent_ < 0:
+        impact_equivalent_ = 0
+    return round(impact_equivalent_)
 
 
 def unbalanced_loads(all_weight):

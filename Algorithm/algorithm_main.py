@@ -52,8 +52,8 @@ def al_main(file):
 
 
 def al_main_weight(all_wheel_data, all_car_aei):
-    all_weight, is_unbalanced_loads = wheel_weigh(all_wheel_data, all_car_aei)
-    return all_weight, is_unbalanced_loads
+    all_weight, is_unbalanced_loads, every_wheel_speed = wheel_weigh(all_wheel_data, all_car_aei)
+    return all_weight, is_unbalanced_loads, every_wheel_speed
 
 
 def fault_detection(x_wheel_data, all_wheel_data):

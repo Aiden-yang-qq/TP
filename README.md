@@ -237,3 +237,19 @@ README.md
 5.show_pic.py 图像显示范围变化；
 6.data_storage.py 迭代版本号；
 7.main_TP.py 新增车辆故障检测功能；
+
+20201217
+小版本更新：2.9.13
+1.algorithm_main.py al_main_weight()函数中新增every_wheel_speed参数；
+2.wheel_analysis.py 
+    |- wheel_weight()函数中，车轮重量分析中输出新增every_wheel_speed参数；
+    |- wheel_weight_analysis()函数中，新增列车速度信息采集方法；
+        |- 修正了冲击当量的算法；
+    |- impact_equivalent_algorithm()修正冲击当量函数算法；
+3.Config.__init__.py 中新增speed_json_path()、speed_json_delay_time()函数
+4.data_storage.py 
+    |- 将read_json()函数修改为read_speed_json()函数，用于读取速度信息数据；
+    |- 新增progressbar()进度显示函数；
+    |- car_json_integration()函数中，新增列车速度读取方法，更新列车平均速度算法，并调整相关json数据的存储；
+    |- 迭代版本号；
+5.main_TP.py 新增了列车速度信息数据；

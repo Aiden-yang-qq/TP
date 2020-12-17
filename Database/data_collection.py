@@ -1,7 +1,7 @@
 # data_collection.py 数据采集模块
 from datetime import datetime, timedelta
 from logging import info
-from os import path, listdir
+from os import listdir, path
 from shutil import rmtree, move
 
 # from collections import Counter
@@ -12,6 +12,8 @@ from Algorithm.algorithm_main import al_main
 from Config import ConfigInfo
 from Database.data_storage import data_to_txt
 from Function.func_collection import make_directory, read_txt, writelines_txt, folder_creation
+
+conf = ConfigInfo()
 
 
 def wheel_no_collection(wnc_path, file_name):
@@ -151,7 +153,6 @@ def format_conversion(fc_path):
     """
     fc_path = 'D:'
     # 加载配置文件
-    conf = ConfigInfo()
     original_db = conf.get_original_db_name()  # 获取Original_DB文件夹名称
     original_temp_db = conf.get_original_temp_db_name()  # 获取Original_temp_DB文件夹名称
     config_frequency = int(conf.get_optical_fiber_frequency())
@@ -218,3 +219,51 @@ def format_conversion(fc_path):
                 txt_output = []
             elif txt_file_name[-4:] == '.AEI':
                 move(fc_original_temp_db_path + '\\' + txt_file_name, fc_original_db_path + '\\' + txt_file_name)
+            # elif txt_file_name[-5:] == '.json':
+            #     move(fc_original_temp_db_path + '\\' + txt_file_name, fc_original_db_path + '\\' + txt_file_name)
+
+
+# def read_speed_json():
+#     speed_set = []
+#     start_time = time()
+#     speed_km_ = 70 * ones((32, 2))
+#     speed_json_path = conf.speed_json_path()
+#     speed_json_delay_time = conf.speed_json_delay_time()
+#     while True:
+#         list_name = listdir(speed_json_path)
+#         for file_name in list_name:
+#             if file_name[-4:] == 'json':
+#                 json_f = speed_json_path + '\\' + file_name
+#                 with open(json_f, 'r', encoding='utf-8-sig') as f:
+#                     data = load(f)
+#                     for speed_ in data['axleSpeeds']:
+#                         speed_set.append(speed_['speed'])
+#                     speed_trans = array(speed_set).reshape((2, int(len(speed_set) / 2))).transpose((1, 0))
+#                     speed_km = around(speed_trans * 1.6093439975538, 2)
+#                 if path.exists(json_f):
+#                     remove(json_f)
+#                 progressbar(0, 0)
+#                 return speed_km
+#
+#         end_time = time()
+#         delay_time = round(end_time - start_time, 2)
+#
+#         progressbar(int(delay_time), int(speed_json_delay_time))
+#         if delay_time >= int(speed_json_delay_time):
+#             print('历时%ss，未查询到速度信息json文件' % int(delay_time))
+#             break
+#         sleep(0.2)
+#     return speed_km_
+#
+#
+# def progressbar(cur, total):
+#     if cur + total != 0:
+#         stdout.write('\r')
+#         stdout.write('等待速度信息json文件还剩：%ss' % (total - cur))
+#         stdout.flush()
+#     else:
+#         stdout.write('\r')
+#         stdout.write('已接收到速度信息json文件，正在进行速度读取！')
+#         stdout.flush()
+#     if cur >= total:
+#         stdout.write('\n')
