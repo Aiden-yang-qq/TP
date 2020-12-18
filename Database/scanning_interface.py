@@ -42,7 +42,7 @@ def database_creation(dc_path):
 
     # 光纤数据库文件夹路径生成
     cfp = dc_path + '\\' + data_base_name  # “DB”文件夹路径
-    json_path = dc_path + '\\' + json_base_name  # “json_file_TP”文件夹路径
+    # json_path = dc_path + '\\' + json_base_name  # “json_file_TP”文件夹路径
     odb = dc_path + '\\' + odb_folder_name  # “Original_DB”文件夹路径
     data_lib_path = cfp + '\\' + algorithm_folder_name  # “Data_lib”文件夹路径
     data_pool_path = cfp + '\\' + original_folder_name  # “Data_pool”文件夹路径

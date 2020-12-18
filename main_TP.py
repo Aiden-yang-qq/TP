@@ -56,7 +56,7 @@ def main_exe():
 
             # 计算车辆相关参数的重量，是否超偏载
             all_weight, is_unbalanced_loads, every_wheel_speed = al_main_weight(all_wheel_data, all_car_aei)
-            
+
             # 车辆故障检测
             is_non_circularity = fault_detection(x_wheel_data, all_wheel_data)
 
@@ -78,26 +78,8 @@ def main_exe():
             sleep(1)
     except Exception as e:
         info('main_error:', e)
-
-    # info('---------------------------------------')
-    # info(ctime())
-    # print('数据正在处理，请稍等……')
-    # a = time()
-    # main_path = getcwd()
-    # folders = database_creation(main_path)
-    # b = time()
-    # print('数据处理耗时:%.4fs，程序结束！' % (b - a))
-    # sleep(3)
-    # info('本次数据处理已完成，共耗时%.4fs:' % (b - a))
-    # info('---------------------------------------')
     return x_wheel_data, all_wheel_data
 
 
 if __name__ == '__main__':
     x, y = main_exe()
-
-    # plt.figure()
-    # plt.plot(x, y[0][0])
-    # # plt.plot(folders[0][0], folders[0][1])
-    # plt.grid()
-    # plt.show()

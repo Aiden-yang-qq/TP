@@ -16,7 +16,6 @@ time_gap = 0.1
 if o_f_frequency == 100:
     time_gap = 4
 elif o_f_frequency == 2000:
-    # time_gap = 0.3
     time_gap = 0.07
 
 single_wheel_data_count = int(o_f_frequency * time_gap) + 140
@@ -104,7 +103,6 @@ def optical_data_splitting(txt_list, frequency):
                 # plt.show()
 
                 max_single = []
-                # for i in range(0, len(each_optical_normalization) - 2000, 2000):
                 for i in range(0, len(y_after_filter) - 200, 200):
                     m = max(y_after_filter[i:i + 200])
                     if 0.4 < m:
@@ -150,7 +148,6 @@ def optical_data_splitting(txt_list, frequency):
                 x_wheel_list = []
                 unit_interval = round(1 / frequency, 4)
 
-                # single_wheel_data_count = int(o_f_frequency * time_gap)
                 for x in x_data:
                     if int(x / unit_interval) <= int(single_wheel_data_count / 2):
                         x_list = [round(unit_interval * a, 4) for a in range(single_wheel_data_count)]
@@ -189,10 +186,6 @@ def optical_data_splitting(txt_list, frequency):
 
                 # optical_all_data的输出格式:三维列表[12个传感器×32个车轮×600个数据][12×32×600]的矩阵
                 optical_all_data.append(y_single_optical)
-        # if wheel_count == 12:
-        #     return optical_all_data
-        # else:
-        #     return []
 
         # 新增optical_all_data的size不一致的处理
         len_list = []
@@ -236,8 +229,6 @@ def optical_data_to_wheel(optical_all_data, frequency):
                 oad_arr_all = np_ap(oad_arr_all, oad_single_arr, axis=0)
 
             if optical_no * wheel_no == len(oad_arr_all):
-                # oad_arr_all = oad_arr_all.reshape((optical_no, wheel_no, 6 * frequency))
-                # oad_arr_all = oad_arr_all.reshape((optical_no, wheel_no, 600))
                 oad_arr_all = oad_arr_all.reshape((optical_no, wheel_no, single_wheel_data_count))
 
             # oad_arr_all为12个传感器的ndarray形式，前6个为设备同侧传感器，后6个为设备对面侧传感器

@@ -129,7 +129,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "totalWeight": "%s" % total_weight,  # 总重
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.9.13",  # 软件版本号
+        "verOfsoftware": "v2.9.14",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
@@ -206,11 +206,6 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
         if len(all_carriage_info) != 0:
             all_carriage_info_arr = array(all_carriage_info)
             all_carriage_info_tran = transpose(all_carriage_info_arr, [1, 0])
-        # # 转换成base64格式
-        # x_wheel_data_encode = b''
-        # if len(x_wheel_data) != 0:
-        #     x_wheel_data_bytes = bytes(('%s' % x_wheel_data).encode())
-        #     x_wheel_data_encode = b64encode(x_wheel_data_bytes).decode()
 
         wheel_weight = all_weight[0]
         axle_weight = all_weight[1]
@@ -342,10 +337,4 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
 
 
 if __name__ == '__main__':
-    # json_path = 'E:\\Python\\Pyinstaller\\TP'
-    # json_name = 'TP_json.json'
-    # json_f = json_path + '\\' + json_name
-    # d = data_to_json(json_f)
-    # json_fi = read_json()
-
     print('Json:')

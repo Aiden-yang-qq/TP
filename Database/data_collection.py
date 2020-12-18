@@ -79,9 +79,6 @@ def optical_fiber_collection(ofc_path, folders):
             negative_ = []
             positive_value = 0
             negative_value = 0
-            # amplitude_ = round(sum(abs(all_nor_optical_arr_tran[1][i][-1000:])) / 1000, 4)
-            # amplitude_ = max(abs(all_nor_optical_arr_tran[1][i][-5000:]))
-            # amplitude_counter = Counter(all_nor_optical_arr_tran[1][i][-5000:])
             for a in all_nor_optical_arr_tran[1][i][-5000:]:
                 if a > 0:
                     positive_.append(a)

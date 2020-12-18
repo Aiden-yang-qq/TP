@@ -11,6 +11,7 @@ conf = ConfigInfo()
 
 
 def read_wheel_data(all_wheel_data):
+    ss = []
     all_wheel_data_array = np_array(all_wheel_data)
     all_wheel_shape = all_wheel_data_array.shape
     if all_wheel_shape[1] * all_wheel_shape[2] == 12 * single_wheel_data_count:
@@ -24,9 +25,10 @@ def read_wheel_data(all_wheel_data):
         n0 = new_all_wheel_data_array[0]
         s = sum(n0)
         ss = s.tolist()
+    return ss
 
 
-def wheel_weigh(wheel_data, all_car_aei_):
+def wheel_weigh(wheel_data, all_car_aei):
     """
     车轮称重
     :param wheel_data:32个轴，每个轴第一个为近端，第二个为远端
@@ -63,7 +65,7 @@ def wheel_weigh(wheel_data, all_car_aei_):
                 mean_car_set.append([0.0, 0.0])
 
         # 车轮重量分析
-        all_weight, every_wheel_speed = wheel_weight_analysis(mean_car_set, all_car_aei_)
+        all_weight, every_wheel_speed = wheel_weight_analysis(mean_car_set, all_car_aei)
         # 车辆偏载分析
         is_unbalanced_loads = unbalanced_loads(all_weight)
         # 车辆超载分析
@@ -71,7 +73,7 @@ def wheel_weigh(wheel_data, all_car_aei_):
     return all_weight, is_unbalanced_loads, every_wheel_speed
 
 
-def wheel_weight_analysis(mean_car_set_, all_car_aei_):
+def wheel_weight_analysis(mean_car_set_, all_car_aei):
     """
     车轮重量分析：默认8节车厢64个车轮的重量均一致，默认同一车厢上，两转向架一样重，四个轴一样重
     :param mean_car_set_:
@@ -81,18 +83,15 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
     final_axle_weight = []
     final_bogie_weight = []
     final_carriage_weight = []
-    # final_car_weight = []
-    final_impact_equivalent = []
     total_mean_car_peak = []
 
     mean_car_arr = np_array(mean_car_set_)[::-1]
-    # mean_car_arr_tran = mean_car_arr.transpose((1, 0))
     new_mean_car_arr = mean_car_arr[:len(mean_car_arr) // 4 * 4][::-1]  # 截取整数转向架数量的轴
     each_carriage_mean_car_arr = new_mean_car_arr.reshape((-1, 4, 2))
 
     order_set = []
-    if len(all_car_aei_) != 0:
-        for all_carriage_info in all_car_aei_[5]:  # 读取车号文件中车厢行进的顺序
+    if len(all_car_aei) != 0:
+        for all_carriage_info in all_car_aei[5]:  # 读取车号文件中车厢行进的顺序
             carriage_forward_order = all_carriage_info[1]
             order_set.append(carriage_forward_order)
         # 当出现车号文件中车厢行进顺序和实际采集车厢数不等的时候，选择实际车厢数做算法
@@ -208,12 +207,6 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
         # carriage_weight_arr = np_array(carriage_weight)
 
         # 整合冲击当量
-        # wheel_equivalent = around(sum(wheel_weight.transpose()), 4)
-        # axle_equivalent = around(sum(wheel_axle_weight.transpose()), 4)
-        # bogie_equivalent = around(sum(wheel_bogie_weight.transpose()), 4)
-        # carriage_equivalent = around(sum(wheel_carriage_weight.transpose()), 4)
-        # impact_equivalent = around(wheel_equivalent + axle_equivalent + bogie_equivalent + carriage_equivalent, 2)
-        # final_impact_equivalent.append(impact_equivalent)
         wheel_total_weight = wheel_weight + wheel_axle_weight + wheel_bogie_weight + wheel_carriage_weight
         wheel_single_weight = sww + saw / 2 + sbw / 4 + scw / 8
         wheel_load_weight = wheel_total_weight - wheel_single_weight
@@ -245,8 +238,8 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
 
     # 末班车重量信息校正
     final_car_weight_list = [38, 39, 38, 38, 38, 38, 38, 37]
-    if len(all_car_aei_) == 6:
-        if 0 <= int(all_car_aei_[1][-8:-6]) <= 6:
+    if len(all_car_aei) == 6:
+        if 0 <= int(all_car_aei[1][-8:-6]) <= 6:
             c = 38 * 0.03
             final_car_weight_random = np_random.uniform(-1 * c, 1 * c, 8)
             if order_set[0] > order_set[-1]:
@@ -278,7 +271,6 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei_):
         total_weight = 314.15
 
     # 整列车的冲击当量
-    # final_impact_equivalent_arr = np_array(final_impact_equivalent).reshape((-1))
     final_impact_equivalent_arr = np_array(carriage_impact_equivalent)
 
     all_weight = [final_wheel_weight_arr, final_axle_weight_arr, final_bogie_weight_arr, final_carriage_weight_arr,
