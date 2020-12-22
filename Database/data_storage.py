@@ -58,6 +58,7 @@ def read_speed_json():
                 json_f = speed_json_path + '\\' + file_name
                 with open(json_f, 'r', encoding='utf-8-sig') as f:
                     data = load(f)
+                    test_date_time = data['testDateTime']
                     for speed_ in data['axleSpeeds']:
                         speed_set.append(speed_['speed'])
                     speed_trans = array(speed_set).reshape((2, int(len(speed_set) / 2))).transpose((1, 0))
@@ -65,7 +66,7 @@ def read_speed_json():
                 if path.exists(json_f):
                     remove(json_f)
                 progressbar(0, 0)
-                return speed_km
+                return [speed_km, test_date_time]
 
         end_time = time()
         delay_time = round(end_time - start_time, 2)
@@ -129,7 +130,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "totalWeight": "%s" % total_weight,  # 总重
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.9.14",  # 软件版本号
+        "verOfsoftware": "v2.9.15",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
@@ -185,11 +186,11 @@ def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, veh
 
 
 def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weight, all_car_aei, is_unbalanced_loads,
-                         every_wheel_speed):
+                         every_wheel_speed, test_date_time):
     all_car_json = {}
     try:
         car_no = ''
-        date_time = ''
+        date_time = strftime('%Y-%m-%d %H:%M:%S', localtime())
         direction = ''
         all_axle_count = ''
         all_carriage_info = ''
@@ -206,6 +207,8 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
         if len(all_carriage_info) != 0:
             all_carriage_info_arr = array(all_carriage_info)
             all_carriage_info_tran = transpose(all_carriage_info_arr, [1, 0])
+        if len(test_date_time) != 0:
+            date_time = test_date_time
 
         wheel_weight = all_weight[0]
         axle_weight = all_weight[1]
@@ -249,6 +252,8 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
                     speed = every_wheel_speed[i][j]
                     if speed == 70.0:
                         speed = ''
+
+                # TODO 根据冲击当量设置踏面损伤报警等级
 
                 # 组合单个车轮的json数据信息
                 if i <= len(wheel_weight) - 1:
@@ -325,7 +330,6 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
                                     sides=direction, all_carriage_json=all_carriage_json)
         else:
             car_no = 'unknown'
-            date_time = strftime('%Y-%m-%d %H:%M:%S', localtime())
             all_car_json = car_json(data_status=data_status, car_no=car_no, file_name=json_file_name,
                                     pass_time=date_time, num_axle=all_axle_count, num_car=all_carriage_count,
                                     train_speed=average_speed, total_weight=total_weight, train_direction=direction,

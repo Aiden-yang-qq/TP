@@ -258,3 +258,15 @@ README.md
 小版本更新：2.9.14
 1.所有文件的整理、注释的精简删除、版本的迭代；
 2.冲击当量<0的置零；
+
+20201222
+小版本更新：2.9.15
+1.algorithm_main.py al_main_weight()函数中新增输出参数test_date_time；
+2.data_collection.py 新增read_json_file()函数，对json进行读取；
+3.data_storage.py 
+    |- read_speed_json()函数中新增对速度json文件中检测时间的读取；
+    |- car_json_integration()函数中更新检测时间为速度json文件中的速度；
+    |- 待办：根据冲击当量设置踏面损伤报警；
+    |- 迭代版本号；
+4.wheel_analysis.py wheel_weight_analysis()函数中对采集列车速度信息的代码做了更新；
+5.main_TP.py 将速度json文件中的检测时间更新上去；

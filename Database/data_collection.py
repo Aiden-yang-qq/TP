@@ -1,5 +1,6 @@
 # data_collection.py 数据采集模块
 from datetime import datetime, timedelta
+from json import load
 from logging import info
 from os import listdir, path
 from shutil import rmtree, move
@@ -219,6 +220,12 @@ def format_conversion(fc_path):
             # elif txt_file_name[-5:] == '.json':
             #     move(fc_original_temp_db_path + '\\' + txt_file_name, fc_original_db_path + '\\' + txt_file_name)
 
+
+def read_json_file(rjf_path):
+    if path.exists(rjf_path):
+        with open(rjf_path, 'r', encoding='utf-8-sig') as f:
+            json_content = load(f)
+    return json_content
 
 # def read_speed_json():
 #     speed_set = []

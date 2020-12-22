@@ -34,6 +34,7 @@ def wheel_weigh(wheel_data, all_car_aei):
     :param wheel_data:32个轴，每个轴第一个为近端，第二个为远端
     :return:
     """
+    test_date_time = ''
     all_weight = []
     peak_car_set = []
     mean_car_set = []
@@ -65,12 +66,12 @@ def wheel_weigh(wheel_data, all_car_aei):
                 mean_car_set.append([0.0, 0.0])
 
         # 车轮重量分析
-        all_weight, every_wheel_speed = wheel_weight_analysis(mean_car_set, all_car_aei)
+        all_weight, every_wheel_speed, test_date_time = wheel_weight_analysis(mean_car_set, all_car_aei)
         # 车辆偏载分析
         is_unbalanced_loads = unbalanced_loads(all_weight)
         # 车辆超载分析
         is_overload = overload(all_weight)
-    return all_weight, is_unbalanced_loads, every_wheel_speed
+    return all_weight, is_unbalanced_loads, every_wheel_speed, test_date_time
 
 
 def wheel_weight_analysis(mean_car_set_, all_car_aei):
@@ -103,8 +104,15 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei):
         order_set.reverse()
 
     # 采集列车速度信息
-    every_wheel_speed = read_speed_json()
-    car_sp_ = every_wheel_speed.reshape((-1, 4, 2))
+    test_date_time = ''
+    speed_json_result = read_speed_json()
+    if len(speed_json_result) == 1:
+        every_wheel_speed = speed_json_result
+        car_sp_ = every_wheel_speed.reshape((-1, 4, 2))
+    else:
+        every_wheel_speed = speed_json_result[0]
+        test_date_time = speed_json_result[1]
+        car_sp_ = every_wheel_speed.reshape((-1, 4, 2))
 
     # 标准重量：
     # 所有车轮重量：0.34t
@@ -275,7 +283,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei):
 
     all_weight = [final_wheel_weight_arr, final_axle_weight_arr, final_bogie_weight_arr, final_carriage_weight_arr,
                   final_car_weight_, total_weight, final_impact_equivalent_arr, final_car_weight_list]
-    return all_weight, every_wheel_speed
+    return all_weight, every_wheel_speed, test_date_time
 
 
 def impact_equivalent_algorithm(wheel_load, car_empty_weight, speed):
