@@ -76,7 +76,7 @@ def read_speed_json():
             print('历时%ss，未查询到速度信息json文件' % int(delay_time))
             break
         sleep(0.2)
-    return speed_km_
+    return [speed_km_]
 
 
 def progressbar(cur, total):

@@ -270,3 +270,5 @@ README.md
     |- 迭代版本号；
 4.wheel_analysis.py wheel_weight_analysis()函数中对采集列车速度信息的代码做了更新；
 5.main_TP.py 将速度json文件中的检测时间更新上去；
+小版本更新：2.9.15
+1.TP_test文件夹中，新增read_json.py模块，主要功能是对TP主程序算法生成的json文件进行车轮数据分析展示；

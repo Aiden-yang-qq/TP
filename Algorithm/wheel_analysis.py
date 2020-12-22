@@ -107,7 +107,7 @@ def wheel_weight_analysis(mean_car_set_, all_car_aei):
     test_date_time = ''
     speed_json_result = read_speed_json()
     if len(speed_json_result) == 1:
-        every_wheel_speed = speed_json_result
+        every_wheel_speed = speed_json_result[0]
         car_sp_ = every_wheel_speed.reshape((-1, 4, 2))
     else:
         every_wheel_speed = speed_json_result[0]
