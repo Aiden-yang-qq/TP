@@ -130,7 +130,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "totalWeight": "%s" % total_weight,  # 总重
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.9.15",  # 软件版本号
+        "verOfsoftware": "v2.9.16",  # 软件版本号
         "vi": all_carriage_json
     }
     return car

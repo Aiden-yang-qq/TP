@@ -272,3 +272,11 @@ README.md
 5.main_TP.py 将速度json文件中的检测时间更新上去；
 小版本更新：2.9.15
 1.TP_test文件夹中，新增read_json.py模块，主要功能是对TP主程序算法生成的json文件进行车轮数据分析展示；
+2.修改部分bug；
+
+20201224
+小版本更新：2.9.16
+1.func_collection.py 新增remove_json()函数，目的为了在算法程序开始之前移除上一个遗留的速度json文件；
+2.read_json.py 对分析并展示json文件中某一轴做了调试与修改；
+3.main_TP.py 新增在算法程序之前移除速度json文件；
+4.data_storage.py 迭代版本号；

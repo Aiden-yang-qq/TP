@@ -1,9 +1,10 @@
 from json import load
 from os import getcwd, path
+from sys import exit
+from time import sleep
 
 from matplotlib import pyplot as plt
-
-# from numpy import arange
+from numpy import arange
 
 plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['axes.unicode_minus'] = False
@@ -11,31 +12,28 @@ plt.rcParams['axes.unicode_minus'] = False
 
 def read_json_main():
     read_json_main_path = getcwd()
-    json_file_name_1 = input('请输入第一个json文件的名称：')
-    json_file_name_2 = input('请输入第二个json文件的名称：')
 
-    # json_file_name_1 = '1124#2020-11-12 23_59_18'
-    # json_file_name_1 = '1124#2020-11-30 23_21_11'
-    # json_file_name_2 = '1124#2020-12-14 00_12_26'
-    # json_file_name_2 = '1124#2020-12-09 23_04_11'
-    # json_file_name_2 = '1124#2020-12-17 00_20_32'
-    # json_file_name_1 = '1120#2020-11-06 00_17_17'
-    # json_file_name_2 = '1120#2020-12-02 00_05_13'
-
-    json_file_dir_1 = read_json_main_path + '\\' + json_file_name_1 + '.json'
-    json_file_dir_2 = read_json_main_path + '\\' + json_file_name_2 + '.json'
-
+    # 判断第一个json文件是否存在
     json_data_1 = None
-    json_data_2 = None
-
+    json_file_name_1 = input('请输入第一个json文件的名称：')
+    json_file_dir_1 = read_json_main_path + '\\' + json_file_name_1 + '.json'
     if path.exists(json_file_dir_1):
         json_data_1 = read_json_file(json_file_dir_1)
     else:
         print('未找到%s文件' % json_file_name_1)
+        sleep(1)
+        exit()
+
+    # 判断第二个json文件是否存在
+    json_data_2 = None
+    json_file_name_2 = input('请输入第二个json文件的名称：')
+    json_file_dir_2 = read_json_main_path + '\\' + json_file_name_2 + '.json'
     if path.exists(json_file_dir_2):
         json_data_2 = read_json_file(json_file_dir_2)
     else:
         print('未找到%s文件' % json_file_name_2)
+        sleep(1)
+        exit()
 
     # 对两个json文件进行读取并展示
     if (json_data_1 is not None) and (json_data_2 is not None):
@@ -51,13 +49,19 @@ def read_json_main():
                     json_axle_data_2 = get_json_axle_data(json_data_2, carriage_no, axle_no)
                 else:
                     print('轴号输入有误！')
+                    sleep(1)
             else:
                 print('车厢号输入有误！')
+                sleep(1)
 
             axle_data_display(json_axle_data_1, json_axle_data_2, carriage_no, axle_no, json_file_name_1,
                               json_file_name_2)
         else:
             print('输入的两个文件车号不相同，不具有可比性！')
+    else:
+        print('请重启本程序并输入正确的json文件名称！')
+        sleep(1)
+        exit()
 
 
 def read_json_file(rjf_path):
@@ -68,7 +72,6 @@ def read_json_file(rjf_path):
 
 
 def get_json_axle_data(json_data, carriage_no, axle_no):
-    # each_wheel_data = []
     carriage_data = json_data['vi']
     each_wheel_data = json_data_collection(carriage_data, carriage_no, axle_no)
     return each_wheel_data
@@ -98,13 +101,21 @@ def json_data_collection(carriage_data, carriage_no, axle_no):
 
 
 def axle_data_display(json_axle_data_1, json_axle_data_2, carriage_no, axle_no, json_file_name_1, json_file_name_2):
-    if (len(json_axle_data_1) == len(json_axle_data_2)) and (len(json_axle_data_1) != 0):
-        ymin = -0.15
+    # if (len(json_axle_data_1) == len(json_axle_data_2)) and (len(json_axle_data_1) != 0):
+    if len(json_axle_data_1) == len(json_axle_data_2) != 0:
+        ymin = -0.14
         ymax = 0.4
 
         plt.figure()
         for i in range(len(json_axle_data_1)):
             plt.subplot(1, 2, i + 1)
+            ax = plt.gca()
+            ax.axhline(-0.1, c='silver')
+            ax.axhline(0.0, c='silver')
+            ax.axhline(0.1, c='silver')
+            ax.axhline(0.2, c='silver')
+            ax.axhline(0.3, c='silver')
+            # plt.style.use('ggplot')
             if i == 0:
                 plt.plot(json_axle_data_1[i][0], json_axle_data_1[i][1], label='%s 左侧车轮数据' % json_file_name_1)
                 plt.plot(json_axle_data_2[i][0], json_axle_data_2[i][1], label='%s 左侧车轮数据' % json_file_name_2)
@@ -113,11 +124,12 @@ def axle_data_display(json_axle_data_1, json_axle_data_2, carriage_no, axle_no, 
                 plt.plot(json_axle_data_2[i][0], json_axle_data_2[i][1], label='%s 右侧车轮数据' % json_file_name_2)
             plt.xlim(0, 0.84)
             plt.ylim(ymin, ymax)
-            # plt.yticks(arange(-0.15, 0.41, 0.05))
-            plt.ylabel('光纤波长长度/nm')
+            plt.yticks(arange(-0.14, 0.41, 0.02))
+            plt.ylabel('光纤波长幅值/nm')
             plt.legend()
-            plt.grid()
-        plt.suptitle('两趟列车，%s车厢%s号轴左右侧车轮的数据对比' % (carriage_no, axle_no))
+            plt.grid(linestyle='-.', alpha=0.75)
+        plt.suptitle('%s车厢%s号轴在不同时间点，左右侧车轮的数据对比' % (carriage_no, axle_no))
+        print('%s车厢%s号轴在不同时间点，左右侧车轮的数据对比' % (carriage_no, axle_no))
         plt.show()
     elif len(json_axle_data_1) != len(json_axle_data_2):
         if len(json_axle_data_1) == 0 and len(json_axle_data_2) != 0:
@@ -125,7 +137,8 @@ def axle_data_display(json_axle_data_1, json_axle_data_2, carriage_no, axle_no, 
         elif len(json_axle_data_1) != 0 and len(json_axle_data_2) == 0:
             print('%s车厢第二个文件数据未采集到！' % carriage_no)
     else:
-        print('两个文件数据均未采集到，无法展示！')
+        print('数据有误，无法展示！')
+        exit()
 
 
 if __name__ == '__main__':

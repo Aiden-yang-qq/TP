@@ -1,7 +1,7 @@
 # Function function module
 from datetime import datetime
 from logging import warning, info
-from os import listdir, makedirs, path
+from os import listdir, makedirs, path, remove
 from shutil import rmtree
 
 from zipfile import ZipFile, ZIP_DEFLATED
@@ -113,3 +113,12 @@ def pack_json(json_dir, json_trans_path):
     json_zip_dir = json_trans_path + '\\' + json_zip_name
     with ZipFile(json_zip_dir, 'w', ZIP_DEFLATED) as f:
         f.write(json_dir, json_name)
+
+
+def remove_json(re_json_path):
+    file_list = listdir(re_json_path)
+    for file_name in file_list:
+        if file_name[-4:] == 'json':
+            json_dir = re_json_path + '\\' + file_name
+            if path.exists(json_dir):
+                remove(json_dir)

@@ -10,6 +10,7 @@ from Config import ConfigInfo
 from Database.data_collection import format_conversion
 from Database.data_storage import car_json_integration, write_json
 from Database.scanning_interface import database_creation
+from Function.func_collection import remove_json
 
 basicConfig(filename='logging_file.log', level=DEBUG)
 
@@ -37,6 +38,9 @@ def main_exe():
             conf = ConfigInfo()
             o_f_frequency = int(conf.get_optical_fiber_frequency())
             print('当前采样频率:%sHz' % o_f_frequency)
+
+            speed_json_path = conf.speed_json_path()  # 获取json文件储存路径
+            remove_json(speed_json_path)  # 删除已有的json文件
 
             # 数据预处理
             format_conversion(main_path)  # 进行数据预处理，并保存在Original_DB文件夹下
