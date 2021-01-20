@@ -280,3 +280,9 @@ README.md
 2.read_json.py 对分析并展示json文件中某一轴做了调试与修改；
 3.main_TP.py 新增在算法程序之前移除速度json文件；
 4.data_storage.py 迭代版本号；
+
+20210120：
+小版本更新：2.9.17
+1.wheel_analysis.py 中impact_equivalent_algorithm()函数进行debug，修正了异常；
+2.al_func_collection.py 中non_circularity()函数进行补充；
+3.data_storage.py 迭代版本号；
