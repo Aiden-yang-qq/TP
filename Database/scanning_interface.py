@@ -72,6 +72,7 @@ def database_creation(dc_path):
                 make_directory(data_pool_path, new_fo_name)
                 try:
                     odb_list = listdir(odb_dir)
+                    # 将Original_temp_DB中的文件移动到D:\DB\Data_pool相应车号文件夹下备份
                     for f in odb_list:
                         odb_file_dir = odb_dir + '\\' + f
                         move(odb_file_dir, car_folder_dir)
@@ -101,7 +102,8 @@ def database_creation(dc_path):
                     old_car_data_path = data_pool_path + '\\' + car_no
                     new_car_data_path = data_pool_back_path + '\\' + car_no_date + '\\' + car_no
                     try:
-                        copytree(old_car_data_path, new_car_data_path)
+                        # 将D:\DB\Data_pool中的数据备份到D:\DB\Data_pool_backup
+                        # copytree(old_car_data_path, new_car_data_path)
                         rmtree(old_car_data_path)
                     except Exception as e:
                         warning(e)

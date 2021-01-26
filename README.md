@@ -286,3 +286,11 @@ README.md
 1.wheel_analysis.py 中impact_equivalent_algorithm()函数进行debug，修正了异常；
 2.al_func_collection.py 中non_circularity()函数进行补充；
 3.data_storage.py 迭代版本号；
+
+20210126:
+大版本更新：2.10.0
+1.data_storage.py 
+    |- data_to_txt()注释掉将数据写成txt文档；
+    |- 迭代版本号
+2.scanning_interface.py database_creation()注释掉数据备份；
+3.main_TP.py 注释掉车辆故障检测待后续补充完整再释放；

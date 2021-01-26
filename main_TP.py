@@ -65,7 +65,7 @@ def main_exe():
                                                                                                 all_car_aei)
 
             # 车辆故障检测
-            is_non_circularity = fault_detection(x_wheel_data, all_wheel_data)
+            # is_non_circularity = fault_detection(x_wheel_data, all_wheel_data)
 
             # 将车轮数据保存成json文件
             if len(json_file_name) != 0:

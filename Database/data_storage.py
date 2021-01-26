@@ -35,8 +35,9 @@ def data_to_txt(dtt_path, each_wheel_data):
                         ewd = str(round(each_wheel_data[0][i], 6)) + ' ' + str(each_wheel_nor_data[i])  # 保留小数位数越多越精确
                         ewd_all.append(ewd)
 
-                    ea = "\n".join(ewd_all)
-                    write_txt(dtt_path, ea)
+                    # 将数据写入D:\DB\Data_lib中
+                    # ea = "\n".join(ewd_all)
+                    # write_txt(dtt_path, ea)
                 if len(each_normalization_wheel) != 0:
                     return each_normalization_wheel
                 else:
@@ -130,7 +131,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "totalWeight": "%s" % total_weight,  # 总重
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.9.17",  # 软件版本号
+        "verOfsoftware": "v2.10.0",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
