@@ -43,7 +43,7 @@ def main_exe():
             remove_json(speed_json_path)  # 删除已有的json文件
 
             # 数据预处理
-            format_conversion(main_path)  # 进行数据预处理，并保存在Original_temp_DB文件夹下
+            format_conversion(main_path)  # 进行数据预处理，并保存在Original_DB文件夹下
 
             # 算法程序开始
             info('---------------------------------------')

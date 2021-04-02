@@ -297,28 +297,6 @@ def impact_equivalent_algorithm(wheel_load, car_empty_weight, speed):
         b0 = car_empty_weight * a2 + b2
 
         dynamic_increment = speed * a0 + b0  # 动态增量回归方程
-        # TODO 单位出错，待调整
-        impact_equivalent_ = round((dynamic_increment + 1.6 * (105 - wheel_load * 9.8) +
-                                    (40.0 - speed) * (0.13 * wheel_load * 9.8 + 0.0834)) / 9.8, 2)
-        if impact_equivalent_ < 0:
-            impact_equivalent_ = 0
-        return round(impact_equivalent_)
-    else:
-        return 'NaN'
-
-
-def impact_equivalent_algorithm_new(wheel_load, car_empty_weight, speed):
-    if wheel_load != -4.625:
-        a1 = (0.145 - 0.0552) / (84 - 24)
-        b1 = 0.145 - 84 * a1
-        a0 = car_empty_weight * a1 + b1
-
-        a2 = (18.91 - 11.51) / (84 - 24)
-        b2 = 18.91 - 84 * a2
-        b0 = car_empty_weight * a2 + b2
-
-        dynamic_increment = speed * a0 + b0  # 动态增量回归方程
-        # TODO 单位出错，待调整
         impact_equivalent_ = round((dynamic_increment + 1.6 * (105 - wheel_load * 9.8) +
                                     (40.0 - speed) * (0.13 * wheel_load * 9.8 + 0.0834)) / 9.8, 2)
         if impact_equivalent_ < 0:
