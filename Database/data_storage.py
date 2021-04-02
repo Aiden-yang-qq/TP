@@ -131,7 +131,7 @@ def car_json(data_status, car_no, file_name, pass_time, num_axle, num_car, train
         "totalWeight": "%s" % total_weight,  # 总重
         "trainDirection": "%s" % train_direction,  # 列车方向  0：正向 1：反向
         "sides": "%s" % sides,  # 处理哪一端取值B,N,F,blank。
-        "verOfsoftware": "v2.10.0",  # 软件版本号
+        "verOfsoftware": "v2.10.2",  # 软件版本号
         "vi": all_carriage_json
     }
     return car
@@ -153,7 +153,7 @@ def carriage_json(vehicle_no, car_ori, axle_count, vehicle_seq, car_weight, all_
 
 
 def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, vehicle_side, speed, x_axis, y_axis,
-               impact_equivalent, wheel_weight, axle_weight, bogie_weight, invalid_flag=0, bearing_defect=0):
+               impact_equivalent, wheel_weight, axle_weight, bogie_weight, bearing_defect, defect_rank, invalid_flag=0):
     car_wheel = {
         "bcd": "%s" % uuid1(),
         "rail": "%s" % rail,  # 取值NS,FS
@@ -178,7 +178,7 @@ def wheel_json(rail, vehicle_axle_seq, axle_seq, vehicle_seq, vehicle_no_bc, veh
         "defectType2": "",  # 是否有不圆度缺陷
         "defectType3": "",  # 是否有多边形缺陷
         "defectType4": "",  # 是否有踏面损伤缺陷
-        "defectRank": "",  # 级别，1-3
+        "defectRank": "%s" % defect_rank,  # 级别，1-3
         "alarmSend": "",  # 是否发送报警给用户，1是，0否
         "xAxis": x_axis,
         "yAxis": y_axis
@@ -217,7 +217,7 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
         # carriage_weight = all_weight[3]
         car_weight = all_weight[4]
         total_weight = all_weight[5]
-        impact_equivalent = all_weight[6]
+        impact_equivalent = all_weight[6]  # 冲击当量
 
         # 各个车轮json数据
         all_wheel_json = []
@@ -254,23 +254,42 @@ def car_json_integration(json_file_name, x_wheel_data, all_wheel_data, all_weigh
                     if speed == 70.0:
                         speed = ''
 
-                # TODO 根据冲击当量设置踏面损伤报警等级
-
+                # 根据冲击当量设置踏面损伤报警等级
                 # 组合单个车轮的json数据信息
+                # y_axis_ = all_wheel_data[i][j]    # 选取对应车轮参数
+                y_axis_ = all_wheel_data[i][1]  # 选取右侧车轮参数
                 if i <= len(wheel_weight) - 1:
+                    warning_level = conf.warning_level_read()
+                    impact_equivalent_ = impact_equivalent[i][j]
+
+                    bearing_defect_ = 0
+                    defect_rank_ = ''
+                    if impact_equivalent_ < warning_level[2]:
+                        bearing_defect_ = 0
+                        defect_rank_ = ''
+                    elif warning_level[2] <= impact_equivalent_ < warning_level[1]:
+                        bearing_defect_ = 1
+                        defect_rank_ = 3
+                    elif warning_level[1] <= impact_equivalent_ < warning_level[0]:
+                        bearing_defect_ = 1
+                        defect_rank_ = 2
+                    elif impact_equivalent_ >= warning_level[0]:
+                        bearing_defect_ = 1
+                        defect_rank_ = 1
+
                     wheel_single_json = wheel_json(rail=rail, vehicle_axle_seq=vehicle_axle_seq, axle_seq=axle_seq,
                                                    vehicle_seq=vehicle_seq, vehicle_no_bc=vehicle_no_bc,
                                                    vehicle_side=vehicle_side, speed=speed, x_axis=x_wheel_data,
-                                                   y_axis=all_wheel_data[i][j],
-                                                   impact_equivalent=impact_equivalent[i][j],
+                                                   y_axis=y_axis_, impact_equivalent=impact_equivalent_,
                                                    wheel_weight=wheel_weight[i][j], axle_weight=axle_weight[i],
-                                                   bogie_weight=bogie_weight[i // 2])
+                                                   bogie_weight=bogie_weight[i // 2], bearing_defect=bearing_defect_,
+                                                   defect_rank=defect_rank_)
                 else:
                     wheel_single_json = wheel_json(rail=rail, vehicle_axle_seq=vehicle_axle_seq, axle_seq=axle_seq,
                                                    vehicle_seq=vehicle_seq, vehicle_no_bc=vehicle_no_bc,
                                                    vehicle_side=vehicle_side, speed=speed, x_axis=x_wheel_data,
-                                                   y_axis=all_wheel_data[i][j], impact_equivalent='', wheel_weight='',
-                                                   axle_weight='', bogie_weight='')
+                                                   y_axis=y_axis_, impact_equivalent='', wheel_weight='',
+                                                   axle_weight='', bogie_weight='', bearing_defect=0, defect_rank='')
 
                 all_wheel_json.append(wheel_single_json)
             if len(all_wheel_json) % 8 == 0:

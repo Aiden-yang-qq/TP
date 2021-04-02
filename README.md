@@ -294,3 +294,17 @@ README.md
     |- 迭代版本号
 2.scanning_interface.py database_creation()注释掉数据备份；
 3.main_TP.py 注释掉车辆故障检测待后续补充完整再释放；
+
+20210402:
+大版本更新：2.10.1
+1.wheel_analysis.py 中冲击当量算法调整；
+2.Config.__init__.py 中新增warning_level_read()冲击当量报警等级读取；
+  config.ini 修改[PATH]的路径，新增[GAP]中等待速度json文件的等待时间，[LOADS]偏载系数，[WARNING]中的报警等级；
+3.data_collection.py 注释掉optical_fiber_collection()函数中的无用代码；format_conversion()中对无效文档不进行处理（跳过）；
+4.data_storage.py 
+    |- wheel_json()函数中新增“有无缺陷”、“报警等级”字段；
+    |- car_json_integration()中加入冲击当量参数；
+       新增根据冲击当量设置踏面损伤报警等级；只采用远端传感器数据；
+    |- 迭代版本号
+5.read_json.py 新增read_result_json()、json_file_handle()、parameter_algorithm()函数
+    

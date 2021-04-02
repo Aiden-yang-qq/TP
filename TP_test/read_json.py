@@ -1,4 +1,4 @@
-from json import load
+from json import load, loads
 from os import getcwd, path
 from sys import exit
 from time import sleep
@@ -141,6 +141,51 @@ def axle_data_display(json_axle_data_1, json_axle_data_2, carriage_no, axle_no, 
         exit()
 
 
+def read_result_json():
+    result_path_ = getcwd()
+    result_json_name = result_path_ + '\\result(2)_.json'
+    json_file = read_json_file(result_json_name)
+    car_sort_dict = json_file_handle(json_file)
+    parameter_algorithm(car_sort_dict)
+    pass
+
+
+def json_file_handle(json_file):
+    if len(json_file) != 0:
+        car_dict = {}
+        for car_no in json_file.keys():
+            if car_no[:2] == '11':
+                value_set = []
+                for value in json_file[car_no]:
+                    if value.upper() != 'NAN':
+                        value_set.append(int(value))
+                car_dict.update({int(car_no): value_set})
+
+        car_sort = sorted(car_dict.items(), key=lambda x: x[0], reverse=False)
+        car_sort_dict = dict(car_sort)
+        return car_sort_dict
+
+
+def parameter_algorithm(car_sort_dict):
+    ie_data = {}
+    if len(car_sort_dict) != 0:
+        for car_key in car_sort_dict.keys():
+            impact_equivalent = car_sort_dict[car_key]
+            ie_average = round(sum(impact_equivalent) / len(impact_equivalent), 2)
+            ie_variance = round(sum([(x - ie_average) ** 2 for x in impact_equivalent]) / len(impact_equivalent), 2)
+            ie_data.update({car_key: [ie_average, ie_variance]})
+
+        car_no = []
+        average_ = []
+        variance_ = []
+        for data_ in ie_data.keys():
+            car_no.append(data_)
+            average_.append(ie_data[data_][0])
+            variance_.append(ie_data[data_][1])
+    return ie_data
+
+
 if __name__ == '__main__':
-    read_json_main()
+    # read_json_main()
     # print('Done')
+    read_result_json()

@@ -59,88 +59,93 @@ def optical_fiber_collection(ofc_path, folders):
                     rmtree(ofc_path)
                     make_directory(path.dirname(ofc_path), 'Data_pool')
     except Exception as e:
-        info(e)
+        info('optical_fiber_collection_1:', e)
         print(e)
 
-    # 对传感器的数据进行修正（基本信号标准统一化）
-    if len(all_nor_optical) > 0:
-        new_optical = []
-        move_set = []
-        positive_set = []
-        negative_set = []
-        amplitude_set = []
-        coefficient_set = []
-        new_all_nor_optical_tran = []
-        all_single_nor_optical_arr_tran = []
+    try:
+        # 对传感器的数据进行修正（基本信号标准统一化）
+        if len(all_nor_optical) > 0:
+            """
+            new_optical = []
+            move_set = []
+            positive_set = []
+            negative_set = []
+            amplitude_set = []
+            coefficient_set = []
+            new_all_nor_optical_tran = []
+            all_single_nor_optical_arr_tran = []
 
-        all_nor_optical_arr = array(all_nor_optical)
-        all_nor_optical_arr_tran = all_nor_optical_arr.transpose((1, 0, 2))  # 将传感器数据提取出来，后续进行校准
-        for i in range(len(all_nor_optical_arr_tran[1])):
-            positive_ = []
-            negative_ = []
-            positive_value = 0
-            negative_value = 0
-            for a in all_nor_optical_arr_tran[1][i][-5000:]:
-                if a > 0:
-                    positive_.append(a)
-                elif a < 0:
-                    negative_.append(a)
+            all_nor_optical_arr = array(all_nor_optical)
+            all_nor_optical_arr_tran = all_nor_optical_arr.transpose((1, 0, 2))  # 将传感器数据提取出来，后续进行校准
+            for i in range(len(all_nor_optical_arr_tran[1])):
+                positive_ = []
+                negative_ = []
+                positive_value = 0
+                negative_value = 0
+                for a in all_nor_optical_arr_tran[1][i][-5000:]:
+                    if a > 0:
+                        positive_.append(a)
+                    elif a < 0:
+                        negative_.append(a)
 
-            if len(positive_) != 0:
-                positive_value = round(sum(positive_) / len(positive_), 5)
-            if len(negative_) != 0:
-                negative_value = round(sum(negative_) / len(negative_), 5)
+                if len(positive_) != 0:
+                    positive_value = round(sum(positive_) / len(positive_), 5)
+                if len(negative_) != 0:
+                    negative_value = round(sum(negative_) / len(negative_), 5)
 
-            need_to_move = round((positive_value + negative_value) / 2, 5)
+                need_to_move = round((positive_value + negative_value) / 2, 5)
 
-            positive_set.append(positive_value)
-            negative_set.append(negative_value)
-            move_set.append(need_to_move)
+                positive_set.append(positive_value)
+                negative_set.append(negative_value)
+                move_set.append(need_to_move)
 
-            single_nor_optical_arr_tran = all_nor_optical_arr_tran[1][i] - need_to_move
-            all_single_nor_optical_arr_tran.append(single_nor_optical_arr_tran)
+                single_nor_optical_arr_tran = all_nor_optical_arr_tran[1][i] - need_to_move
+                all_single_nor_optical_arr_tran.append(single_nor_optical_arr_tran)
 
-            amplitude_ = round(positive_value - need_to_move, 4)
-            amplitude_set.append(amplitude_)
+                amplitude_ = round(positive_value - need_to_move, 4)
+                amplitude_set.append(amplitude_)
 
-        mean_positive = round(sum(positive_set) / len(positive_set), 4)
-        mean_negative = round(sum(negative_set) / len(negative_set), 4)
-        mean_standard = round((mean_positive - mean_negative) / 2, 4)
+            mean_positive = round(sum(positive_set) / len(positive_set), 4)
+            mean_negative = round(sum(negative_set) / len(negative_set), 4)
+            mean_standard = round((mean_positive - mean_negative) / 2, 4)
 
-        for i in range(len(all_single_nor_optical_arr_tran)):
-            if len(all_single_nor_optical_arr_tran) == len(amplitude_set):
-                coefficient_ = round(mean_standard / amplitude_set[i], 4)
-                coefficient_set.append(coefficient_)
-                # new_single_optical = all_nor_optical_arr_tran[1][i] * coefficient_
-                new_single_optical = all_single_nor_optical_arr_tran[i] * coefficient_
-                # new_optical.append(new_single_optical)
-                new_optical.append(new_single_optical)
+            for i in range(len(all_single_nor_optical_arr_tran)):
+                if len(all_single_nor_optical_arr_tran) == len(amplitude_set):
+                    coefficient_ = round(mean_standard / amplitude_set[i], 4)
+                    coefficient_set.append(coefficient_)
+                    # new_single_optical = all_nor_optical_arr_tran[1][i] * coefficient_
+                    new_single_optical = all_single_nor_optical_arr_tran[i] * coefficient_
+                    # new_optical.append(new_single_optical)
+                    new_optical.append(new_single_optical)
 
-        if len(all_nor_optical_arr_tran[0]) == len(new_optical):
-            new_all_nor_optical = vstack((all_nor_optical_arr_tran[0], new_optical))
-            new_all_nor_optical_reshape = new_all_nor_optical.reshape((2, len(new_optical), -1))
-            new_all_nor_optical_tran = new_all_nor_optical_reshape.transpose((1, 0, 2))
+            if len(all_nor_optical_arr_tran[0]) == len(new_optical):
+                new_all_nor_optical = vstack((all_nor_optical_arr_tran[0], new_optical))
+                new_all_nor_optical_reshape = new_all_nor_optical.reshape((2, len(new_optical), -1))
+                new_all_nor_optical_tran = new_all_nor_optical_reshape.transpose((1, 0, 2))
 
-        # plt.ion()
-        # plt.figure()
-        # for i in range(len(all_nor_optical_arr_tran[1])):
-        #     plt.subplot(2, 6, i + 1)
-        #     plt.plot(all_nor_optical_arr_tran[1][i])
-        #     plt.ylim((-0.184, 0.52))
-        #     plt.grid()
-        # # plt.show()
-        # plt.figure()
-        # for i in range(len(new_optical)):
-        #     plt.subplot(2, 6, i + 1)
-        #     plt.plot(new_optical[i])
-        #     plt.ylim((-0.184, 0.52))
-        #     plt.grid()
-        # plt.show()
+            # plt.ion()
+            # plt.figure()
+            # for i in range(len(all_nor_optical_arr_tran[1])):
+            #     plt.subplot(2, 6, i + 1)
+            #     plt.plot(all_nor_optical_arr_tran[1][i])
+            #     plt.ylim((-0.184, 0.52))
+            #     plt.grid()
+            # # plt.show()
+            # plt.figure()
+            # for i in range(len(new_optical)):
+            #     plt.subplot(2, 6, i + 1)
+            #     plt.plot(new_optical[i])
+            #     plt.ylim((-0.184, 0.52))
+            #     plt.grid()
+            # plt.show()
 
-        # return new_all_nor_optical_tran
-        return all_nor_optical
-    else:
-        return {}
+            # return new_all_nor_optical_tran
+            """
+            return all_nor_optical
+        else:
+            return {}
+    except Exception as e:
+        info('optical_fiber_collection_2:', e)
 
 
 def format_conversion(fc_path):
@@ -169,52 +174,53 @@ def format_conversion(fc_path):
                 txt_ = read_txt(fc_original_temp_db_path + '\\' + txt_file_name)  # txt文档读取
                 _txt = txt_[1:]  # 数据截取
 
-                # 时间格式获取
-                date_time = txt_[0].strip()
-                datetime_ = datetime.fromisoformat(date_time)
-                time_delay = timedelta(microseconds=(10 ** 6 / config_frequency))
+                if len(txt_) != 0:
+                    # 时间格式获取
+                    date_time = txt_[0].strip()
+                    datetime_ = datetime.fromisoformat(date_time)
+                    time_delay = timedelta(microseconds=(10 ** 6 / config_frequency))
 
-                for i in range(len(_txt)):
-                    time_ = str(datetime_ + time_delay * i)
-                    if len(_txt[i]) > 1:
-                        format_time = ''
-                        if len(time_) == 26:
-                            format_time = time_[:20 + decimal_places].replace('.', ':')
-                        elif len(time_) == 19:
-                            format_time = time_ + ':' + '0' * decimal_places
-                        txt_data = _txt[i].strip()
-                        if len(txt_data) == 7:
-                            txt_new_ = txt_data[:4] + '.' + txt_data[4:] + '0\n'
-                            format_single_data = format_time + ',' + txt_new_
-                            txt_output.append(format_single_data)
-                        else:
-                            # format_single_data = format_time + ',' + _txt[i].strip() + '\n'
-                            format_single_data = format_time + ',' + _txt[i]
-                            txt_output.append(format_single_data)
-                if txt_file_name == '4.txt':
-                    txt_file_name = '3.txt'
-                elif txt_file_name == '5.txt':
-                    txt_file_name = '4.txt'
-                elif txt_file_name == '6.txt':
-                    txt_file_name = '5.txt'
-                elif txt_file_name == '3.txt':
-                    txt_file_name = '6.txt'
-                elif txt_file_name == '12.txt':
-                    txt_file_name = '7.txt'
-                elif txt_file_name == '11.txt':
-                    txt_file_name = '8.txt'
-                elif txt_file_name == '10.txt':
-                    txt_file_name = '9.txt'
-                elif txt_file_name == '8.txt':
-                    txt_file_name = '10.txt'
-                elif txt_file_name == '7.txt':
-                    txt_file_name = '11.txt'
-                elif txt_file_name == '9.txt':
-                    txt_file_name = '12.txt'
-                if len(txt_file_name) == 5:
-                    txt_file_name = '0' + txt_file_name  # 统一文件名称：01.txt~12.txt
-                writelines_txt(fc_original_db_path + '\\' + txt_file_name, txt_output)
-                txt_output = []
+                    for i in range(len(_txt)):
+                        time_ = str(datetime_ + time_delay * i)
+                        if len(_txt[i]) > 1:
+                            format_time = ''
+                            if len(time_) == 26:
+                                format_time = time_[:20 + decimal_places].replace('.', ':')
+                            elif len(time_) == 19:
+                                format_time = time_ + ':' + '0' * decimal_places
+                            txt_data = _txt[i].strip()
+                            if len(txt_data) == 7:
+                                txt_new_ = txt_data[:4] + '.' + txt_data[4:] + '0\n'
+                                format_single_data = format_time + ',' + txt_new_
+                                txt_output.append(format_single_data)
+                            else:
+                                # format_single_data = format_time + ',' + _txt[i].strip() + '\n'
+                                format_single_data = format_time + ',' + _txt[i]
+                                txt_output.append(format_single_data)
+                    if txt_file_name == '4.txt':
+                        txt_file_name = '3.txt'
+                    elif txt_file_name == '5.txt':
+                        txt_file_name = '4.txt'
+                    elif txt_file_name == '6.txt':
+                        txt_file_name = '5.txt'
+                    elif txt_file_name == '3.txt':
+                        txt_file_name = '6.txt'
+                    elif txt_file_name == '12.txt':
+                        txt_file_name = '7.txt'
+                    elif txt_file_name == '11.txt':
+                        txt_file_name = '8.txt'
+                    elif txt_file_name == '10.txt':
+                        txt_file_name = '9.txt'
+                    elif txt_file_name == '8.txt':
+                        txt_file_name = '10.txt'
+                    elif txt_file_name == '7.txt':
+                        txt_file_name = '11.txt'
+                    elif txt_file_name == '9.txt':
+                        txt_file_name = '12.txt'
+                    if len(txt_file_name) == 5:
+                        txt_file_name = '0' + txt_file_name  # 统一文件名称：01.txt~12.txt
+                    writelines_txt(fc_original_db_path + '\\' + txt_file_name, txt_output)
+                    txt_output = []
             elif txt_file_name[-4:] == '.AEI':
                 move(fc_original_temp_db_path + '\\' + txt_file_name, fc_original_db_path + '\\' + txt_file_name)
             # elif txt_file_name[-5:] == '.json':

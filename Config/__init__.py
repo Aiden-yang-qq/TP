@@ -103,6 +103,12 @@ class ConfigInfo:
         opt_wave_diff = self.cp.get('OPTICAL', 'opt_wave_diff')
         return opt_wave_diff
 
+    def warning_level_read(self):
+        l_1 = self.cp.get('WARNING', '1st_level')
+        l_2 = self.cp.get('WARNING', '2nd_level')
+        l_3 = self.cp.get('WARNING', '3rd_level')
+        return [int(l_1), int(l_2), int(l_3)]
+
 
 def str_to_bool(string):
     return True if string.lower() == 'true' else False
